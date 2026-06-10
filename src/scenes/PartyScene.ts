@@ -9,6 +9,7 @@ import { GameState, displayName, isFainted } from '../systems/stats';
 import { drawHpBar } from '../ui/HUD';
 import { creatureTextureKey } from '../utils/assetLoader';
 import { trySave } from '../utils/saveFeedback';
+import { buildScreenOverlay, buildMenuPanel } from '../ui/sceneBackdrops';
 import { Input } from '../systems/input';
 
 const HELD_ITEMS = ['oran_berry', 'charcoal', 'mystic_water'];
@@ -35,9 +36,8 @@ export class PartyScene extends Phaser.Scene {
   private render(): void {
     this.children.removeAll(true);
 
-    const overlay = this.add.graphics();
-    overlay.fillStyle(0x000000, 0.7);
-    overlay.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    buildScreenOverlay(this, 0.72);
+    buildMenuPanel(this, 20, 16, GAME_WIDTH - 40, GAME_HEIGHT - 32, 5);
 
     this.add.text(GAME_WIDTH / 2, 24, this.battleSwitch ? 'Choose a Critter' : 'Your Party', {
       fontFamily: '"Courier New", monospace', fontSize: '22px', color: '#f5c542',

@@ -49,10 +49,26 @@ export async function gotoFresh(page: Page): Promise<void> {
 }
 
 export async function advanceDialogs(page: Page, count: number): Promise<void> {
+  const canvas = page.locator('#game-container canvas');
   for (let i = 0; i < count; i++) {
-    await page.waitForTimeout(250);
-    await pressConfirm(page);
+    await page.waitForTimeout(350);
+    await focusCanvas(page);
+    // Dialog box sits at bottom of 640×480 game canvas
+    await canvas.click({ position: { x: 320, y: 430 } });
+    await page.waitForTimeout(100);
+    await page.keyboard.press('z');
+    await page.waitForTimeout(100);
   }
+}
+
+export async function confirmCharacterSelect(page: Page): Promise<void> {
+  await page.waitForTimeout(300);
+  await pressConfirm(page);
+  await page.waitForTimeout(700);
+  if ((await sceneKeys(page)).includes('CharacterSelect')) {
+    await page.evaluate(() => window.__cq?.confirmCharacter());
+  }
+  await waitForScene(page, 'LabIntro', 12_000);
 }
 
 export async function skipIntroToMenu(page: Page): Promise<void> {
@@ -82,19 +98,13 @@ export async function chooseNewGame(page: Page): Promise<void> {
 export async function startNewGameToOverworld(page: Page): Promise<void> {
   await skipIntroToMenu(page);
   await chooseNewGame(page);
-  await page.waitForTimeout(300);
-  await pressConfirm(page);
-  await page.waitForTimeout(700);
-  if ((await sceneKeys(page)).includes('CharacterSelect')) {
-    await page.evaluate(() => window.__cq?.confirmCharacter());
-  }
-  await waitForScene(page, 'LabIntro', 10_000);
+  await confirmCharacterSelect(page);
   await advanceDialogs(page, 4);
   await page.waitForTimeout(500);
   if ((await sceneKeys(page)).includes('LabIntro')) {
     await page.evaluate(() => window.__cq?.startStarterSelect());
   }
-  await waitForScene(page, 'StarterSelect', 10_000);
+  await waitForScene(page, 'StarterSelect', 15_000);
   await advanceDialogs(page, 3);
   await page.waitForTimeout(400);
   await pressConfirm(page);

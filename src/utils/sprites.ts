@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { COLORS, TYPE_COLORS, type ElementType } from '../data/types';
+import { COLORS, GAME_WIDTH, TYPE_COLORS, type ElementType } from '../data/types';
 import type { CreatureDef } from '../data/creatures';
 import type { MapTheme } from '../data/maps';
 import { TRAINER_PRESETS, getTrainer, type TrainerPreset } from '../data/characters';
@@ -370,6 +370,145 @@ function drawTile(
   }
 }
 
+function drawNpc32(
+  g: Phaser.GameObjects.Graphics,
+  body: number,
+  hair: number,
+  accent: number,
+  prop?: string,
+): void {
+  g.fillStyle(0x0f172a, 0.3);
+  g.fillEllipse(16, 30, 20, 6);
+  g.fillStyle(body, 1);
+  g.fillRoundedRect(10, 14, 12, 14, 3);
+  g.fillStyle(hair, 1);
+  g.fillCircle(16, 10, 8);
+  g.fillStyle(0x1a1a2e, 1);
+  g.fillRect(12, 9, 3, 3);
+  g.fillRect(18, 9, 3, 3);
+  g.fillStyle(0xffffff, 0.8);
+  g.fillRect(13, 10, 1, 1);
+  g.fillRect(19, 10, 1, 1);
+  g.fillStyle(accent, 1);
+  g.fillRect(9, 26, 5, 4);
+  g.fillRect(18, 26, 5, 4);
+  g.fillStyle(darken(body, 20), 1);
+  g.fillRect(12, 28, 8, 2);
+
+  if (prop === 'nurse') {
+    g.fillStyle(0xffffff, 1);
+    g.fillRoundedRect(8, 14, 16, 12, 2);
+    g.fillStyle(0xf472b6, 1);
+    g.fillRect(8, 14, 16, 4);
+    g.fillStyle(0xef4444, 1);
+    g.fillRect(14, 20, 4, 4);
+    g.fillStyle(0xffffff, 1);
+    g.fillRect(15, 21, 2, 2);
+  } else if (prop === 'clerk') {
+    g.fillStyle(0x22c55e, 1);
+    g.fillRect(9, 16, 14, 8);
+    g.fillStyle(0xffffff, 1);
+    g.fillRect(11, 18, 10, 3);
+    g.fillStyle(0xfbbf24, 1);
+    g.fillRect(12, 8, 8, 3);
+  } else if (prop === 'leader') {
+    g.fillStyle(COLORS.gold, 1);
+    g.fillCircle(16, 4, 3);
+    g.fillRect(8, 8, 16, 3);
+    g.fillStyle(0xffffff, 0.5);
+    g.fillRect(10, 14, 12, 2);
+  } else if (prop === 'prof') {
+    g.fillStyle(0xffffff, 1);
+    g.fillRect(8, 14, 16, 4);
+    g.fillStyle(0x4338ca, 1);
+    g.fillRoundedRect(7, 22, 18, 8, 2);
+    g.fillStyle(0xe5e7eb, 1);
+    g.fillRect(11, 7, 10, 3);
+    g.lineStyle(1, 0x1a1a2e, 1);
+    g.lineBetween(10, 11, 14, 11);
+    g.lineBetween(18, 11, 22, 11);
+    g.fillStyle(0xfbbf24, 0.8);
+    g.fillCircle(22, 18, 2);
+  } else if (prop === 'rival') {
+    g.fillStyle(0x1a1a2e, 1);
+    g.fillRect(10, 4, 12, 4);
+    g.fillStyle(0xfbbf24, 1);
+    g.fillRect(12, 5, 8, 2);
+    g.fillStyle(0xef4444, 0.6);
+    g.fillTriangle(24, 12, 28, 16, 24, 20);
+  } else if (prop === 'trainer') {
+    g.fillStyle(0xffffff, 0.3);
+    g.fillRect(11, 15, 10, 2);
+    g.fillStyle(accent, 0.8);
+    g.fillRect(9, 24, 14, 3);
+  }
+}
+
+function drawAllNpcSprites(scene: Phaser.Scene): void {
+  const roles: { role: string; body: number; hair: number; accent: number; prop?: string }[] = [
+    { role: 'generic', body: 0x9333ea, hair: 0xfca5a5, accent: 0x4c1d95 },
+    { role: 'nurse', body: 0xf472b6, hair: 0xfff1f2, accent: 0xdb2777, prop: 'nurse' },
+    { role: 'clerk', body: 0x3b82f6, hair: 0x1e3a5f, accent: 0x1d4ed8, prop: 'clerk' },
+    { role: 'trainer_m', body: 0x22c55e, hair: 0xfbbf24, accent: 0x15803d, prop: 'trainer' },
+    { role: 'trainer_f', body: 0xec4899, hair: 0x831843, accent: 0xbe185d, prop: 'trainer' },
+    { role: 'rival', body: 0xef4444, hair: 0x1a1a2e, accent: 0xb91c1c, prop: 'rival' },
+    { role: 'leader', body: 0xf59e0b, hair: 0xfef3c7, accent: 0xd97706, prop: 'leader' },
+    { role: 'prof', body: 0x6366f1, hair: 0xe5e7eb, accent: 0x4338ca, prop: 'prof' },
+  ];
+  for (const { role, body, hair, accent, prop } of roles) {
+    const g = scene.make.graphics({ x: 0, y: 0 });
+    drawNpc32(g, body, hair, accent, prop);
+    g.generateTexture(`npc_${role}`, 32, 32);
+    g.destroy();
+  }
+}
+
+function drawBiomeBattleBg(
+  g: Phaser.GameObjects.Graphics,
+  b: { sky: number; ground: number; accent: number },
+  variant: string,
+): void {
+  g.fillGradientStyle(b.sky, b.sky, b.ground, b.ground, 1);
+  g.fillRect(0, 0, 640, 480);
+  g.fillStyle(darken(b.sky, 30), 0.3);
+  g.fillRect(0, 280, 640, 2);
+
+  if (variant === 'forest') {
+    g.fillStyle(darken(b.accent, 40), 0.7);
+    g.fillTriangle(0, 280, 80, 180, 160, 280);
+    g.fillTriangle(120, 280, 200, 160, 280, 280);
+    g.fillTriangle(400, 280, 480, 170, 560, 280);
+  } else if (variant === 'cave') {
+    g.fillStyle(0x1c1917, 0.8);
+    for (let i = 0; i < 8; i++) {
+      g.fillTriangle(i * 90, 0, i * 90 + 30, 80 + (i % 3) * 20, i * 90 + 60, 0);
+    }
+    g.fillStyle(0x57534e, 0.5);
+    g.fillRect(0, 250, 640, 30);
+  } else if (variant === 'gym') {
+    g.fillStyle(COLORS.gold, 0.25);
+    g.fillRect(0, 0, 640, 40);
+    g.fillStyle(0xffffff, 0.15);
+    g.fillRect(40, 60, 560, 8);
+    g.fillRect(40, 200, 560, 8);
+  } else if (variant === 'volcano') {
+    g.fillStyle(0xef4444, 0.3);
+    g.fillCircle(520, 100, 40);
+    g.fillStyle(0xfbbf24, 0.2);
+    g.fillCircle(100, 80, 25);
+  } else {
+    g.fillStyle(0xffffff, 0.35);
+    g.fillEllipse(120, 60, 80, 30);
+    g.fillEllipse(400, 90, 100, 35);
+    g.fillEllipse(550, 50, 60, 25);
+  }
+
+  g.fillStyle(b.accent, 1);
+  g.fillEllipse(320, 420, 700, 120);
+  g.fillStyle(darken(b.accent, 25), 0.8);
+  g.fillEllipse(320, 435, 520, 60);
+}
+
 export function generateAssets(scene: Phaser.Scene): void {
   const ts = 16;
 
@@ -473,62 +612,10 @@ export function generateAssets(scene: Phaser.Scene): void {
     drawPlayerBackSprite(scene, preset);
   }
 
-  // NPC sprites by role — role-specific uniforms
-  const roles: { role: string; body: number; hair: number; accent: number; prop?: string }[] = [
-    { role: 'generic', body: 0x9333ea, hair: 0xfca5a5, accent: 0x4c1d95 },
-    { role: 'nurse', body: 0xf472b6, hair: 0xfff1f2, accent: 0xdb2777, prop: 'nurse' },
-    { role: 'clerk', body: 0x3b82f6, hair: 0x1e3a5f, accent: 0x1d4ed8, prop: 'clerk' },
-    { role: 'trainer_m', body: 0x22c55e, hair: 0xfbbf24, accent: 0x15803d, prop: 'trainer' },
-    { role: 'trainer_f', body: 0xec4899, hair: 0x831843, accent: 0xbe185d, prop: 'trainer' },
-    { role: 'rival', body: 0xef4444, hair: 0x1a1a2e, accent: 0xb91c1c, prop: 'rival' },
-    { role: 'leader', body: 0xf59e0b, hair: 0xfef3c7, accent: 0xd97706, prop: 'leader' },
-    { role: 'prof', body: 0x6366f1, hair: 0xe5e7eb, accent: 0x4338ca, prop: 'prof' },
-  ];
-  for (const { role, body, hair, accent, prop } of roles) {
-    const g = scene.make.graphics({ x: 0, y: 0 });
-    g.fillStyle(0x0f172a, 1);
-    g.fillRect(2, 5, 12, 11);
-    g.fillStyle(body, 1);
-    g.fillRect(3, 6, 10, 8);
-    g.fillStyle(hair, 1);
-    g.fillCircle(8, 5, 4);
-    g.fillStyle(0x1a1a2e, 1);
-    g.fillRect(6, 4, 2, 2);
-    g.fillRect(9, 4, 2, 2);
-    g.fillStyle(accent, 1);
-    g.fillRect(4, 14, 3, 2);
-    g.fillRect(9, 14, 3, 2);
-    if (prop === 'nurse') {
-      g.fillStyle(0xffffff, 1);
-      g.fillRect(4, 7, 8, 6);
-      g.fillStyle(0xf472b6, 1);
-      g.fillRect(4, 7, 8, 2);
-      g.fillStyle(0xef4444, 1);
-      g.fillRect(7, 9, 2, 2);
-    } else if (prop === 'clerk') {
-      g.fillStyle(0x22c55e, 1);
-      g.fillRect(4, 8, 8, 4);
-      g.fillStyle(0xffffff, 1);
-      g.fillRect(5, 9, 6, 2);
-    } else if (prop === 'leader') {
-      g.fillStyle(COLORS.gold, 1);
-      g.fillCircle(8, 2, 2);
-      g.fillRect(3, 5, 10, 2);
-    } else if (prop === 'prof') {
-      g.fillStyle(0xffffff, 1);
-      g.fillRect(3, 7, 10, 2);
-      g.fillStyle(0x4338ca, 1);
-      g.fillRect(3, 12, 10, 3);
-    } else if (prop === 'rival') {
-      g.fillStyle(0x1a1a2e, 1);
-      g.fillRect(5, 2, 6, 2);
-      g.fillStyle(0xfbbf24, 1);
-      g.fillRect(6, 3, 4, 1);
-    }
-    g.generateTexture(`npc_${role}`, 16, 16);
-    g.destroy();
-  }
-  // legacy key
+  // NPC sprites by role — 32×32 with role-specific detail
+  drawAllNpcSprites(scene);
+
+  // Legacy 16px npc alias
   if (!scene.textures.exists('npc')) {
     scene.textures.addImage('npc', scene.textures.get('npc_generic').getSourceImage() as HTMLImageElement);
   }
@@ -579,23 +666,16 @@ export function generateAssets(scene: Phaser.Scene): void {
   }
 
   // Biome battle backgrounds
-  const biomes: { key: string; sky: number; ground: number; accent: number }[] = [
-    { key: 'battle_bg', sky: 0x87ceeb, ground: 0x6bbf59, accent: 0x5a9e4a },
-    { key: 'battle_bg_forest', sky: 0x6b9080, ground: 0x40916c, accent: 0x2d6a4f },
-    { key: 'battle_bg_cave', sky: 0x44403c, ground: 0x292524, accent: 0x1c1917 },
-    { key: 'battle_bg_gym', sky: 0xd4c4a8, ground: 0xc4b498, accent: 0xa89070 },
-    { key: 'battle_bg_volcano', sky: 0x7f1d1d, ground: 0x44403c, accent: 0x991b1b },
+  const biomes: { key: string; sky: number; ground: number; accent: number; variant: string }[] = [
+    { key: 'battle_bg', sky: 0x87ceeb, ground: 0x6bbf59, accent: 0x5a9e4a, variant: 'default' },
+    { key: 'battle_bg_forest', sky: 0x6b9080, ground: 0x40916c, accent: 0x2d6a4f, variant: 'forest' },
+    { key: 'battle_bg_cave', sky: 0x44403c, ground: 0x292524, accent: 0x1c1917, variant: 'cave' },
+    { key: 'battle_bg_gym', sky: 0xd4c4a8, ground: 0xc4b498, accent: 0xa89070, variant: 'gym' },
+    { key: 'battle_bg_volcano', sky: 0x7f1d1d, ground: 0x44403c, accent: 0x991b1b, variant: 'volcano' },
   ];
   for (const b of biomes) {
     const bg = scene.make.graphics({ x: 0, y: 0 });
-    bg.fillGradientStyle(b.sky, b.sky, b.ground, b.ground, 1);
-    bg.fillRect(0, 0, 640, 480);
-    bg.fillStyle(darken(b.sky, 30), 0.3);
-    bg.fillRect(0, 280, 640, 2);
-    bg.fillStyle(b.accent, 1);
-    bg.fillEllipse(320, 420, 700, 120);
-    bg.fillStyle(darken(b.accent, 25), 0.8);
-    bg.fillEllipse(320, 435, 520, 60);
+    drawBiomeBattleBg(bg, b, b.variant);
     bg.generateTexture(b.key, 640, 480);
     bg.destroy();
   }
@@ -628,15 +708,30 @@ export function generateAssets(scene: Phaser.Scene): void {
   for (const [key, fill, border] of [
     ['btn_normal', COLORS.panel, COLORS.panelBorder],
     ['btn_selected', COLORS.panelBorder, COLORS.gold],
+    ['btn_hover', lighten(COLORS.panel, 12), COLORS.gold],
   ] as const) {
     const btn = scene.make.graphics({ x: 0, y: 0 });
     btn.fillStyle(fill, 0.95);
     btn.fillRoundedRect(0, 0, 200, 36, 6);
     btn.lineStyle(2, border, 1);
     btn.strokeRoundedRect(0, 0, 200, 36, 6);
+    if (key === 'btn_hover') {
+      btn.fillStyle(COLORS.gold, 0.15);
+      btn.fillRect(4, 4, 192, 4);
+    }
     btn.generateTexture(key, 200, 36);
     btn.destroy();
   }
+
+  const dialogG = scene.make.graphics({ x: 0, y: 0 });
+  dialogG.fillStyle(COLORS.panel, 0.97);
+  dialogG.fillRoundedRect(0, 0, GAME_WIDTH - 32, 96, 10);
+  dialogG.lineStyle(3, COLORS.gold, 0.9);
+  dialogG.strokeRoundedRect(0, 0, GAME_WIDTH - 32, 96, 10);
+  dialogG.fillStyle(COLORS.accent, 0.12);
+  dialogG.fillRect(8, 8, GAME_WIDTH - 48, 3);
+  dialogG.generateTexture('dialog_frame', GAME_WIDTH - 32, 96);
+  dialogG.destroy();
 
   // Controls panel backdrop
   const ctrlG = scene.make.graphics({ x: 0, y: 0 });

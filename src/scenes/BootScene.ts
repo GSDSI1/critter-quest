@@ -43,6 +43,8 @@ export class BootScene extends Phaser.Scene {
       this.progressBar.clear();
       this.progressBar.fillStyle(COLORS.accent, 1);
       this.progressBar.fillRoundedRect(cx - 162, 286, 324 * v, 16, 4);
+      this.progressBar.fillStyle(COLORS.gold, 0.4);
+      this.progressBar.fillRoundedRect(cx - 162, 286, 324 * v, 4, 2);
       this.loadText.setText(`${Math.floor(v * 100)}%`);
     });
 
@@ -69,6 +71,13 @@ export class BootScene extends Phaser.Scene {
     ensureAllCreatureTextures(this, Object.keys(CREATURES), id => CREATURES[id]);
 
     this.loadText.setText('Ready!');
+    this.tweens.add({
+      targets: this.loadText,
+      scale: 1.15,
+      duration: 200,
+      yoyo: true,
+      repeat: 2,
+    });
     this.cameras.main.fadeOut(350, 0, 0, 0);
     this.time.delayedCall(350, () => {
       this.scene.start('Intro');

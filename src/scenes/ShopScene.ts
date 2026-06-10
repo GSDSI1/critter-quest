@@ -3,6 +3,7 @@ import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../data/types';
 import { SHOP_STOCK, getItem, addItem } from '../data/items';
 import { GameState } from '../systems/stats';
 import { trySave } from '../utils/saveFeedback';
+import { buildMartInterior, buildScreenOverlay, buildMenuPanel } from '../ui/sceneBackdrops';
 import { Input } from '../systems/input';
 import { Sfx } from '../utils/audio';
 
@@ -18,7 +19,9 @@ export class ShopScene extends Phaser.Scene {
     Input.bind(this);
     this.returnMap = data.returnMap ?? GameState.player.mapId;
 
-    this.add.graphics().fillStyle(0x000000, 0.75).fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    buildMartInterior(this, -10);
+    buildScreenOverlay(this, 0.5, 0);
+    buildMenuPanel(this, 40, 60, GAME_WIDTH - 80, 360, 5);
 
     this.add.text(GAME_WIDTH / 2, 20, 'Verdant Mart', {
       fontFamily: '"Courier New", monospace', fontSize: '22px', color: '#f5c542',

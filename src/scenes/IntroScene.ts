@@ -57,6 +57,17 @@ export class IntroScene extends Phaser.Scene {
 
     this.time.delayedCall(1400, () => Sfx.introJingle());
 
+    for (let i = 0; i < 12; i++) {
+      const spark = this.add.circle(
+        Phaser.Math.Between(80, GAME_WIDTH - 80),
+        Phaser.Math.Between(60, 200),
+        2, 0xf5c542, 0,
+      );
+      this.tweens.add({
+        targets: spark, alpha: 0.8, duration: 600 + i * 80, yoyo: true, repeat: -1,
+      });
+    }
+
     this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 18, 'v1.0  ·  Verdant Region', {
       fontFamily: '"Courier New", monospace', fontSize: '10px', color: '#556677',
     }).setOrigin(0.5);
@@ -65,6 +76,8 @@ export class IntroScene extends Phaser.Scene {
 
     // Always skippable after 600ms — don't rely on tween onComplete (tab focus / stacked builds)
     this.time.delayedCall(600, () => { this.canSkip = true; });
+    // Auto-advance if the tab opened in the background and no input arrives
+    this.time.delayedCall(3500, () => { if (!this.skipping) this.goToMenu(); });
 
     this.input.once('pointerdown', () => this.goToMenu());
   }

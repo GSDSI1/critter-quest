@@ -4,6 +4,7 @@ import { TRAINER_PRESETS } from '../data/characters';
 import { GameState } from '../systems/stats';
 import { playerTextureKey } from '../utils/sprites';
 import { buildTitleBackdrop, addBlinkingPrompt } from '../ui/titleScreen';
+import { buildMenuPanel } from '../ui/sceneBackdrops';
 import { Input } from '../systems/input';
 import { Sfx } from '../utils/audio';
 
@@ -30,11 +31,7 @@ export class CharacterSelectScene extends Phaser.Scene {
 
     buildTitleBackdrop(this);
 
-    const panel = this.add.graphics().setDepth(5);
-    panel.fillStyle(COLORS.panel, 0.88);
-    panel.fillRoundedRect(40, 24, GAME_WIDTH - 80, GAME_HEIGHT - 48, 14);
-    panel.lineStyle(2, COLORS.gold, 0.9);
-    panel.strokeRoundedRect(40, 24, GAME_WIDTH - 80, GAME_HEIGHT - 48, 14);
+    buildMenuPanel(this, 40, 24, GAME_WIDTH - 80, GAME_HEIGHT - 48, 5);
 
     this.add.text(GAME_WIDTH / 2, 48, 'Who are you?', {
       fontFamily: '"Courier New", monospace', fontSize: '26px', color: '#f5c542',
@@ -86,7 +83,7 @@ export class CharacterSelectScene extends Phaser.Scene {
       fontFamily: '"Courier New", monospace', fontSize: '20px', color: '#f5c542',
     }).setOrigin(0.5).setDepth(10);
 
-    addBlinkingPrompt(this, 'A / Z confirm  ·  B / ESC back to title', GAME_HEIGHT - 52);
+    addBlinkingPrompt(this, 'Type name · A / Z confirm  ·  B / ESC back', GAME_HEIGHT - 52);
 
     this.input.keyboard?.on('keydown', (ev: KeyboardEvent) => {
       if (ev.key === 'Backspace') {

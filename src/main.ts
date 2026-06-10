@@ -19,7 +19,7 @@ import { TrainerIntroScene } from './scenes/TrainerIntroScene';
 import { VictoryScene } from './scenes/VictoryScene';
 import { LearnMoveScene, NicknameScene } from './scenes/LearnMoveScene';
 
-const config: Phaser.Types.Core.GameConfig = {
+const config = {
   type: Phaser.AUTO,
   width: GAME_WIDTH,
   height: GAME_HEIGHT,
@@ -40,7 +40,8 @@ const config: Phaser.Types.Core.GameConfig = {
     PauseMenuScene, LearnMoveScene, NicknameScene,
   ],
   render: { antialias: false, roundPixels: true },
-};
+  pauseOnBlur: false,
+} as Phaser.Types.Core.GameConfig;
 
 const game = new Phaser.Game(config);
 

@@ -27,6 +27,19 @@ export class VictoryScene extends Phaser.Scene {
     bg.fillGradientStyle(0x0f0f1a, 0x16213e, 0x1a2e1a, 0x0f3460, 1);
     bg.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
+    for (let i = 0; i < 60; i++) {
+      const star = this.add.circle(
+        Phaser.Math.Between(0, GAME_WIDTH),
+        Phaser.Math.Between(0, GAME_HEIGHT),
+        Phaser.Math.Between(1, 2),
+        0xffffff,
+        Phaser.Math.FloatBetween(0.1, 0.6),
+      );
+      this.tweens.add({
+        targets: star, alpha: 0.05, duration: Phaser.Math.Between(800, 2200), yoyo: true, repeat: -1,
+      });
+    }
+
     const p = GameState.player;
     const leader = p.party[0] ? getCreature(p.party[0].speciesId).name : '—';
     const badgeNames = p.badges.map(b => getBadge(b).name.split(' ')[0]).join(' & ');

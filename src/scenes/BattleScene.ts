@@ -22,7 +22,9 @@ import { addToParty } from '../systems/save';
 import { trySave } from '../utils/saveFeedback';
 import { drawHpBar } from '../ui/HUD';
 import { statusLabel } from '../systems/status';
-import { creatureTextureKey, battleBgForMap } from '../utils/assetLoader';
+import { creatureTextureKey } from '../utils/assetLoader';
+import { buildBattleArena } from '../ui/sceneBackdrops';
+import { pinContainerChildren } from '../ui/screenUi';
 import { Sfx } from '../utils/audio';
 import { Input } from '../systems/input';
 
@@ -105,7 +107,7 @@ export class BattleScene extends Phaser.Scene {
     if (!alive) { this.scene.start('Overworld'); return; }
     this.playerMon = alive;
 
-    this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, battleBgForMap(this.mapId));
+    buildBattleArena(this, this.mapId);
     this.buildUi();
     Input.bind(this);
     this.syncEnemyUi(false);
@@ -177,11 +179,15 @@ export class BattleScene extends Phaser.Scene {
     this.playerHpBar = drawHpBar(this, 56, 292, 180, 10, 0, 1);
     this.expBar = drawHpBar(this, 56, 308, 180, 6, 0, 1, 50);
 
-    const msgBg = this.add.graphics();
-    msgBg.fillStyle(COLORS.panel, 0.97);
-    msgBg.fillRoundedRect(16, 368, GAME_WIDTH - 32, 96, 10);
-    msgBg.lineStyle(3, COLORS.panelBorder, 1);
-    msgBg.strokeRoundedRect(16, 368, GAME_WIDTH - 32, 96, 10);
+    if (this.textures.exists('dialog_frame')) {
+      this.add.image(GAME_WIDTH / 2, 416, 'dialog_frame').setOrigin(0.5);
+    } else {
+      const msgBg = this.add.graphics();
+      msgBg.fillStyle(COLORS.panel, 0.97);
+      msgBg.fillRoundedRect(16, 368, GAME_WIDTH - 32, 96, 10);
+      msgBg.lineStyle(3, COLORS.panelBorder, 1);
+      msgBg.strokeRoundedRect(16, 368, GAME_WIDTH - 32, 96, 10);
+    }
 
     this.messageText = this.add.text(32, 384, '', {
       fontFamily: '"Courier New", monospace', fontSize: '14px', color: '#f0f0f0',
@@ -189,8 +195,10 @@ export class BattleScene extends Phaser.Scene {
     });
 
     this.buildMenu();
-    this.moveContainer = this.add.container(0, 0).setVisible(false);
-    this.bagContainer = this.add.container(0, 0).setVisible(false);
+    this.moveContainer = this.add.container(0, 0).setVisible(false).setDepth(1100);
+    this.bagContainer = this.add.container(0, 0).setVisible(false).setDepth(1100);
+    pinContainerChildren(this.moveContainer, 1100);
+    pinContainerChildren(this.bagContainer, 1100);
     this.refreshPlayerUi();
   }
 
@@ -220,7 +228,8 @@ export class BattleScene extends Phaser.Scene {
   }
 
   private buildMenu(): void {
-    this.menuContainer = this.add.container(0, 0);
+    this.menuContainer = this.add.container(0, 0).setDepth(1100);
+    pinContainerChildren(this.menuContainer, 1100);
     this.menuHighlights = [];
     MENU_ITEMS.forEach((label, i) => {
       const [x, y] = MENU_POS[i];

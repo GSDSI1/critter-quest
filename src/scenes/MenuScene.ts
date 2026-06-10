@@ -78,7 +78,14 @@ export class MenuScene extends Phaser.Scene {
       const text = this.add.text(GAME_WIDTH / 2, y, label, {
         fontFamily: '"Courier New", monospace', fontSize: '18px', color: '#f0f0f0',
       }).setOrigin(0.5);
-      btn.on('pointerover', () => { if (!this.confirmingDelete) { this.selected = i; this.refreshMenu(); } });
+      btn.on('pointerover', () => {
+        if (!this.confirmingDelete) {
+          this.selected = i;
+          this.refreshMenu();
+          btn.setTexture('btn_hover');
+        }
+      });
+      btn.on('pointerout', () => { if (i !== this.selected) btn.setTexture('btn_normal'); });
       btn.on('pointerdown', () => { if (!this.confirmingDelete) { this.selected = i; this.confirm(); } });
       this.menuItems.push({ label, btn, text });
     });
@@ -148,6 +155,8 @@ export class MenuScene extends Phaser.Scene {
     this.menuItems.forEach((item, i) => {
       const sel = i === this.selected;
       item.btn.setTexture(sel ? 'btn_selected' : 'btn_normal');
+      if (sel) item.btn.setScale(1.04);
+      else item.btn.setScale(1);
       item.text.setColor(sel ? '#f5c542' : '#c0c0c0');
       item.text.setText(sel ? `▶  ${item.label}` : item.label);
     });

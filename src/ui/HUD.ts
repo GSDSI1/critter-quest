@@ -17,8 +17,10 @@ export class OverworldHUD {
     pinContainerChildren(this.container, 900);
 
     const bg = scene.add.graphics();
-    bg.fillStyle(0x000000, 0.45);
-    bg.fillRoundedRect(8, 8, 220, 68, 6);
+    bg.fillStyle(0x000000, 0.55);
+    bg.fillRoundedRect(8, 8, 224, 72, 8);
+    bg.lineStyle(1, COLORS.gold, 0.6);
+    bg.strokeRoundedRect(8, 8, 224, 72, 8);
 
     this.mapText = scene.add.text(16, 12, '', {
       fontFamily: '"Courier New", monospace', fontSize: '11px', color: '#f5c542',

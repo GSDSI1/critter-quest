@@ -148,6 +148,8 @@ for (const tex of ['title_banner', 'lab_bench', 'starter_orb_${type}', 'tileText
   if (sprites.includes(tex)) ok(`sprites: ${tex}`);
   else fail(`sprites.ts missing ${tex}`);
 }
+if (sprites.includes('dialog_frame') && sprites.includes('drawNpc32')) ok('Upgraded sprites (dialog_frame + 32px NPCs)');
+else fail('sprites.ts missing dialog_frame or drawNpc32');
 
 if (existsSync(join(root, 'src/data/characters.ts'))) {
   const chars = read('src/data/characters.ts');
@@ -209,6 +211,19 @@ else fail('e2e/load.spec.ts missing');
 const dialogBox = read('src/ui/DialogBox.ts');
 if (dialogBox.includes("events.once('shutdown'")) ok('DialogBox shutdown cleanup');
 else fail('DialogBox missing shutdown cleanup');
+if (dialogBox.includes('pinContainerChildren')) ok('DialogBox uses pinContainerChildren');
+else fail('DialogBox should use pinContainerChildren only');
+if (dialogBox.includes('speakerText')) ok('DialogBox speaker label');
+else fail('DialogBox missing speaker label');
+
+if (existsSync(join(root, 'src/ui/sceneBackdrops.ts'))) {
+  const backdrops = read('src/ui/sceneBackdrops.ts');
+  if (backdrops.includes('buildLabInterior') && backdrops.includes('buildMenuPanel')) ok('sceneBackdrops.ts');
+  else fail('sceneBackdrops.ts incomplete');
+} else fail('src/ui/sceneBackdrops.ts missing');
+
+if (existsSync(join(root, 'e2e/lab-intro.spec.ts'))) ok('E2E lab intro spec');
+else fail('e2e/lab-intro.spec.ts missing');
 
 if (!battleSrc.includes('setupInput')) ok('BattleScene no duplicate setupInput');
 else fail('BattleScene still calls setupInput()');

@@ -6,6 +6,7 @@ import { depositToStorage, withdrawFromStorage } from '../systems/save';
 import { trySave } from '../utils/saveFeedback';
 import { drawHpBar } from '../ui/HUD';
 import { creatureTextureKey } from '../utils/assetLoader';
+import { buildScreenOverlay, buildMenuPanel } from '../ui/sceneBackdrops';
 import { Input } from '../systems/input';
 
 export class PcScene extends Phaser.Scene {
@@ -18,7 +19,8 @@ export class PcScene extends Phaser.Scene {
 
   create(): void {
     Input.bind(this);
-    this.add.graphics().fillStyle(0x000000, 0.8).fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    buildScreenOverlay(this, 0.78);
+    buildMenuPanel(this, 16, 12, GAME_WIDTH - 32, GAME_HEIGHT - 24, 3);
 
     this.add.text(GAME_WIDTH / 2, 16, 'Critter Storage System', {
       fontFamily: '"Courier New", monospace', fontSize: '20px', color: '#3b82f6',

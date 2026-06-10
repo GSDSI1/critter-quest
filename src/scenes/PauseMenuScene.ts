@@ -3,6 +3,7 @@ import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../data/types';
 import { getBadge } from '../data/badges';
 import { GameState } from '../systems/stats';
 import { trySave } from '../utils/saveFeedback';
+import { buildScreenOverlay, buildMenuPanel } from '../ui/sceneBackdrops';
 import { Input } from '../systems/input';
 import { Sfx } from '../utils/audio';
 export class PauseMenuScene extends Phaser.Scene {
@@ -15,13 +16,8 @@ export class PauseMenuScene extends Phaser.Scene {
 
   create(): void {
     Input.bind(this);
-    this.add.graphics().fillStyle(0x000000, 0.6).fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-
-    const panel = this.add.graphics();
-    panel.fillStyle(COLORS.panel, 0.97);
-    panel.fillRoundedRect(170, 80, 300, 320, 12);
-    panel.lineStyle(3, COLORS.gold, 1);
-    panel.strokeRoundedRect(170, 80, 300, 320, 12);
+    buildScreenOverlay(this, 0.65);
+    buildMenuPanel(this, 170, 80, 300, 320, 5);
 
     this.add.text(GAME_WIDTH / 2, 110, 'MENU', {
       fontFamily: '"Courier New", monospace', fontSize: '24px', color: '#f5c542',

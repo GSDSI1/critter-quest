@@ -145,7 +145,7 @@ export class OverworldScene extends Phaser.Scene {
     }
 
     if (this.dialog.isShowing()) {
-      if (Input.justPressed('confirm')) this.dialog.advance();
+      if (Input.justPressed('confirm') || Input.justPressed('cancel')) this.dialog.advance();
       this.updateInputHint();
       return;
     }
@@ -316,7 +316,7 @@ export class OverworldScene extends Phaser.Scene {
         npc.x * TILE_SIZE + TILE_SIZE / 2,
         npc.y * TILE_SIZE + TILE_SIZE / 2,
         npcTextureKey(this, role),
-      ).setDepth(9);
+      ).setDepth(9).setScale(0.5);
     }
   }
 

@@ -5,6 +5,7 @@ import { tryLearnMove } from '../data/learnsets';
 import type { CritterInstance } from '../systems/stats';
 import { displayName } from '../systems/stats';
 import { Sfx } from '../utils/audio';
+import { buildScreenOverlay, buildMenuPanel } from '../ui/sceneBackdrops';
 import { Input } from '../systems/input';
 
 export type LearnMoveCallback = (result: { learned: boolean; moves: string[]; replaced?: string }) => void;
@@ -30,7 +31,8 @@ export class LearnMoveScene extends Phaser.Scene {
     this.moveId = data.moveId;
     this.onDone = data.onDone;
 
-    this.add.graphics().fillStyle(0x000000, 0.75).fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    buildScreenOverlay(this, 0.75);
+    buildMenuPanel(this, 40, 70, GAME_WIDTH - 80, 280, 5);
 
     const move = getMove(this.moveId);
     this.add.text(GAME_WIDTH / 2, 40, `${displayName(this.critter)} wants to learn ${move.name}!`, {

@@ -3,6 +3,7 @@ import { COLORS, GAME_WIDTH, GAME_HEIGHT, TYPE_NAMES } from '../data/types';
 import { DEX_ORDER, getCreature, totalSpecies } from '../data/creatures';
 import { GameState } from '../systems/stats';
 import { creatureTextureKey } from '../utils/assetLoader';
+import { buildScreenOverlay, buildMenuPanel } from '../ui/sceneBackdrops';
 import { Input } from '../systems/input';
 
 export class CritterdexScene extends Phaser.Scene {
@@ -48,7 +49,8 @@ export class CritterdexScene extends Phaser.Scene {
 
   private renderShell(): void {
     this.children.removeAll(true);
-    this.add.graphics().fillStyle(0x000000, 0.85).fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    buildScreenOverlay(this, 0.82);
+    buildMenuPanel(this, 12, 8, GAME_WIDTH - 24, GAME_HEIGHT - 16, 2);
     const caught = GameState.player.dexCaught.length;
     this.add.text(GAME_WIDTH / 2, 16, `Critterdex  ${caught}/${totalSpecies()}`, {
       fontFamily: '"Courier New", monospace', fontSize: '20px', color: '#f5c542',
