@@ -1,0 +1,184 @@
+import Phaser from 'phaser';
+import { COLORS, GAME_WIDTH, GAME_HEIGHT, TYPE_NAMES } from '../data/types';
+import { DEX_ORDER, getCreature, totalSpecies } from '../data/creatures';
+import { GameState } from '../systems/stats';
+import { creatureTextureKey } from '../utils/assetLoader';
+import { Input } from '../systems/input';
+
+export class CritterdexScene extends Phaser.Scene {
+  private selected = 0;
+  private fromPause = false;
+  private tab: 'info' | 'area' = 'info';
+
+  constructor() {
+    super('Critterdex');
+  }
+
+  create(data: { fromPause?: boolean }): void {
+    Input.bind(this);
+    this.fromPause = data.fromPause ?? false;
+    this.tab = 'info';
+    this.renderShell();
+    this.bindKeys();
+  }
+
+  private bindKeys(): void {
+    this.input.keyboard?.off('keydown-UP');
+    this.input.keyboard?.off('keydown-DOWN');
+    this.input.keyboard?.off('keydown-LEFT');
+    this.input.keyboard?.off('keydown-RIGHT');
+    this.input.keyboard?.off('keydown-ESC');
+    this.input.keyboard?.off('keydown-Z');
+    this.input.keyboard?.on('keydown-UP', () => { this.selected = Math.max(0, this.selected - 1); this.renderList(); });
+    this.input.keyboard?.on('keydown-DOWN', () => { this.selected = Math.min(DEX_ORDER.length - 1, this.selected + 1); this.renderList(); });
+    this.input.keyboard?.on('keydown-LEFT', () => { this.tab = 'info'; this.renderDetail(); });
+    this.input.keyboard?.on('keydown-RIGHT', () => { this.tab = 'area'; this.renderDetail(); });
+    this.input.keyboard?.on('keydown-ESC', () => this.close());
+    this.input.keyboard?.on('keydown-Z', () => this.close());
+  }
+
+  update(): void {
+    Input.update();
+    if (Input.justPressed('up')) { this.selected = Math.max(0, this.selected - 1); this.renderList(); }
+    if (Input.justPressed('down')) { this.selected = Math.min(DEX_ORDER.length - 1, this.selected + 1); this.renderList(); }
+    if (Input.justPressed('left')) { this.tab = 'info'; this.renderDetail(); }
+    if (Input.justPressed('right')) { this.tab = 'area'; this.renderDetail(); }
+    if (Input.justPressed('cancel') || Input.justPressed('confirm')) this.close();
+  }
+
+  private renderShell(): void {
+    this.children.removeAll(true);
+    this.add.graphics().fillStyle(0x000000, 0.85).fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    const caught = GameState.player.dexCaught.length;
+    this.add.text(GAME_WIDTH / 2, 16, `Critterdex  ${caught}/${totalSpecies()}`, {
+      fontFamily: '"Courier New", monospace', fontSize: '20px', color: '#f5c542',
+    }).setOrigin(0.5).setName('header');
+    this.renderList();
+    this.renderDetail();
+  }
+
+  private listContainer!: Phaser.GameObjects.Container;
+  private detailContainer!: Phaser.GameObjects.Container;
+
+  private renderList(): void {
+    if (this.listContainer) this.listContainer.destroy();
+    this.listContainer = this.add.container(0, 0);
+    const start = Math.max(0, this.selected - 4);
+    const visible = DEX_ORDER.slice(start, start + 9);
+
+    visible.forEach((id, vi) => {
+      const idx = start + vi;
+      const def = getCreature(id);
+      const seen = GameState.player.dexSeen.includes(id);
+      const caught = GameState.player.dexCaught.includes(id);
+      const y = 44 + vi * 42;
+      const sel = idx === this.selected;
+
+      const bg = this.add.graphics();
+      bg.fillStyle(sel ? COLORS.panelBorder : COLORS.panel, 0.85);
+      bg.fillRoundedRect(24, y, 280, 38, 5);
+      this.listContainer.add(bg);
+
+      const num = String(def.dexNumber).padStart(3, '0');
+      const name = caught ? def.name : seen ? def.name : '???';
+      this.listContainer.add(this.add.text(36, y + 10, `${num}  ${name}`, {
+        fontFamily: '"Courier New", monospace', fontSize: '12px',
+        color: caught ? '#f0f0f0' : seen ? '#8899aa' : '#444444',
+      }));
+
+      if (caught || seen) {
+        def.types.forEach((t, ti) => {
+          this.listContainer.add(this.add.image(230 + ti * 16, y + 19, `type_${t}`).setScale(0.55));
+        });
+      }
+      if (caught) {
+        this.listContainer.add(this.add.image(270, y + 19, creatureTextureKey(this, id, true)).setScale(1.5));
+      }
+    });
+  }
+
+  private renderDetail(): void {
+    if (this.detailContainer) this.detailContainer.destroy();
+    this.detailContainer = this.add.container(0, 0);
+
+    const id = DEX_ORDER[this.selected];
+    const def = getCreature(id);
+    const caught = GameState.player.dexCaught.includes(id);
+    const seen = GameState.player.dexSeen.includes(id);
+
+    const panel = this.add.graphics();
+    panel.fillStyle(COLORS.panel, 0.95);
+    panel.fillRoundedRect(320, 44, 300, 400, 8);
+    panel.lineStyle(2, COLORS.panelBorder, 1);
+    panel.strokeRoundedRect(320, 44, 300, 400, 8);
+    this.detailContainer.add(panel);
+
+    this.detailContainer.add(this.add.text(380, 52, this.tab === 'info' ? '▶ Info' : '  Info', {
+      fontFamily: '"Courier New", monospace', fontSize: '11px', color: this.tab === 'info' ? '#f5c542' : '#667788',
+    }).setInteractive({ useHandCursor: true }).on('pointerdown', () => { this.tab = 'info'; this.renderDetail(); }));
+    this.detailContainer.add(this.add.text(480, 52, this.tab === 'area' ? '▶ Area' : '  Area', {
+      fontFamily: '"Courier New", monospace', fontSize: '11px', color: this.tab === 'area' ? '#f5c542' : '#667788',
+    }).setInteractive({ useHandCursor: true }).on('pointerdown', () => { this.tab = 'area'; this.renderDetail(); }));
+
+    if (!seen && !caught) {
+      this.detailContainer.add(this.add.text(470, 200, '???', {
+        fontFamily: '"Courier New", monospace', fontSize: '24px', color: '#444444',
+      }).setOrigin(0.5));
+      return;
+    }
+
+    if (caught) {
+      this.detailContainer.add(this.add.image(470, 120, creatureTextureKey(this, id)).setScale(1.5));
+      this.detailContainer.add(this.add.image(340, 120, `footprint_${def.shape}`).setScale(1.2));
+    }
+
+    this.detailContainer.add(this.add.text(470, 200, caught ? def.name : '???', {
+      fontFamily: '"Courier New", monospace', fontSize: '18px', color: '#f5c542',
+    }).setOrigin(0.5));
+
+    def.types.forEach((t, ti) => {
+      this.detailContainer.add(this.add.image(450 + ti * 22, 222, `type_${t}`).setScale(0.7));
+    });
+
+    if (this.tab === 'info') {
+      this.detailContainer.add(this.add.text(470, 248, caught ? def.types.map(t => TYPE_NAMES[t]).join(' / ') : '???', {
+        fontFamily: '"Courier New", monospace', fontSize: '11px', color: '#8899aa',
+      }).setOrigin(0.5));
+      this.detailContainer.add(this.add.text(330, 270, caught ? def.description : 'Seen in the wild.', {
+        fontFamily: '"Courier New", monospace', fontSize: '11px', color: '#c0c0c0',
+        wordWrap: { width: 280 }, align: 'center',
+      }).setOrigin(0.5, 0));
+      if (caught) {
+        const b = def.baseStats;
+        this.detailContainer.add(this.add.text(330, 350, `HP ${b.hp}  ATK ${b.atk}  DEF ${b.def}\nSPA ${b.spa}  SPD ${b.spd}  SPE ${b.spe}`, {
+          fontFamily: '"Courier New", monospace', fontSize: '10px', color: '#667788',
+        }));
+        if (def.height && def.weight) {
+          this.detailContainer.add(this.add.text(330, 390, `H:${def.height}m  W:${def.weight}kg`, {
+            fontFamily: '"Courier New", monospace', fontSize: '10px', color: '#667788',
+          }));
+        }
+      }
+    } else {
+      const habitat = def.habitat ?? 'Unknown area';
+      this.detailContainer.add(this.add.text(470, 280, 'Habitat', {
+        fontFamily: '"Courier New", monospace', fontSize: '14px', color: '#f5c542',
+      }).setOrigin(0.5));
+      this.detailContainer.add(this.add.text(330, 310, seen || caught ? habitat : 'Unknown', {
+        fontFamily: '"Courier New", monospace', fontSize: '11px', color: '#c0c0c0',
+        wordWrap: { width: 280 }, align: 'center',
+      }).setOrigin(0.5, 0));
+      if (def.height && def.weight) {
+        this.detailContainer.add(this.add.text(470, 380, `${def.height}m / ${def.weight}kg`, {
+          fontFamily: '"Courier New", monospace', fontSize: '11px', color: '#8899aa',
+        }).setOrigin(0.5));
+      }
+    }
+  }
+
+  private close(): void {
+    this.scene.stop();
+    if (this.fromPause) this.scene.resume('PauseMenu');
+    else this.scene.resume('Overworld');
+  }
+}
