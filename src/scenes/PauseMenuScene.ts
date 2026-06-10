@@ -6,9 +6,11 @@ import { trySave } from '../utils/saveFeedback';
 import { buildScreenOverlay, buildMenuPanel } from '../ui/sceneBackdrops';
 import { Input } from '../systems/input';
 import { Sfx } from '../utils/audio';
+import { canFastTravel } from '../systems/healTravel';
+
 export class PauseMenuScene extends Phaser.Scene {
   private selected = 0;
-  private options = ['Critterdex', 'Party', 'Options', 'Save Game', 'Close'];
+  private options: string[] = [];
 
   constructor() {
     super('PauseMenu');
@@ -16,6 +18,10 @@ export class PauseMenuScene extends Phaser.Scene {
 
   create(): void {
     Input.bind(this);
+    this.options = ['Critterdex', 'Party', 'Options'];
+    if (canFastTravel()) this.options.push('Fly');
+    this.options.push('Save Game', 'Close');
+    this.selected = Math.min(this.selected, this.options.length - 1);
     buildScreenOverlay(this, 0.65);
     buildMenuPanel(this, 170, 70, 300, 360, 5);
 
@@ -80,6 +86,9 @@ export class PauseMenuScene extends Phaser.Scene {
       this.scene.pause();
     } else if (opt === 'Options') {
       this.scene.launch('Options');
+      this.scene.pause();
+    } else if (opt === 'Fly') {
+      this.scene.launch('FastTravel', { fromPause: true });
       this.scene.pause();
     } else if (opt === 'Save Game') {
       trySave(this);

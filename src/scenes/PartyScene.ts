@@ -12,7 +12,9 @@ import { trySave } from '../utils/saveFeedback';
 import { buildScreenOverlay, buildMenuPanel } from '../ui/sceneBackdrops';
 import { Input } from '../systems/input';
 
-const HELD_ITEMS = ['oran_berry', 'charcoal', 'mystic_water'];
+const HELD_ITEMS = [
+  'oran_berry', 'charcoal', 'mystic_water', 'silk_scarf', 'never_melt_ice', 'twisted_spoon', 'scope_lens',
+];
 
 export class PartyScene extends Phaser.Scene {
   private battleSwitch = false;
@@ -105,10 +107,14 @@ export class PartyScene extends Phaser.Scene {
         }).setInteractive({ useHandCursor: true });
         btn.on('pointerdown', () => this.selectForBattle(i));
       } else if (!this.battleSwitch) {
-        const info = this.add.text(x + 220, y + 90, showingDetail ? 'Close' : 'Stats', {
+        const info = this.add.text(x + 200, y + 90, showingDetail ? 'Close' : 'Stats', {
           fontFamily: '"Courier New", monospace', fontSize: '10px', color: '#8899aa',
         }).setInteractive({ useHandCursor: true });
         info.on('pointerdown', () => { this.detailIndex = showingDetail ? null : i; this.render(); });
+        const nick = this.add.text(x + 248, y + 90, 'Nick', {
+          fontFamily: '"Courier New", monospace', fontSize: '10px', color: '#e94560',
+        }).setInteractive({ useHandCursor: true });
+        nick.on('pointerdown', () => this.promptNickname(i));
       }
     });
 
@@ -155,6 +161,22 @@ export class PartyScene extends Phaser.Scene {
         this.render();
       });
     });
+  }
+
+  private promptNickname(index: number): void {
+    const c = GameState.player.party[index];
+    if (!c) return;
+    const def = getCreature(c.speciesId);
+    this.scene.launch('Nickname', {
+      speciesName: def.name,
+      onDone: (nickname: string | undefined) => {
+        c.nickname = nickname;
+        trySave(this);
+        this.scene.resume();
+        this.render();
+      },
+    });
+    this.scene.pause();
   }
 
   private selectForBattle(index: number): void {

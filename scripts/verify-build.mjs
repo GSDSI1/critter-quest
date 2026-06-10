@@ -82,7 +82,7 @@ const registerScenes = existsSync(join(root, 'src/scenes/registerScenes.ts'))
 const EAGER_SCENES = ['BootScene', 'IntroScene', 'MenuScene'];
 const LAZY_SCENE_KEYS = [
   'CharacterSelect', 'LabIntro', 'StarterSelect', 'Overworld', 'TrainerIntro', 'Battle',
-  'Party', 'Shop', 'PC', 'Critterdex', 'PauseMenu', 'Options', 'HallOfFame', 'LearnMove', 'Nickname', 'Victory',
+  'Party', 'Shop', 'PC', 'Critterdex', 'PauseMenu', 'Options', 'FastTravel', 'HallOfFame', 'LearnMove', 'Nickname', 'Victory',
 ];
 for (const scene of EAGER_SCENES) {
   if (main.includes(scene)) ok(`${scene} registered (eager)`);

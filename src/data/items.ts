@@ -85,6 +85,22 @@ export const ITEMS: Record<string, ItemDef> = {
     id: 'mystic_water', name: 'Mystic Water', description: 'Held: boosts Tide moves 20%.',
     price: 9800, category: 'battle', usableInBattle: false, usableOverworld: false,
   },
+  silk_scarf: {
+    id: 'silk_scarf', name: 'Silk Scarf', description: 'Held: boosts Leaf moves 20%.',
+    price: 9800, category: 'battle', usableInBattle: false, usableOverworld: false,
+  },
+  never_melt_ice: {
+    id: 'never_melt_ice', name: 'Never-Melt Ice', description: 'Held: boosts Ice moves 20%.',
+    price: 9800, category: 'battle', usableInBattle: false, usableOverworld: false,
+  },
+  twisted_spoon: {
+    id: 'twisted_spoon', name: 'Twisted Spoon', description: 'Held: boosts Psychic moves 20%.',
+    price: 9800, category: 'battle', usableInBattle: false, usableOverworld: false,
+  },
+  scope_lens: {
+    id: 'scope_lens', name: 'Scope Lens', description: 'Held: raises critical-hit ratio.',
+    price: 12000, category: 'battle', usableInBattle: false, usableOverworld: false,
+  },
 };
 
 export const SHOP_STOCK = [
@@ -92,7 +108,7 @@ export const SHOP_STOCK = [
   'potion', 'super_potion', 'hyper_potion', 'full_restore',
   'revive', 'ether',
   'antidote', 'paralyze_heal', 'burn_heal', 'awakening', 'full_heal',
-  'oran_berry', 'charcoal', 'mystic_water',
+  'oran_berry', 'charcoal', 'mystic_water', 'silk_scarf', 'never_melt_ice', 'twisted_spoon', 'scope_lens',
 ];
 
 export function getItem(id: string): ItemDef {
@@ -121,6 +137,10 @@ export function emptyBag(): ItemBag {
     oran_berry: 0,
     charcoal: 0,
     mystic_water: 0,
+    silk_scarf: 0,
+    never_melt_ice: 0,
+    twisted_spoon: 0,
+    scope_lens: 0,
   };
 }
 

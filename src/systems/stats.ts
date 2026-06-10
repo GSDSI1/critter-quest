@@ -55,6 +55,7 @@ export interface PlayerState {
   storyFlags: Record<string, boolean>;
   defeatedTrainers: string[];
   defeatedRematch: string[];
+  visitedHealCenters: string[];
   playTime: number;
   started: boolean;
 }
@@ -220,6 +221,7 @@ export function defaultPlayer(): PlayerState {
     storyFlags: {},
     defeatedTrainers: [],
     defeatedRematch: [],
+    visitedHealCenters: [],
     playTime: 0,
     started: false,
   };

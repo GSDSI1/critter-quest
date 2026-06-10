@@ -59,10 +59,15 @@ function stabBonus(attacker: CritterInstance, moveType: string): number {
 function heldTypeBoost(c: CritterInstance, moveType: string): number {
   if (!c.heldItem) return 1;
   const boosts: Record<string, string> = {
-    charcoal: 'flame', mystic_water: 'tide', miracle_seed: 'leaf',
+    charcoal: 'flame', mystic_water: 'tide', silk_scarf: 'leaf',
+    never_melt_ice: 'ice', twisted_spoon: 'psychic',
     magnet: 'volt', hard_stone: 'stone', shadow_cloth: 'shadow',
   };
   return boosts[c.heldItem] === moveType ? 1.2 : 1;
+}
+
+function heldCritBoost(c: CritterInstance): number {
+  return c.heldItem === 'scope_lens' ? 0.125 : 0.0625;
 }
 
 function isStatusImmune(c: CritterInstance, status: StatusCondition): boolean {
@@ -102,7 +107,7 @@ export function calcDamage(
   const hpRatio = attacker.currentHp / attacker.maxHp;
   const attack = atkStat * stageMult(atkStage) * attackMultiplier(attacker);
   const defense = Math.max(1, defStat * stageMult(defStage));
-  const critical = forceCrit || rng.chance(0.0625);
+  const critical = forceCrit || rng.chance(heldCritBoost(attacker));
   const critMult = critical ? 1.5 : 1;
   const stab = stabBonus(attacker, move.type);
   const abilityMult = abilityAttackMult(attacker.ability, move.type, hpRatio);

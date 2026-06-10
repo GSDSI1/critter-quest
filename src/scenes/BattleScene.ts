@@ -16,10 +16,12 @@ import { buildBattleArena } from '../ui/sceneBackdrops';
 import { Sfx } from '../utils/audio';
 import { Input } from '../systems/input';
 import { BattleAnims } from './battle/BattleAnims';
+import { BattleUi, MENU_ITEMS, type BattlePhase, type BattleUiHost } from './battle/BattleUi';
+import { BattleFlow, type BattleFlowHost } from './battle/BattleFlow';
 import {
-  BattleUi, BattleFlow, MENU_ITEMS,
-  type BattlePhase, type BattleUiHost, type BattleFlowHost,
-} from './battle/BattleUi';
+  isEliteGauntletActive, clearEliteGauntlet, nextGauntletTrainerId,
+  findGauntletNpc, buildTrainerBattleData,
+} from '../systems/eliteGauntlet';
 
 export class BattleScene extends Phaser.Scene implements BattleUiHost, BattleFlowHost {
   enemyParty: CritterInstance[] = [];
@@ -224,6 +226,7 @@ export class BattleScene extends Phaser.Scene implements BattleUiHost, BattleFlo
   }
 
   private blackout(): void {
+    if (isEliteGauntletActive()) clearEliteGauntlet();
     GameState.player.money -= moneyLossOnBlackout(GameState.player.money);
     healParty(GameState.player.party);
     GameState.player.mapId = 'heal_center';
@@ -274,6 +277,10 @@ export class BattleScene extends Phaser.Scene implements BattleUiHost, BattleFlo
   }
 
   endBattle(_caught: boolean): void {
+    const gauntletNext = isEliteGauntletActive() && this.isTrainer
+      ? nextGauntletTrainerId(this.trainerId)
+      : null;
+    if (this.trainerId === 'champion' && isEliteGauntletActive()) clearEliteGauntlet();
     const triggerVictory = this.trainerId === 'rival3'
       && GameState.player.badges.length >= 2
       && !GameState.player.storyFlags.league_ready;
@@ -281,6 +288,19 @@ export class BattleScene extends Phaser.Scene implements BattleUiHost, BattleFlo
       && GameState.player.badges.length >= 4
       && !GameState.player.storyFlags.champion;
     this.battleAnims.fadeOut(300, () => {
+      if (gauntletNext) {
+        const npc = findGauntletNpc(gauntletNext);
+        const battleData = npc ? buildTrainerBattleData(npc) : null;
+        if (battleData) {
+          this.scene.start('TrainerIntro', {
+            trainerName: npc!.name,
+            isTrainer: true,
+            battleData,
+          });
+          return;
+        }
+        clearEliteGauntlet();
+      }
       if (triggerHallOfFame) this.scene.start('HallOfFame');
       else if (triggerVictory) this.scene.start('Victory');
       else this.scene.start('Overworld', { fromBattle: true });

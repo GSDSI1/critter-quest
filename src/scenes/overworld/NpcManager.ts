@@ -16,6 +16,10 @@ import { npcTextureKey, type NpcRole } from '../../utils/assetLoader';
 import { playerTextureKey } from '../../utils/sprites';
 import { showExclamationBubble } from '../TrainerIntroScene';
 import { Sfx } from '../../utils/audio';
+import {
+  startEliteGauntlet, findGauntletNpc, buildTrainerBattleData, rematchLevelBonus,
+} from '../../systems/eliteGauntlet';
+import { registerHealVisit } from '../../systems/healTravel';
 
 type Critter = ReturnType<typeof createCritter>;
 
@@ -183,6 +187,33 @@ export class NpcManager {
       return;
     }
 
+    if (npc.id === 'elite_registrar') {
+      if (GameState.player.storyFlags.champion) {
+        this.dialog.show(['You are the regional Champion!', 'Congratulations again!'], () => {
+          this.callbacks.setInputLocked(false);
+        });
+        return;
+      }
+      if (!GameState.player.badges.includes('psyche')) {
+        this.dialog.show(['Earn the Psyche Badge before challenging the Elite Four.'], () => {
+          this.callbacks.setInputLocked(false);
+        });
+        return;
+      }
+      this.dialog.show(npc.lines, () => {
+        startEliteGauntlet();
+        const first = findGauntletNpc('elite_trainer1');
+        if (first) {
+          showExclamationBubble(this.scene, first.x * TILE_SIZE + 8, first.y * TILE_SIZE, () => {
+            this.launchGauntletBattle(first);
+          });
+        } else {
+          this.callbacks.setInputLocked(false);
+        }
+      });
+      return;
+    }
+
     const defeated = GameState.player.defeatedTrainers.includes(npc.id);
     const rematched = GameState.player.defeatedRematch.includes(npc.id);
 
@@ -255,6 +286,7 @@ export class NpcManager {
   }
 
   private changeMap(mapId: string, x: number, y: number): void {
+    if (mapId === 'heal_center') registerHealVisit(this.getMap().id);
     GameState.player.mapId = mapId;
     GameState.player.x = x;
     GameState.player.y = y;
@@ -307,11 +339,26 @@ export class NpcManager {
     const partySpec = isRematch && npc.rematch ? npc.rematch.party : npc.trainer.party;
     const reward = isRematch && npc.rematch ? npc.rematch.reward : npc.trainer.reward;
     const resolved = resolveTrainerParty(partySpec, GameState.player.starterId);
+    const bonus = isRematch ? rematchLevelBonus() : 0;
     const party = resolved.map(m => {
       registerSeen(GameState.player.dexSeen, m.creatureId);
-      return createCritter(m.creatureId, m.level);
+      return createCritter(m.creatureId, m.level + bonus);
     });
     this.launchBattle(party, true, npc.id, npc.name, reward, npc.trainer.badge ?? '', isRematch);
+  }
+
+  private launchGauntletBattle(npc: MapNpc): void {
+    const battleData = buildTrainerBattleData(npc);
+    if (!battleData) { this.callbacks.setInputLocked(false); return; }
+    this.callbacks.setInputLocked(true);
+    this.scene.cameras.main.flash(200, 255, 255, 255);
+    this.scene.time.delayedCall(300, () => {
+      this.scene.scene.start('TrainerIntro', {
+        trainerName: npc.name,
+        isTrainer: true,
+        battleData,
+      });
+    });
   }
 
   private launchBattle(

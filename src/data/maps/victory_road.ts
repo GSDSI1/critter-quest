@@ -8,10 +8,19 @@ export const victory_road: GameMap = {
     { x: 12, y: 19, toMap: 'mindspire', toX: 12, toY: 1 },
   ],
   npcs: [
-    { id: 'elite_trainer1', x: 6, y: 10, name: 'Elite Ace Dana', role: 'trainer_f', lines: ['Only the strongest reach the summit!', 'Show me your team!'],
+    { id: 'elite_registrar', x: 12, y: 14, name: 'League Registrar', role: 'generic', lines: [
+      'Welcome to the Elite Four chamber.',
+      'Defeat all four Elites and the Champion in a row — no healing between!',
+      'Ready to begin the gauntlet?',
+    ] },
+    { id: 'elite_trainer1', x: 4, y: 10, name: 'Elite Ace Dana', role: 'trainer_f', lines: ['Only the strongest reach the summit!', 'Show me your team!'],
       trainer: { party: [{ creatureId: 'voidseer', level: 35 }, { creatureId: 'glaciorex', level: 36 }], reward: 800 } },
-    { id: 'elite_trainer2', x: 17, y: 6, name: 'Elite Ace Max', role: 'trainer_m', lines: ['Victory Road breaks weak trainers!', 'Let\'s battle!'],
+    { id: 'elite_trainer2', x: 10, y: 8, name: 'Elite Ace Max', role: 'trainer_m', lines: ['Victory Road breaks weak trainers!', 'Let\'s battle!'],
       trainer: { party: [{ creatureId: 'zenolith', level: 36 }, { creatureId: 'infernox', level: 35 }], reward: 820 } },
+    { id: 'elite_trainer3', x: 16, y: 8, name: 'Elite Ace Rin', role: 'trainer_f', lines: ['Ice and stone — my specialty!', 'Freeze!'],
+      trainer: { party: [{ creatureId: 'arctodon', level: 37 }, { creatureId: 'blizzhound', level: 36 }], reward: 840 } },
+    { id: 'elite_trainer4', x: 20, y: 5, name: 'Elite Ace Cole', role: 'trainer_m', lines: ['The final Elite awaits the worthy.', 'Battle!'],
+      trainer: { party: [{ creatureId: 'astralyn', level: 38 }, { creatureId: 'somnara', level: 37 }], reward: 860 } },
     { id: 'champion', x: 12, y: 2, name: 'Champion Vera', role: 'leader', lines: [
       'You\'ve come far, trainer.', 'I am Champion Vera — the final test.', 'Give me everything you\'ve got!',
     ], trainer: {

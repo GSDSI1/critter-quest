@@ -1,6 +1,9 @@
 import Phaser from 'phaser';
 import { COLORS, GAME_WIDTH, GAME_HEIGHT, TYPE_NAMES } from '../data/types';
 import { DEX_ORDER, getCreature, totalSpecies } from '../data/creatures';
+import { getEvolutionChain } from '../data/evolutions';
+import { LEARNSETS } from '../data/learnsets';
+import { getMove } from '../data/moves';
 import { GameState } from '../systems/stats';
 import { creatureTextureKey } from '../utils/assetLoader';
 import { buildScreenOverlay, buildMenuPanel } from '../ui/sceneBackdrops';
@@ -9,7 +12,7 @@ import { Input } from '../systems/input';
 export class CritterdexScene extends Phaser.Scene {
   private selected = 0;
   private fromPause = false;
-  private tab: 'info' | 'area' = 'info';
+  private tab: 'info' | 'area' | 'moves' | 'evo' = 'info';
 
   constructor() {
     super('Critterdex');
@@ -32,8 +35,8 @@ export class CritterdexScene extends Phaser.Scene {
     this.input.keyboard?.off('keydown-Z');
     this.input.keyboard?.on('keydown-UP', () => { this.selected = Math.max(0, this.selected - 1); this.renderList(); });
     this.input.keyboard?.on('keydown-DOWN', () => { this.selected = Math.min(DEX_ORDER.length - 1, this.selected + 1); this.renderList(); });
-    this.input.keyboard?.on('keydown-LEFT', () => { this.tab = 'info'; this.renderDetail(); });
-    this.input.keyboard?.on('keydown-RIGHT', () => { this.tab = 'area'; this.renderDetail(); });
+    this.input.keyboard?.on('keydown-LEFT', () => this.cycleTab(-1));
+    this.input.keyboard?.on('keydown-RIGHT', () => this.cycleTab(1));
     this.input.keyboard?.on('keydown-ESC', () => this.close());
     this.input.keyboard?.on('keydown-Z', () => this.close());
   }
@@ -42,9 +45,17 @@ export class CritterdexScene extends Phaser.Scene {
     Input.update();
     if (Input.justPressed('up')) { this.selected = Math.max(0, this.selected - 1); this.renderList(); }
     if (Input.justPressed('down')) { this.selected = Math.min(DEX_ORDER.length - 1, this.selected + 1); this.renderList(); }
-    if (Input.justPressed('left')) { this.tab = 'info'; this.renderDetail(); }
-    if (Input.justPressed('right')) { this.tab = 'area'; this.renderDetail(); }
+    if (Input.justPressed('left')) this.cycleTab(-1);
+    if (Input.justPressed('right')) this.cycleTab(1);
     if (Input.justPressed('cancel') || Input.justPressed('confirm')) this.close();
+  }
+
+  private readonly tabs: Array<'info' | 'area' | 'moves' | 'evo'> = ['info', 'area', 'moves', 'evo'];
+
+  private cycleTab(dir: number): void {
+    const idx = this.tabs.indexOf(this.tab);
+    this.tab = this.tabs[(idx + dir + this.tabs.length) % this.tabs.length];
+    this.renderDetail();
   }
 
   private renderShell(): void {
@@ -115,12 +126,14 @@ export class CritterdexScene extends Phaser.Scene {
     panel.strokeRoundedRect(320, 44, 300, 400, 8);
     this.detailContainer.add(panel);
 
-    this.detailContainer.add(this.add.text(380, 52, this.tab === 'info' ? '▶ Info' : '  Info', {
-      fontFamily: '"Courier New", monospace', fontSize: '11px', color: this.tab === 'info' ? '#f5c542' : '#667788',
-    }).setInteractive({ useHandCursor: true }).on('pointerdown', () => { this.tab = 'info'; this.renderDetail(); }));
-    this.detailContainer.add(this.add.text(480, 52, this.tab === 'area' ? '▶ Area' : '  Area', {
-      fontFamily: '"Courier New", monospace', fontSize: '11px', color: this.tab === 'area' ? '#f5c542' : '#667788',
-    }).setInteractive({ useHandCursor: true }).on('pointerdown', () => { this.tab = 'area'; this.renderDetail(); }));
+    const tabLabels: [typeof this.tab, string, number][] = [
+      ['info', 'Info', 330], ['area', 'Area', 390], ['moves', 'Moves', 450], ['evo', 'Evo', 510],
+    ];
+    tabLabels.forEach(([key, label, x]) => {
+      this.detailContainer.add(this.add.text(x, 52, this.tab === key ? `▶ ${label}` : `  ${label}`, {
+        fontFamily: '"Courier New", monospace', fontSize: '10px', color: this.tab === key ? '#f5c542' : '#667788',
+      }).setInteractive({ useHandCursor: true }).on('pointerdown', () => { this.tab = key; this.renderDetail(); }));
+    });
 
     if (!seen && !caught) {
       this.detailContainer.add(this.add.text(470, 200, '???', {
@@ -161,7 +174,7 @@ export class CritterdexScene extends Phaser.Scene {
           }));
         }
       }
-    } else {
+    } else if (this.tab === 'area') {
       const habitat = def.habitat ?? 'Unknown area';
       this.detailContainer.add(this.add.text(470, 280, 'Habitat', {
         fontFamily: '"Courier New", monospace', fontSize: '14px', color: '#f5c542',
@@ -170,11 +183,23 @@ export class CritterdexScene extends Phaser.Scene {
         fontFamily: '"Courier New", monospace', fontSize: '11px', color: '#c0c0c0',
         wordWrap: { width: 280 }, align: 'center',
       }).setOrigin(0.5, 0));
-      if (def.height && def.weight) {
-        this.detailContainer.add(this.add.text(470, 380, `${def.height}m / ${def.weight}kg`, {
-          fontFamily: '"Courier New", monospace', fontSize: '11px', color: '#8899aa',
-        }).setOrigin(0.5));
-      }
+    } else if (this.tab === 'moves' && caught) {
+      const entries = LEARNSETS[id] ?? [];
+      const lines = entries.slice(0, 10).map(e => `Lv.${String(e.level).padStart(2)}  ${getMove(e.move).name}`);
+      this.detailContainer.add(this.add.text(330, 270, lines.join('\n') || 'No learnset data.', {
+        fontFamily: '"Courier New", monospace', fontSize: '10px', color: '#c0c0c0',
+        lineSpacing: 4,
+      }));
+    } else if (this.tab === 'evo' && (seen || caught)) {
+      const chain = getEvolutionChain(id);
+      const chainText = chain.map(sid => getCreature(sid).name).join(' → ');
+      this.detailContainer.add(this.add.text(330, 280, 'Evolution', {
+        fontFamily: '"Courier New", monospace', fontSize: '13px', color: '#f5c542',
+      }).setOrigin(0.5, 0));
+      this.detailContainer.add(this.add.text(330, 310, chainText, {
+        fontFamily: '"Courier New", monospace', fontSize: '11px', color: '#c0c0c0',
+        wordWrap: { width: 280 }, align: 'center',
+      }).setOrigin(0.5, 0));
     }
   }
 

@@ -13,6 +13,7 @@ import { applyOverworldCamera } from '../utils/camera';
 import { resumeAudio } from '../utils/audio';
 import { Input } from '../systems/input';
 import { canAlwaysRun } from '../systems/options';
+import { isOutdoorMap, nightTintAlpha } from '../systems/dayNight';
 import { MapRenderer } from './overworld/MapRenderer';
 import { NpcManager } from './overworld/NpcManager';
 
@@ -31,6 +32,7 @@ export class OverworldScene extends Phaser.Scene {
   private moveDuration = 200;
   private padToast?: Phaser.GameObjects.Text;
   private touchPad?: OverworldTouchPad;
+  private nightOverlay?: Phaser.GameObjects.Graphics;
 
   constructor() {
     super('Overworld');
@@ -49,6 +51,8 @@ export class OverworldScene extends Phaser.Scene {
     }).setOrigin(0.5).setDepth(1100).setVisible(false);
     pinToScreen(this.inputHint, 1100);
     this.addVignette();
+    this.nightOverlay = this.add.graphics().setDepth(840).setScrollFactor(0);
+    pinToScreen(this.nightOverlay, 840);
 
     this.mapRenderer = new MapRenderer(this);
     this.npcManager = new NpcManager(this, () => this.map, this.dialog, {
@@ -166,6 +170,7 @@ export class OverworldScene extends Phaser.Scene {
     this.touchPad?.setEnabled(!blocked);
 
     this.mapRenderer.update(delta);
+    this.updateDayNightTint();
 
     if (blocked) return;
     GameState.player.playTime += delta / 1000;
@@ -191,6 +196,16 @@ export class OverworldScene extends Phaser.Scene {
 
     const { dx, dy } = Input.getMovement();
     if (dx !== 0 || dy !== 0) this.npcManager.tryMove(dx, dy);
+  }
+
+  private updateDayNightTint(): void {
+    if (!this.nightOverlay) return;
+    const alpha = isOutdoorMap(this.map.id) ? nightTintAlpha(GameState.player.playTime) : 0;
+    this.nightOverlay.clear();
+    if (alpha > 0.01) {
+      this.nightOverlay.fillStyle(0x1e1b4b, alpha);
+      this.nightOverlay.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    }
   }
 
   private showPadToast(msg: string): void {
