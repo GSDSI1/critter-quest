@@ -36,6 +36,7 @@ Must match the legend in [`src/data/maps.ts`](../../src/data/maps.ts):
 | 18 | Mart counter |
 | 19–20 | Tall grass / water anim alt frames |
 | 21–35 | Grass↔path autotile (16-case bitmask, masks 1–15) |
+| 36–50 | Grass/path↔water shore autotile (masks 1–15) |
 
 ## Recommended sources
 

@@ -3,7 +3,7 @@ import { TILE_SIZE } from '../../data/types';
 import { getTile, type GameMap, type MapTheme } from '../../data/maps';
 import { isExternalTilesetAvailable } from '../../utils/assetLoader';
 import { isSmallInterior } from '../../utils/camera';
-import { applyGrassPathAutotiles } from '../../utils/tileAutotile';
+import { applyMapAutotiles } from '../../utils/tileAutotile';
 import { tileTextureKey, proceduralTilesetKey, bakeProceduralTileset } from '../../utils/sprites';
 
 /** Alternate tileset frames for animated tall grass / water (see pack-tileset.mjs). */
@@ -40,7 +40,7 @@ export class MapRenderer {
       const tileset = tm.addTilesetImage('tileset', 'ext_tileset', TILE_SIZE, TILE_SIZE, 0, 0, 0);
       if (tileset) {
         this.tileLayer = tm.createLayer(0, tileset, 0, 0)?.setDepth(0);
-        if (this.tileLayer) applyGrassPathAutotiles(map, this.tileLayer);
+        if (this.tileLayer) applyMapAutotiles(map, this.tileLayer);
         this.buildAnimatedOverlays(map, true);
         this.renderEdgeOverlays(true);
         this.decorLayer = this.scene.add.container(0, 0).setDepth(6);

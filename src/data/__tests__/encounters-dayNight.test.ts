@@ -3,8 +3,11 @@ import { resolveEncounterTable, ENCOUNTER_TABLES } from '../encounters';
 import { isNight } from '../../systems/dayNight';
 import {
   AUTOTILE_GRASS_PATH_BASE,
+  AUTOTILE_WATER_SHORE_BASE,
   grassPathAutotileFrame,
   grassPathNeighborMask,
+  waterShoreAutotileFrame,
+  waterShoreNeighborMask,
 } from '../../utils/tileAutotile';
 import type { GameMap } from '../maps/types';
 
@@ -50,5 +53,27 @@ describe('grassPathAutotile', () => {
     const frame = grassPathAutotileFrame(miniMap, 1, 1);
     expect(frame).toBe(AUTOTILE_GRASS_PATH_BASE + 15 - 1);
     expect(grassPathAutotileFrame(miniMap, 1, 0)).toBeNull();
+  });
+});
+
+describe('waterShoreAutotile', () => {
+  const waterMap: GameMap = {
+    id: 'water_test', name: 'Water Test', width: 3, height: 3,
+    spawn: { x: 1, y: 1 }, encounterRate: 0,
+    warps: [], npcs: [],
+    tiles: [
+      0, 3, 0,
+      3, 0, 3,
+      0, 3, 0,
+    ],
+  };
+
+  it('detects water neighbors on grass', () => {
+    expect(waterShoreNeighborMask(waterMap, 1, 1)).toBe(1 | 2 | 4 | 8);
+  });
+
+  it('maps water mask to shore frame', () => {
+    const frame = waterShoreAutotileFrame(waterMap, 1, 1);
+    expect(frame).toBe(AUTOTILE_WATER_SHORE_BASE + 15 - 1);
   });
 });

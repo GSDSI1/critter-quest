@@ -120,11 +120,17 @@ export function calcDamage(
   return { damage, effectiveness, label: typeLabel(effectiveness), critical };
 }
 
-function applyMoveStatus(defender: CritterInstance, status: StatusCondition, chance: number, rng: Rng): string {
+export function applyMoveStatus(defender: CritterInstance, status: StatusCondition, chance: number, rng: Rng): string {
   if (!status || defender.status) return '';
   if (isStatusImmune(defender, status)) return '';
   if (rng.next() * 100 >= chance) return '';
   if (applyStatus(defender, status, 2 + rng.int(0, 2))) {
+    if (defender.heldItem === 'lum_berry') {
+      defender.status = null;
+      defender.statusTurns = 0;
+      defender.heldItem = undefined;
+      return `${displayName(defender)} ate its Lum Berry!`;
+    }
     const labels: Record<string, string> = {
       burn: 'was burned!', paralyze: 'is paralyzed!', poison: 'was poisoned!',
       sleep: 'fell asleep!', freeze: 'was frozen solid!', confusion: 'became confused!',

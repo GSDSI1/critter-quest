@@ -139,7 +139,7 @@ export class NpcManager {
         const landedTile = getTile(map, nx, ny);
         if (landedTile === 2) {
           Sfx.footstepGrass();
-          this.spawnWalkFx(player.x, player.y, 0x4ade80);
+          this.spawnWalkFx(player.x, player.y, 0x4ade80, true);
         } else if (landedTile === 0 || landedTile === 1) {
           Sfx.footstepPath();
           if (landedTile === 1) this.spawnWalkFx(player.x, player.y, 0xc4a574);
@@ -171,13 +171,25 @@ export class NpcManager {
     });
   }
 
-  private spawnWalkFx(x: number, y: number, color: number): void {
-    const p = this.scene.add.graphics().setDepth(11);
-    p.fillStyle(color, 0.5);
-    p.fillCircle(x, y + 4, 3);
-    this.scene.tweens.add({
-      targets: p, alpha: 0, y: y - 6, duration: 280, onComplete: () => p.destroy(),
-    });
+  private spawnWalkFx(x: number, y: number, color: number, tallGrass = false): void {
+    const count = tallGrass ? 5 : 4;
+    const baseSize = tallGrass ? 4 : 3;
+    for (let i = 0; i < count; i++) {
+      const p = this.scene.add.graphics().setDepth(11);
+      p.fillStyle(color, tallGrass ? 0.55 : 0.45);
+      const ox = (i - count / 2) * 3 + (Math.random() * 2 - 1);
+      p.fillCircle(ox, 4, baseSize - (i % 2));
+      p.setPosition(x + ox, y);
+      this.scene.time.delayedCall(i * 40, () => {
+        this.scene.tweens.add({
+          targets: p,
+          alpha: 0,
+          y: y - (tallGrass ? 10 : 7) - i,
+          duration: tallGrass ? 320 : 280,
+          onComplete: () => p.destroy(),
+        });
+      });
+    }
   }
 
   tryInteract(): void {

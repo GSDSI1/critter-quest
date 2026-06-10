@@ -3,7 +3,7 @@ import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../data/types';
 import { pinContainerChildren } from './screenUi';
 import { createTouchButton } from './touchButtons';
 import { Sfx } from '../utils/audio';
-import { autoAdvanceMs } from '../systems/options';
+import { autoAdvanceMs, shouldAutoAdvanceText } from '../systems/options';
 
 const BOX_X = 16;
 const BOX_Y = GAME_HEIGHT - 112;
@@ -133,6 +133,7 @@ export class DialogBox {
 
   private resetAutoTimer(): void {
     this.clearAutoTimer();
+    if (!shouldAutoAdvanceText()) return;
     this.autoTimer = this.scene.time.delayedCall(autoAdvanceMs(), () => {
       if (this.visible) this.advance();
     });

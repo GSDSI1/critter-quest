@@ -7,10 +7,12 @@ import { buildScreenOverlay, buildMenuPanel } from '../ui/sceneBackdrops';
 import { Input } from '../systems/input';
 import { Sfx } from '../utils/audio';
 import { canFastTravel } from '../systems/healTravel';
+import { loadAudioSettings, saveAudioSettings } from '../systems/audioSettings';
 
 export class PauseMenuScene extends Phaser.Scene {
   private selected = 0;
   private options: string[] = [];
+  private muted = false;
 
   constructor() {
     super('PauseMenu');
@@ -18,7 +20,9 @@ export class PauseMenuScene extends Phaser.Scene {
 
   create(): void {
     Input.bind(this);
+    this.muted = loadAudioSettings().muted;
     this.options = ['Critterdex', 'Party', 'Options'];
+    this.options.push(this.muted ? 'Unmute' : 'Mute');
     if (canFastTravel()) this.options.push('Fly');
     this.options.push('Save Game', 'Close');
     this.selected = Math.min(this.selected, this.options.length - 1);
@@ -87,6 +91,16 @@ export class PauseMenuScene extends Phaser.Scene {
     } else if (opt === 'Options') {
       this.scene.launch('Options');
       this.scene.pause();
+    } else if (opt === 'Mute' || opt === 'Unmute') {
+      const settings = loadAudioSettings();
+      settings.muted = !settings.muted;
+      saveAudioSettings(settings);
+      this.muted = settings.muted;
+      this.options = ['Critterdex', 'Party', 'Options', this.muted ? 'Unmute' : 'Mute'];
+      if (canFastTravel()) this.options.push('Fly');
+      this.options.push('Save Game', 'Close');
+      this.selected = 3;
+      this.renderOptions();
     } else if (opt === 'Fly') {
       this.scene.launch('FastTravel', { fromPause: true });
       this.scene.pause();

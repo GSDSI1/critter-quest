@@ -101,6 +101,10 @@ export const ITEMS: Record<string, ItemDef> = {
     id: 'scope_lens', name: 'Scope Lens', description: 'Held: raises critical-hit ratio.',
     price: 12000, category: 'battle', usableInBattle: false, usableOverworld: false,
   },
+  lum_berry: {
+    id: 'lum_berry', name: 'Lum Berry', description: 'Held: cures any status condition once.',
+    price: 1200, category: 'battle', usableInBattle: false, usableOverworld: false,
+  },
 };
 
 export const SHOP_STOCK = [
@@ -108,7 +112,7 @@ export const SHOP_STOCK = [
   'potion', 'super_potion', 'hyper_potion', 'full_restore',
   'revive', 'ether',
   'antidote', 'paralyze_heal', 'burn_heal', 'awakening', 'full_heal',
-  'oran_berry', 'charcoal', 'mystic_water', 'silk_scarf', 'never_melt_ice', 'twisted_spoon', 'scope_lens',
+  'oran_berry', 'lum_berry', 'charcoal', 'mystic_water', 'silk_scarf', 'never_melt_ice', 'twisted_spoon', 'scope_lens',
 ];
 
 export function getItem(id: string): ItemDef {
@@ -135,6 +139,7 @@ export function emptyBag(): ItemBag {
     max_revive: 0,
     ether: 0,
     oran_berry: 0,
+    lum_berry: 0,
     charcoal: 0,
     mystic_water: 0,
     silk_scarf: 0,

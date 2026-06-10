@@ -54,3 +54,8 @@ export function canAlwaysRun(): boolean {
 export function autoAdvanceMs(): number {
   return TEXT_SPEED_MS[cached.textSpeed];
 }
+
+/** Battle/overworld auto-advance: slow stays manual. */
+export function shouldAutoAdvanceText(): boolean {
+  return cached.textSpeed !== 'slow';
+}

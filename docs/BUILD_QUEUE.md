@@ -14,13 +14,16 @@ Last updated: 2026-06-10. Source: `GAMEPLAN.md`.
 | **Opt** | Battle send-out + faint tween polish | ✓ |
 | **Opt** | Post-champion trainer rematch roster pass (`src/data/rematches.ts`) | ✓ |
 | **Opt** | Grass↔path 16-case autotile bitmask + night encounter tables | ✓ |
+| **Opt** | Water-shore autotile bitmask (frames 36–50) | ✓ |
+| **Opt** | Battle feel pass (back idle, text speed, element VFX, walk puffs) | ✓ |
+| **Opt** | Lum Berry held item + pause-menu mute toggle | ✓ |
 
 ## Optional polish (future)
 
 | Item | Notes |
 |------|-------|
 | Kenney tileset drop-in | Replace `tileset.png`; re-run `npm run pack-tileset` |
-| Water shore autotile bitmask | Extend tileset beyond grass↔path transitions |
+| CC0 music file loops | Replace procedural BGM in `music.ts` |
 
 ## Verify
 

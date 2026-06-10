@@ -238,19 +238,20 @@ export function startCritterIdle(
   sprite: Phaser.GameObjects.Image,
   speciesId: string,
   bobY?: number,
+  variant: 'front' | 'back' = 'front',
 ): CritterIdleHandle {
   let stopped = false;
   let timer: Phaser.Time.TimerEvent | undefined;
   let bob: Phaser.Tweens.Tween | undefined;
 
-  const atlas = usesCreatureAtlas(scene);
-  const f1 = creatureTexRef(scene, speciesId, false, 'front');
-  const f2 = creatureTexRef(scene, speciesId, false, 'f2');
-  const hasF2 = atlas
-    ? hasAtlasFrame(scene, creatureFrameName(speciesId, false, 'f2'), false)
-    : isRealExternalTexture(scene, `ext_creature_${speciesId}_f2`);
+  applyCreatureTexture(sprite, scene, speciesId, false, variant);
 
-  applyCreatureTexture(sprite, scene, speciesId, false, 'front');
+  const atlas = usesCreatureAtlas(scene);
+  const f1 = creatureTexRef(scene, speciesId, false, variant);
+  const f2 = creatureTexRef(scene, speciesId, false, 'f2');
+  const hasF2 = variant === 'front' && (atlas
+    ? hasAtlasFrame(scene, creatureFrameName(speciesId, false, 'f2'), false)
+    : isRealExternalTexture(scene, `ext_creature_${speciesId}_f2`));
 
   if (hasF2) {
     let frame = 0;

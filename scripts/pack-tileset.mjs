@@ -12,8 +12,9 @@ const out = join(outDir, 'tileset.png');
 
 const W = 16;
 const BASE_COUNT = 21;
-const AUTOTILE_COUNT = 15;
-const COUNT = BASE_COUNT + AUTOTILE_COUNT;
+const GRASS_PATH_AUTOTILE_COUNT = 15;
+const WATER_SHORE_AUTOTILE_COUNT = 15;
+const COUNT = BASE_COUNT + GRASS_PATH_AUTOTILE_COUNT + WATER_SHORE_AUTOTILE_COUNT;
 const H = W * COUNT;
 
 const C = {
@@ -185,9 +186,49 @@ function drawGrassPathAutotile(mask) {
   return rgba;
 }
 
+/** Grass or path tile with water edges for 4-bit neighbor mask (1–15). */
+function drawWaterShoreAutotile(mask) {
+  const rgba = Buffer.alloc(W * W * 4, 0);
+  fillRect(rgba, W, W, 0, 0, W, W, [...C.grass, 255]);
+  const edge = 5;
+  const waterEdge = [...shade(C.water, 20), 255];
+  const foam = [...shade(C.water, 50), 220];
+  if (mask & 1) {
+    fillRect(rgba, W, W, 0, 0, W, edge, waterEdge);
+    fillRect(rgba, W, W, 0, edge - 2, W, 2, foam);
+  }
+  if (mask & 2) {
+    fillRect(rgba, W, W, W - edge, 0, edge, W, waterEdge);
+    fillRect(rgba, W, W, W - edge - 1, 0, 2, W, foam);
+  }
+  if (mask & 4) {
+    fillRect(rgba, W, W, 0, W - edge, W, edge, waterEdge);
+    fillRect(rgba, W, W, 0, W - edge, W, 2, foam);
+  }
+  if (mask & 8) {
+    fillRect(rgba, W, W, 0, 0, edge, W, waterEdge);
+    fillRect(rgba, W, W, edge - 1, 0, 2, W, foam);
+  }
+  if ((mask & 3) === 3) fillRect(rgba, W, W, W - edge, 0, edge, edge, waterEdge);
+  if ((mask & 6) === 6) fillRect(rgba, W, W, W - edge, W - edge, edge, edge, waterEdge);
+  if ((mask & 9) === 9) fillRect(rgba, W, W, 0, 0, edge, edge, waterEdge);
+  if ((mask & 12) === 12) fillRect(rgba, W, W, 0, W - edge, edge, edge, waterEdge);
+  for (let i = 0; i < 3; i++) {
+    setPx(rgba, W, (i * 4 + mask) % 12 + 2, (i * 3 + 2) % 10 + 4, [...shade(C.grassDark, 10), 255]);
+  }
+  return rgba;
+}
+
 const sheet = Buffer.alloc(W * H * 4, 0);
 for (let id = 0; id < COUNT; id++) {
-  const tile = id >= BASE_COUNT ? drawGrassPathAutotile(id - BASE_COUNT + 1) : drawTile(id, id % 2);
+  let tile;
+  if (id >= BASE_COUNT + GRASS_PATH_AUTOTILE_COUNT) {
+    tile = drawWaterShoreAutotile(id - BASE_COUNT - GRASS_PATH_AUTOTILE_COUNT + 1);
+  } else if (id >= BASE_COUNT) {
+    tile = drawGrassPathAutotile(id - BASE_COUNT + 1);
+  } else {
+    tile = drawTile(id, id % 2);
+  }
   for (let y = 0; y < W; y++) {
     tile.copy(sheet, ((id * W + y) * W) * 4, y * W * 4, (y + 1) * W * 4);
   }

@@ -20,6 +20,7 @@ import { Input } from '../systems/input';
 import { BattleAnims } from './battle/BattleAnims';
 import { BattleUi, MENU_ITEMS, type BattlePhase, type BattleUiHost } from './battle/BattleUi';
 import { BattleFlow, type BattleFlowHost } from './battle/BattleFlow';
+import { autoAdvanceMs, shouldAutoAdvanceText } from '../systems/options';
 import {
   isEliteGauntletActive, clearEliteGauntlet, nextGauntletTrainerId,
   findGauntletNpc, buildTrainerBattleData,
@@ -49,6 +50,7 @@ export class BattleScene extends Phaser.Scene implements BattleUiHost, BattleFlo
   ui!: BattleUi;
   battleAnims!: BattleAnims;
   private flow!: BattleFlow;
+  private messageAutoTimer?: Phaser.Time.TimerEvent;
 
   constructor() {
     super('Battle');
@@ -155,7 +157,11 @@ export class BattleScene extends Phaser.Scene implements BattleUiHost, BattleFlo
   }
 
   onConfirm(): void {
-    if (this.phase === 'message' || this.phase === 'intro') this.showNextMessage();
+    if (this.phase === 'message' || this.phase === 'intro') {
+      this.clearMessageAutoTimer();
+      this.showNextMessage();
+      return;
+    }
     else if (this.phase === 'evolve') this.flow.doEvolution();
     else if (this.phase === 'menu') this.menuChoice(MENU_ITEMS[this.menuIndex]);
     else if (this.phase === 'moves') this.useMove(this.moveIndex);
@@ -330,12 +336,24 @@ export class BattleScene extends Phaser.Scene implements BattleUiHost, BattleFlo
   }
 
   showNextMessage(): void {
-    this.ui.showNextMessage(() => {
+    this.clearMessageAutoTimer();
+    const shown = this.ui.showNextMessage(() => {
+      this.clearMessageAutoTimer();
       if (this.phase === 'message' || this.phase === 'intro') {
         this.phase = 'menu';
         this.ui.showMenu();
       }
     });
+    if (shown && shouldAutoAdvanceText() && (this.phase === 'message' || this.phase === 'intro')) {
+      this.messageAutoTimer = this.time.delayedCall(autoAdvanceMs(), () => {
+        if (this.phase === 'message' || this.phase === 'intro') this.showNextMessage();
+      });
+    }
+  }
+
+  private clearMessageAutoTimer(): void {
+    this.messageAutoTimer?.remove(false);
+    this.messageAutoTimer = undefined;
   }
 
   switchTo(index: number, voluntary = true): void {

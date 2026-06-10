@@ -6,14 +6,74 @@ function isPlayerSprite(sprite: Phaser.GameObjects.Image): boolean {
   return sprite.x < GAME_WIDTH / 2;
 }
 
-export class BattleAnims {
-  constructor(private scene: Phaser.Scene) {}
+type BurstFn = (scene: Phaser.Scene, x: number, y: number, color: number) => void;
 
-  addIdleBob(sprite: Phaser.GameObjects.Image, y: number, duration: number): void {
-    this.scene.tweens.add({
-      targets: sprite, y, duration, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
+function burstCircles(scene: Phaser.Scene, x: number, y: number, color: number, count: number, spread: number, dy = 0): void {
+  for (let i = 0; i < count; i++) {
+    const g = scene.add.graphics().setDepth(200);
+    g.fillStyle(color, 0.9);
+    g.fillCircle(0, 0, 3 + (i % 2));
+    g.setPosition(x + (i - count / 2) * spread, y + dy);
+    scene.tweens.add({
+      targets: g,
+      x: g.x + (i - count / 2) * 4,
+      y: g.y - 8 - Math.abs(i - count / 2) * 3,
+      alpha: 0,
+      scaleX: 1.8,
+      scaleY: 1.8,
+      duration: 280 + i * 30,
+      onComplete: () => g.destroy(),
     });
   }
+}
+
+function burstLines(scene: Phaser.Scene, x: number, y: number, color: number): void {
+  for (let i = 0; i < 5; i++) {
+    const g = scene.add.graphics().setDepth(200);
+    g.lineStyle(2, color, 0.95);
+    const angle = (-60 + i * 30) * (Math.PI / 180);
+    g.lineBetween(0, 0, Math.cos(angle) * 14, Math.sin(angle) * 14);
+    g.setPosition(x, y);
+    scene.tweens.add({
+      targets: g,
+      x: x + Math.cos(angle) * 18,
+      y: y + Math.sin(angle) * 18,
+      alpha: 0,
+      duration: 220,
+      onComplete: () => g.destroy(),
+    });
+  }
+}
+
+function burstRing(scene: Phaser.Scene, x: number, y: number, color: number): void {
+  const g = scene.add.graphics().setDepth(200);
+  g.lineStyle(3, color, 0.85);
+  g.strokeCircle(0, 0, 6);
+  g.setPosition(x, y);
+  scene.tweens.add({
+    targets: g, scaleX: 2.8, scaleY: 2.8, alpha: 0, duration: 360, onComplete: () => g.destroy(),
+  });
+}
+
+const ELEMENT_BURSTS: Record<string, BurstFn> = {
+  flame: (s, x, y, c) => burstCircles(s, x, y, c, 5, 6, -4),
+  tide: (s, x, y, c) => {
+    burstCircles(s, x, y - 4, c, 4, 8, 6);
+    burstCircles(s, x, y + 2, c, 3, 5, 0);
+  },
+  leaf: (s, x, y, c) => burstCircles(s, x - 6, y, c, 4, 5, -2),
+  volt: (s, x, y, c) => burstLines(s, x, y, c),
+  stone: (s, x, y, c) => burstCircles(s, x, y + 4, c, 6, 4, 4),
+  shadow: (s, x, y, c) => {
+    burstCircles(s, x, y, c, 3, 7, 0);
+    burstRing(s, x, y, c);
+  },
+  ice: (s, x, y, c) => burstCircles(s, x, y - 2, c, 5, 5, -6),
+  psychic: (s, x, y, c) => burstRing(s, x, y, c),
+};
+
+export class BattleAnims {
+  constructor(private scene: Phaser.Scene) {}
 
   animateSendOut(sprite: Phaser.GameObjects.Image, endX: number, isPlayer: boolean): void {
     sprite.setScale(isPlayer ? 2 : 1.5);
@@ -52,13 +112,10 @@ export class BattleAnims {
       flame: 0xff6b35, tide: 0x3b82f6, leaf: 0x22c55e, volt: 0xfacc15,
       stone: 0xa8a29e, shadow: 0x7c3aed, ice: 0x67e8f9, psychic: 0xf472b6,
     };
-    const g = this.scene.add.graphics().setDepth(200);
-    g.fillStyle(colors[element] ?? 0xffffff, 0.85);
-    g.fillCircle(x, y, 10);
-    this.scene.tweens.add({
-      targets: g, scaleX: 2.5, scaleY: 2.5, alpha: 0, duration: 320,
-      onComplete: () => g.destroy(),
-    });
+    const color = colors[element] ?? 0xffffff;
+    const burst = ELEMENT_BURSTS[element];
+    if (burst) burst(this.scene, x, y, color);
+    else burstCircles(this.scene, x, y, color, 4, 5);
   }
 
   applyEffectivenessTint(

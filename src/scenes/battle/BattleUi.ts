@@ -87,7 +87,7 @@ export class BattleUi {
 
     this.scene.add.image(180, 340, 'battle_platform').setAlpha(0.9);
     this.playerSprite = addCreatureImage(this.scene, 160, 290, this.host.playerMon.speciesId, false, 'back').setScale(2).setFlipX(true);
-    this.playerIdle = startCritterIdle(this.scene, this.playerSprite, this.host.playerMon.speciesId, 290);
+    this.playerIdle = startCritterIdle(this.scene, this.playerSprite, this.host.playerMon.speciesId, 290, 'back');
 
     const pBox = this.scene.add.graphics();
     pBox.fillStyle(COLORS.panel, 0.92);
@@ -158,7 +158,7 @@ export class BattleUi {
   refreshPlayerSprite(speciesId: string): void {
     this.playerIdle?.stop();
     applyCreatureTexture(this.playerSprite, this.scene, speciesId, false, 'back');
-    this.playerIdle = startCritterIdle(this.scene, this.playerSprite, speciesId, 290);
+    this.playerIdle = startCritterIdle(this.scene, this.playerSprite, speciesId, 290, 'back');
   }
 
   refreshPlayerUi(): void {
@@ -309,14 +309,15 @@ export class BattleUi {
 
   queueMessage(msg: string): void { this.messageQueue.push(msg); }
 
-  showNextMessage(onExhausted: () => void): void {
+  showNextMessage(onExhausted: () => void): boolean {
     if (this.messageQueue.length === 0) {
       this.continueBtn?.setVisible(false);
       onExhausted();
-      return;
+      return false;
     }
     this.messageText.setText(this.messageQueue.shift()!);
     this.continueBtn?.setVisible(true);
+    return true;
   }
 
   private animateHp(bar: Phaser.GameObjects.Graphics, current: number, max: number, x: number, y: number): void {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { calcDamage, stageMult, expGain, tryRun, tryCatchWithItem } from '../battle';
+import { calcDamage, stageMult, expGain, tryRun, tryCatchWithItem, applyMoveStatus } from '../battle';
 import { createCritter } from '../stats';
 import { createSeededRng } from '../rng';
 import { typeMultiplier } from '../../data/types';
@@ -62,5 +62,16 @@ describe('expGain', () => {
   it('awards more exp for trainer battles', () => {
     const c = createCritter('mossling', 10);
     expect(expGain(c, false)).toBeGreaterThan(expGain(c, true));
+  });
+});
+
+describe('lum berry', () => {
+  it('cures inflicted status and is consumed', () => {
+    const def = createCritter('mossling', 10);
+    def.heldItem = 'lum_berry';
+    const msg = applyMoveStatus(def, 'poison', 100, createSeededRng(1));
+    expect(msg).toContain('Lum Berry');
+    expect(def.status).toBeNull();
+    expect(def.heldItem).toBeUndefined();
   });
 });

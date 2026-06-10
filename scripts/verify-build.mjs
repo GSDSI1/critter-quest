@@ -254,7 +254,27 @@ if (existsSync(join(root, 'src/utils/tileAutotile.ts'))) {
   if (autotile.includes('applyGrassPathAutotiles') && autotile.includes('AUTOTILE_GRASS_PATH_BASE')) {
     ok('Grass↔path 16-case autotile helper');
   } else fail('tileAutotile.ts incomplete');
+  if (autotile.includes('applyWaterShoreAutotiles') && autotile.includes('AUTOTILE_WATER_SHORE_BASE')) {
+    ok('Water-shore autotile helper');
+  } else fail('tileAutotile.ts missing water shore autotiles');
 } else fail('src/utils/tileAutotile.ts missing');
+
+const battleSrc = read('src/systems/battle.ts');
+if (battleSrc.includes('lum_berry') || read('src/data/items.ts').includes('lum_berry')) ok('Lum Berry held item');
+else fail('Lum Berry missing');
+
+const pauseMenu = read('src/scenes/PauseMenuScene.ts');
+if (pauseMenu.includes('Mute') && pauseMenu.includes('loadAudioSettings')) ok('Pause menu mute toggle');
+else fail('PauseMenuScene missing mute toggle');
+
+const battleScene = read('src/scenes/BattleScene.ts');
+if (battleScene.includes('shouldAutoAdvanceText') && battleScene.includes('messageAutoTimer')) {
+  ok('Battle text speed auto-advance');
+} else fail('BattleScene missing text speed wiring');
+
+const battleAnims = read('src/scenes/battle/BattleAnims.ts');
+if (battleAnims.includes('ELEMENT_BURSTS')) ok('Element-typed battle move VFX');
+else fail('BattleAnims missing element VFX');
 
 const encounters = read('src/data/encounters.ts');
 if (encounters.includes('resolveEncounterTable') && encounters.includes('forest_night')) {
@@ -269,8 +289,7 @@ if (victory.includes("'Victory'") && (victory.includes('champion') || victory.in
   ok('VictoryScene endgame credits');
 } else fail('VictoryScene incomplete');
 
-const battleSrc = read('src/scenes/BattleScene.ts');
-if (battleSrc.includes("'Victory'") && battleSrc.includes('rival3')) ok('Battle triggers Victory after rival3');
+if (battleScene.includes("'Victory'") && battleScene.includes('rival3')) ok('Battle triggers Victory after rival3');
 else fail('Battle victory trigger missing');
 
 const dist = join(root, 'dist/index.html');
@@ -306,7 +325,7 @@ if (existsSync(join(root, 'src/ui/sceneBackdrops.ts'))) {
 if (existsSync(join(root, 'e2e/lab-intro.spec.ts'))) ok('E2E lab intro spec');
 else fail('e2e/lab-intro.spec.ts missing');
 
-if (!battleSrc.includes('setupInput')) ok('BattleScene no duplicate setupInput');
+if (!battleScene.includes('setupInput')) ok('BattleScene no duplicate setupInput');
 else fail('BattleScene still calls setupInput()');
 
 if (boot.includes('preloadAssetMeta') && boot.includes('isPlaceholderAssets')) ok('BootScene placeholder-aware preload');
