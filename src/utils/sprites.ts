@@ -593,16 +593,37 @@ export function generateAssets(scene: Phaser.Scene): void {
 
   for (const [type, color] of [['flame', 0xff6b35], ['tide', 0x3b82f6], ['leaf', 0x22c55e]] as const) {
     const og = scene.make.graphics({ x: 0, y: 0 });
+    const c = color as number;
+    // Pedestal
+    og.fillStyle(0x44403c, 1);
+    og.fillRoundedRect(14, 52, 36, 10, 3);
+    og.fillStyle(0x57534e, 1);
+    og.fillRoundedRect(18, 48, 28, 6, 2);
+    // Outer glow ring
+    og.fillStyle(c, 0.25);
+    og.fillCircle(32, 30, 28);
+    // Shell
     og.fillStyle(0xffffff, 1);
-    og.fillCircle(24, 24, 22);
-    og.fillStyle(color, 1);
-    og.fillCircle(24, 24, 16);
-    og.fillStyle(lighten(color as number, 40), 0.6);
-    og.fillCircle(18, 18, 6);
-    og.lineStyle(3, 0x333333, 1);
-    og.strokeCircle(24, 24, 22);
-    og.lineBetween(4, 24, 44, 24);
-    og.generateTexture(`starter_orb_${type}`, 48, 48);
+    og.fillCircle(32, 28, 24);
+    og.fillStyle(0xf0f0f0, 1);
+    og.fillCircle(32, 30, 22);
+    // Colored core
+    og.fillStyle(c, 1);
+    og.fillCircle(32, 28, 17);
+    og.fillStyle(lighten(c, 50), 0.7);
+    og.fillCircle(24, 20, 7);
+    og.fillStyle(0xffffff, 0.35);
+    og.fillEllipse(38, 22, 8, 5);
+    // Band + button
+    og.lineStyle(4, 0x1a1a2e, 1);
+    og.strokeCircle(32, 28, 22);
+    og.fillStyle(0x1a1a2e, 1);
+    og.fillRect(8, 26, 48, 4);
+    og.fillStyle(lighten(c, 30), 1);
+    og.fillCircle(32, 28, 6);
+    og.fillStyle(0xffffff, 0.5);
+    og.fillCircle(30, 26, 2);
+    og.generateTexture(`starter_orb_${type}`, 64, 64);
     og.destroy();
   }
 

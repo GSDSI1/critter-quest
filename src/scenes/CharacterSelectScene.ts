@@ -5,6 +5,7 @@ import { GameState } from '../systems/stats';
 import { playerTextureKey } from '../utils/sprites';
 import { buildTitleBackdrop, addBlinkingPrompt } from '../ui/titleScreen';
 import { buildMenuPanel } from '../ui/sceneBackdrops';
+import { createTouchButton } from '../ui/touchButtons';
 import { Input } from '../systems/input';
 import { Sfx } from '../utils/audio';
 
@@ -83,7 +84,11 @@ export class CharacterSelectScene extends Phaser.Scene {
       fontFamily: '"Courier New", monospace', fontSize: '20px', color: '#f5c542',
     }).setOrigin(0.5).setDepth(10);
 
-    addBlinkingPrompt(this, 'Type name · A / Z confirm  ·  B / ESC back', GAME_HEIGHT - 52);
+    addBlinkingPrompt(this, 'Type name · tap Confirm or press Z', GAME_HEIGHT - 52);
+
+    createTouchButton(this, GAME_WIDTH / 2 - 120, 430, '◀', () => this.cycle(-1), { width: 52, depth: 12 });
+    createTouchButton(this, GAME_WIDTH / 2, 430, 'Confirm', () => this.confirm(), { width: 110, depth: 12 });
+    createTouchButton(this, GAME_WIDTH / 2 + 120, 430, '▶', () => this.cycle(1), { width: 52, depth: 12 });
 
     this.input.keyboard?.on('keydown', (ev: KeyboardEvent) => {
       if (ev.key === 'Backspace') {

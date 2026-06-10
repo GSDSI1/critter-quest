@@ -38,7 +38,7 @@ export function buildLabInterior(scene: Phaser.Scene, depth = -5): Phaser.GameOb
   const c = scene.add.container(0, 0).setDepth(depth);
 
   const wall = scene.add.graphics();
-  wall.fillGradientStyle(0x1e293b, 0x1e293b, 0x334155, 0x312e81, 1);
+  wall.fillGradientStyle(0x2d3748, 0x2d3748, 0x4a5568, 0x553c9a, 1);
   wall.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
   c.add(wall);
 

@@ -1,7 +1,7 @@
 import { getCreature } from '../data/creatures';
 import { getMove } from '../data/moves';
 import { movesKnownAtLevel } from '../data/learnsets';
-import { emptyBag, type ItemBag } from '../data/items';
+import { emptyBag, addItem, type ItemBag } from '../data/items';
 import { defaultAbilityForTypes } from '../data/abilities';
 import { randomNature, randomIvs, natureMult } from '../data/natures';
 import type { ElementType } from '../data/types';
@@ -200,6 +200,9 @@ export function registerCaught(dexCaught: string[], speciesId: string, dexSeen?:
 }
 
 export function defaultPlayer(): PlayerState {
+  const items = emptyBag();
+  addItem(items, 'potion', 3);
+  addItem(items, 'capture_orb', 5);
   return {
     name: 'Trainer',
     characterId: 'scout',
@@ -208,8 +211,8 @@ export function defaultPlayer(): PlayerState {
     facing: 'up',
     party: [],
     storage: [],
-    money: 800,
-    items: emptyBag(),
+    money: 1500,
+    items,
     badges: [],
     dexSeen: [],
     dexCaught: [],

@@ -12,7 +12,7 @@
     "check": "npm run verify && npm run build",
     "smoke": "node scripts/smoke-http.mjs",
     "play": "node -e \"console.log('\\n  Critter Quest → http://127.0.0.1:5180\\n')\" && npm run dev",
-    "test:e2e": "playwright test",
+    "test:e2e": "node scripts/ensure-dev-port.mjs && playwright test",
     "test:all": "npm run verify && npm run build && npm run test:e2e"
   },
   "dependencies": {

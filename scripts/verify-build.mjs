@@ -94,8 +94,9 @@ if (lab.includes("'StarterSelect'")) ok('LabIntro → StarterSelect');
 else fail('LabIntro missing StarterSelect route');
 
 const starter = read('src/scenes/StarterSelectScene.ts');
-if (starter.includes("'Overworld'") && starter.includes('lab_bench')) ok('StarterSelect → Overworld (lab table)');
-else fail('StarterSelect flow incomplete');
+if (starter.includes("'Overworld'") && (starter.includes('chooseBtn') || starter.includes('Choose!'))) {
+  ok('StarterSelect → Overworld (touch picker)');
+} else fail('StarterSelect flow incomplete');
 
 // ── Systems ──
 const stats = read('src/systems/stats.ts');
@@ -138,8 +139,9 @@ for (const uiFile of ['DialogBox.ts', 'ControlsPanel.ts', 'HUD.ts']) {
     ok(`${uiFile} pins UI to screen`);
   } else fail(`${uiFile} missing screen pin`);
 }
-if (read('src/ui/DialogBox.ts').includes('pointerdown')) ok('DialogBox click/tap advance');
-else fail('DialogBox missing pointer advance');
+const dialogBoxEarly = read('src/ui/DialogBox.ts');
+if (dialogBoxEarly.includes('createTouchButton') || dialogBoxEarly.includes('pointerdown')) ok('DialogBox touch/click advance');
+else fail('DialogBox missing touch advance');
 if (read('src/ui/ControlsPanel.ts').includes('pointerdown')) ok('ControlsPanel click/tap advance');
 else fail('ControlsPanel missing pointer advance');
 
@@ -159,6 +161,11 @@ if (existsSync(join(root, 'src/data/characters.ts'))) {
 } else fail('characters.ts missing');
 
 const overworld = read('src/scenes/OverworldScene.ts');
+if (existsSync(join(root, 'src/ui/touchButtons.ts'))) ok('touchButtons.ts on-screen controls');
+else fail('src/ui/touchButtons.ts missing');
+
+if (overworld.includes('OverworldTouchPad')) ok('Overworld touch D-pad');
+else fail('OverworldScene missing touch pad');
 if (overworld.includes('playerTextureKey') && overworld.includes('applyOverworldCamera')) {
   ok('Overworld: player sprite + camera');
 } else fail('OverworldScene incomplete');

@@ -25,6 +25,7 @@ import { statusLabel } from '../systems/status';
 import { creatureTextureKey } from '../utils/assetLoader';
 import { buildBattleArena } from '../ui/sceneBackdrops';
 import { pinContainerChildren } from '../ui/screenUi';
+import { createTouchButton } from '../ui/touchButtons';
 import { Sfx } from '../utils/audio';
 import { Input } from '../systems/input';
 
@@ -67,6 +68,7 @@ export class BattleScene extends Phaser.Scene {
   private menuContainer!: Phaser.GameObjects.Container;
   private moveContainer!: Phaser.GameObjects.Container;
   private bagContainer!: Phaser.GameObjects.Container;
+  private continueBtn!: ReturnType<typeof createTouchButton>;
   private enemyNameText!: Phaser.GameObjects.Text;
   private playerHpText!: Phaser.GameObjects.Text;
   private abilityText!: Phaser.GameObjects.Text;
@@ -199,6 +201,12 @@ export class BattleScene extends Phaser.Scene {
     this.bagContainer = this.add.container(0, 0).setVisible(false).setDepth(1100);
     pinContainerChildren(this.moveContainer, 1100);
     pinContainerChildren(this.bagContainer, 1100);
+    this.continueBtn = createTouchButton(
+      this, GAME_WIDTH - 70, 416, 'Continue ▶',
+      () => this.onConfirm(),
+      { width: 110, height: 34, depth: 1101, fontSize: '11px' },
+    );
+    this.continueBtn.setVisible(false);
     this.refreshPlayerUi();
   }
 
@@ -260,6 +268,9 @@ export class BattleScene extends Phaser.Scene {
 
   update(): void {
     Input.update();
+    const showContinue = this.phase === 'message' || this.phase === 'intro';
+    this.continueBtn?.setVisible(showContinue);
+    this.continueBtn?.setEnabled(showContinue);
     if (Input.justPressed('up')) this.onNav(-1, 0);
     if (Input.justPressed('down')) this.onNav(1, 0);
     if (Input.justPressed('left')) this.onNav(0, -1);
@@ -745,6 +756,7 @@ export class BattleScene extends Phaser.Scene {
 
   private showNextMessage(): void {
     if (this.messageQueue.length === 0) {
+      this.continueBtn?.setVisible(false);
       if (this.phase === 'message' || this.phase === 'intro') {
         this.phase = 'menu';
         this.menuContainer.setVisible(true);
@@ -753,6 +765,7 @@ export class BattleScene extends Phaser.Scene {
       return;
     }
     this.messageText.setText(this.messageQueue.shift()!);
+    this.continueBtn?.setVisible(true);
   }
 
   private animateHp(bar: Phaser.GameObjects.Graphics, current: number, max: number, x: number, y: number): void {

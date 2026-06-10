@@ -243,7 +243,7 @@ export function tryCatchWithItem(wild: CritterInstance, itemId: string): { caugh
   const hpFactor = (wild.maxHp * 3 - wild.currentHp * 2) / (wild.maxHp * 3);
   const catchValue = hpFactor * (def.catchRate / 255) * (item.catchBonus ?? 1);
   const shakes = catchValue > 0.7 ? 3 : catchValue > 0.4 ? 2 : catchValue > 0.15 ? 1 : 0;
-  const caught = Math.random() < catchValue * 0.85 + 0.08;
+  const caught = Math.random() < Math.min(0.92, catchValue * 1.15 + 0.14);
 
   let message = `You threw a ${item.name}!`;
   if (caught) message += ' Gotcha! Critter was caught!';

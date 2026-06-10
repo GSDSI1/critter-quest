@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../data/types';
 import { pinContainerChildren } from './screenUi';
+import { createTouchButton } from './touchButtons';
+import { Sfx } from '../utils/audio';
 
 const BOX_X = 16;
 const BOX_Y = GAME_HEIGHT - 112;
@@ -13,17 +15,13 @@ export class DialogBox {
   private container: Phaser.GameObjects.Container;
   private speakerText: Phaser.GameObjects.Text;
   private textObj: Phaser.GameObjects.Text;
-  private hintText: Phaser.GameObjects.Text;
+  private nextBtn: ReturnType<typeof createTouchButton>;
   private lines: string[] = [];
   private lineIndex = 0;
   private onComplete?: () => void;
   private visible = false;
   private ignoreInputUntil = 0;
   private autoTimer?: Phaser.Time.TimerEvent;
-
-  private onPointerDown = () => {
-    if (this.visible && Date.now() >= this.ignoreInputUntil) this.advance();
-  };
 
   private onKeyAdvance = () => {
     if (this.visible && Date.now() >= this.ignoreInputUntil) this.advance();
@@ -53,40 +51,34 @@ export class DialogBox {
       fontFamily: '"Courier New", monospace',
       fontSize: '14px',
       color: '#f0f0f0',
-      wordWrap: { width: BOX_W - 32 },
+      wordWrap: { width: BOX_W - 140 },
       lineSpacing: 4,
     });
 
-    this.hintText = scene.add.text(BOX_X + BOX_W - 16, BOX_Y + BOX_H - 14, 'Z / Click ▼', {
-      fontFamily: '"Courier New", monospace',
-      fontSize: '10px',
-      color: '#667788',
-    }).setOrigin(1, 0.5);
-
-    this.container = scene.add.container(0, 0, [bg, this.speakerText, this.textObj, this.hintText]);
+    this.container = scene.add.container(0, 0, [bg, this.speakerText, this.textObj]);
     this.container.setDepth(1000).setVisible(false);
     pinContainerChildren(this.container, 1000);
 
-    scene.tweens.add({
-      targets: this.hintText,
-      alpha: 0.3,
-      duration: 550,
-      yoyo: true,
-      repeat: -1,
-      ease: 'Sine.easeInOut',
-    });
+    this.nextBtn = createTouchButton(
+      scene,
+      BOX_X + BOX_W - 58,
+      BOX_Y + BOX_H / 2,
+      'Next ▶',
+      () => this.advance(),
+      { width: 96, height: 34, depth: 1001, fontSize: '12px' },
+    );
+    this.nextBtn.setVisible(false);
 
-    scene.input.on('pointerdown', this.onPointerDown);
     scene.input.keyboard?.on('keydown-Z', this.onKeyAdvance);
     scene.input.keyboard?.on('keydown-ENTER', this.onKeyAdvance);
     scene.input.keyboard?.on('keydown-SPACE', this.onKeyAdvance);
 
     scene.events.once('shutdown', () => {
       this.clearAutoTimer();
-      scene.input.off('pointerdown', this.onPointerDown);
       scene.input.keyboard?.off('keydown-Z', this.onKeyAdvance);
       scene.input.keyboard?.off('keydown-ENTER', this.onKeyAdvance);
       scene.input.keyboard?.off('keydown-SPACE', this.onKeyAdvance);
+      this.nextBtn.destroy();
     });
   }
 
@@ -97,6 +89,7 @@ export class DialogBox {
     this.visible = true;
     this.ignoreInputUntil = Date.now() + 150;
     this.container.setVisible(true);
+    this.nextBtn.setVisible(true);
     this.speakerText.setText(speaker ?? '');
     this.speakerText.setVisible(!!speaker);
     this.renderLine();
@@ -106,6 +99,7 @@ export class DialogBox {
   hide(): void {
     this.visible = false;
     this.container.setVisible(false);
+    this.nextBtn.setVisible(false);
     this.onComplete = undefined;
     this.clearAutoTimer();
   }
@@ -116,6 +110,7 @@ export class DialogBox {
 
   advance(): void {
     if (!this.visible || Date.now() < this.ignoreInputUntil) return;
+    Sfx.menuConfirm();
     if (this.lineIndex < this.lines.length - 1) {
       this.lineIndex++;
       this.renderLine();

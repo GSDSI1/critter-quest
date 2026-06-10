@@ -58,6 +58,15 @@
           }
         }
       }, 12000);
+      // Hide error overlay once Phaser canvas mounts (stale overlay blocked E2E clicks)
+      var hideErrorIfReady = function () {
+        if (document.querySelector('#game-container canvas')) {
+          var el = document.getElementById('load-error');
+          if (el) el.classList.remove('visible');
+        }
+      };
+      setInterval(hideErrorIfReady, 250);
+      hideErrorIfReady();
     </script>
     <script type="module" src="/src/main.ts"></script>
   </body>

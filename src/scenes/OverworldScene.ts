@@ -14,6 +14,7 @@ import { DialogBox } from '../ui/DialogBox';
 import { ControlsPanel } from '../ui/ControlsPanel';
 import { OverworldHUD } from '../ui/HUD';
 import { showMapBannerForCurrentMap, showToast } from '../ui/mapBanner';
+import { OverworldTouchPad } from '../ui/touchButtons';
 import { pinToScreen } from '../ui/screenUi';
 import { npcTextureKey, isExternalTilesetAvailable, type NpcRole } from '../utils/assetLoader';
 import { applyOverworldCamera, isSmallInterior } from '../utils/camera';
@@ -36,6 +37,7 @@ export class OverworldScene extends Phaser.Scene {
   private inputLocked = false;
   private moveDuration = 200;
   private padToast?: Phaser.GameObjects.Text;
+  private touchPad?: OverworldTouchPad;
   private animTiles: { img: Phaser.GameObjects.Image; tile: number }[] = [];
   private animFrame = 0;
   private animTimer = 0;
@@ -57,6 +59,13 @@ export class OverworldScene extends Phaser.Scene {
     }).setOrigin(0.5).setDepth(1100).setVisible(false);
     pinToScreen(this.inputHint, 1100);
     this.addVignette();
+
+    this.touchPad = new OverworldTouchPad(
+      this,
+      (dx, dy) => this.tryMove(dx, dy),
+      () => this.tryInteract(),
+      () => { this.scene.launch('PauseMenu'); this.scene.pause(); },
+    );
 
     this.renderMap();
     this.spawnPlayer();
@@ -136,6 +145,7 @@ export class OverworldScene extends Phaser.Scene {
     }
 
     if (this.controlsPanel.isShowing()) {
+      this.touchPad?.setEnabled(false);
       if (Input.justPressed('left')) this.controlsPanel.prevPage();
       if (Input.justPressed('right')) this.controlsPanel.nextPage();
       if (Input.justPressed('confirm')) this.controlsPanel.advance();
@@ -145,12 +155,16 @@ export class OverworldScene extends Phaser.Scene {
     }
 
     if (this.dialog.isShowing()) {
+      this.touchPad?.setEnabled(false);
       if (Input.justPressed('confirm') || Input.justPressed('cancel')) this.dialog.advance();
       this.updateInputHint();
       return;
     }
 
     this.updateInputHint();
+
+    const blocked = this.inputLocked || this.moving || this.scene.isPaused();
+    this.touchPad?.setEnabled(!blocked);
 
     this.animTimer += delta;
     if (this.animTimer >= 500) {
@@ -162,7 +176,7 @@ export class OverworldScene extends Phaser.Scene {
       }
     }
 
-    if (this.inputLocked || this.moving || this.scene.isPaused()) return;
+    if (blocked) return;
     GameState.player.playTime += delta / 1000;
 
     if (Input.justPressed('party')) {
