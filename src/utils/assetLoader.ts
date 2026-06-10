@@ -6,6 +6,11 @@ export type NpcRole = typeof NPC_ROLES[number];
 
 export const EXTERNAL_CRITTERS = Object.keys(CREATURES);
 
+/** Loaded at boot — starters + first-route wild. Rest load in background. */
+export const BOOT_SPECIES = ['emberpup', 'aqualet', 'leafkit', 'mossling', 'cinderkit', 'thornling', 'sparkbit'] as const;
+
+const CREATURE_SUFFIXES = ['', '_f2', '_back', '_sm', '_sm_f2', '_sm_back'] as const;
+
 export const SFX_KEYS = [
   'menu_select', 'menu_confirm', 'hit', 'level_up', 'catch', 'heal', 'battle_start',
 ] as const;
@@ -29,24 +34,56 @@ export function preloadAssetMeta(scene: Phaser.Scene): void {
   scene.load.json('asset_meta', 'assets/meta.json');
 }
 
-export function preloadExternalArt(scene: Phaser.Scene): void {
+function queueCreatureFiles(scene: Phaser.Scene, id: string): void {
+  for (const suffix of CREATURE_SUFFIXES) {
+    const key = `ext_creature_${id}${suffix}`;
+    if (scene.textures.exists(key)) continue;
+    scene.load.image(key, `assets/critters/${id}${suffix}.png`);
+  }
+}
+
+function startQueuedLoads(scene: Phaser.Scene): Promise<void> {
+  if (scene.load.totalToLoad === 0) return Promise.resolve();
+  return new Promise(resolve => {
+    scene.load.once('complete', () => resolve());
+    scene.load.start();
+  });
+}
+
+/** Tileset, NPCs, SFX, and boot-critical critters only. */
+export function preloadBootArt(scene: Phaser.Scene): void {
   scene.load.spritesheet('ext_tileset', 'assets/tiles/tileset.png', {
     frameWidth: 16,
     frameHeight: 16,
   });
-  for (const id of EXTERNAL_CRITTERS) {
-    scene.load.image(`ext_creature_${id}`, `assets/critters/${id}.png`);
-    scene.load.image(`ext_creature_${id}_f2`, `assets/critters/${id}_f2.png`);
-    scene.load.image(`ext_creature_${id}_back`, `assets/critters/${id}_back.png`);
-    scene.load.image(`ext_creature_${id}_sm`, `assets/critters/${id}_sm.png`);
-    scene.load.image(`ext_creature_${id}_sm_f2`, `assets/critters/${id}_sm_f2.png`);
-    scene.load.image(`ext_creature_${id}_sm_back`, `assets/critters/${id}_sm_back.png`);
-  }
+  for (const id of BOOT_SPECIES) queueCreatureFiles(scene, id);
   for (const role of NPC_ROLES) {
     scene.load.image(`ext_npc_${role}`, `assets/npcs/${role}.png`);
   }
   for (const key of SFX_KEYS) {
     scene.load.audio(`sfx_${key}`, `assets/audio/${key}.wav`);
+  }
+}
+
+/** Load specific species PNGs on demand (battle, party, dex). */
+export function preloadCreatureTextures(scene: Phaser.Scene, ids: string[]): Promise<void> {
+  if (isPlaceholderAssets()) return Promise.resolve();
+  for (const id of ids) queueCreatureFiles(scene, id);
+  return startQueuedLoads(scene);
+}
+
+/** Background-load remaining species after menu is visible. */
+export function preloadAllRemainingCreatures(scene: Phaser.Scene): Promise<void> {
+  if (isPlaceholderAssets()) return Promise.resolve();
+  const rest = EXTERNAL_CRITTERS.filter(id => !(BOOT_SPECIES as readonly string[]).includes(id));
+  return preloadCreatureTextures(scene, rest);
+}
+
+export function preloadExternalArt(scene: Phaser.Scene): void {
+  preloadBootArt(scene);
+  for (const id of EXTERNAL_CRITTERS) {
+    if ((BOOT_SPECIES as readonly string[]).includes(id)) continue;
+    queueCreatureFiles(scene, id);
   }
 }
 
@@ -88,30 +125,47 @@ export function creatureTextureKey(
   return proc;
 }
 
+export interface CritterIdleHandle {
+  stop(): void;
+}
+
 export function startCritterIdle(
   scene: Phaser.Scene,
   sprite: Phaser.GameObjects.Image,
   speciesId: string,
   bobY?: number,
-): void {
+): CritterIdleHandle {
+  let stopped = false;
+  let timer: Phaser.Time.TimerEvent | undefined;
+  let bob: Phaser.Tweens.Tween | undefined;
+
   const f1 = creatureTextureKey(scene, speciesId, false, 'front');
   const f2 = creatureTextureKey(scene, speciesId, false, 'f2');
   const hasF2 = f2 !== f1 && scene.textures.exists(f2);
   if (hasF2) {
     let frame = 0;
-    scene.time.addEvent({
+    timer = scene.time.addEvent({
       delay: 450,
       loop: true,
       callback: () => {
+        if (stopped) return;
         frame = 1 - frame;
         sprite.setTexture(frame ? f2 : f1);
       },
     });
   }
   const baseY = bobY ?? sprite.y;
-  scene.tweens.add({
+  bob = scene.tweens.add({
     targets: sprite, y: baseY - 3, duration: 900, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
   });
+
+  return {
+    stop() {
+      stopped = true;
+      timer?.remove();
+      bob?.stop();
+    },
+  };
 }
 
 export function npcTextureKey(scene: Phaser.Scene, role: NpcRole = 'generic'): string {
@@ -121,6 +175,10 @@ export function npcTextureKey(scene: Phaser.Scene, role: NpcRole = 'generic'): s
 
 export function hasExternalCreature(scene: Phaser.Scene, id: string): boolean {
   return isRealExternalTexture(scene, `ext_creature_${id}`);
+}
+
+export function hasExternalNpc(scene: Phaser.Scene): boolean {
+  return isRealExternalTexture(scene, 'ext_npc_generic');
 }
 
 export function isExternalTilesetAvailable(scene: Phaser.Scene): boolean {

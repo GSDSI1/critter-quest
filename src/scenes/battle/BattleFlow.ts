@@ -16,7 +16,6 @@ import {
   GameState, type CritterInstance, displayName, isFainted, addExp, registerCaught, registerSeen,
 } from '../../systems/stats';
 import { trySave } from '../../utils/saveFeedback';
-import { creatureTextureKey } from '../../utils/assetLoader';
 import { Sfx } from '../../utils/audio';
 import type { BattlePhase } from './BattleUi';
 import type { BattleUi } from './BattleUi';
@@ -264,7 +263,7 @@ export class BattleFlow {
     if (this.host.evolveStep === 1) {
       this.host.evolveStep = 2;
       evolveCritter(this.host.playerMon, to);
-      this.host.ui.playerSprite.setTexture(creatureTextureKey(this.host.scene.scene, to));
+      this.host.ui.refreshPlayerSprite(to);
       this.host.ui.playerSprite.setAlpha(1);
       this.host.battleAnims.evolutionFlash(1);
       registerCaught(GameState.player.dexCaught, to, GameState.player.dexSeen);

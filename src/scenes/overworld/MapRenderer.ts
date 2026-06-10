@@ -5,14 +5,21 @@ import { isExternalTilesetAvailable } from '../../utils/assetLoader';
 import { isSmallInterior } from '../../utils/camera';
 import { tileTextureKey, proceduralTilesetKey, bakeProceduralTileset } from '../../utils/sprites';
 
+/** Alternate tileset frames for animated tall grass / water (see pack-tileset.mjs). */
+const ANIM_ALT: Record<number, number> = { 2: 19, 3: 20 };
+
 export class MapRenderer {
+  private static tileDataCache = new Map<string, number[][]>();
+
   private tileLayer?: Phaser.Tilemaps.TilemapLayer;
   private animContainer?: Phaser.GameObjects.Container;
   private decorLayer?: Phaser.GameObjects.Container;
   private animTiles: { img: Phaser.GameObjects.Image; tile: number; x: number; y: number }[] = [];
+  private animCells: { x: number; y: number; base: number; alt: number }[] = [];
   private animFrame = 0;
   private animTimer = 0;
   private map!: GameMap;
+  private useTileAnim = false;
 
   constructor(private scene: Phaser.Scene) {}
 
@@ -22,21 +29,18 @@ export class MapRenderer {
     this.animContainer?.destroy();
     this.decorLayer?.destroy();
     this.animTiles = [];
+    this.animCells = [];
+    this.useTileAnim = false;
 
-    const data: number[][] = [];
-    for (let y = 0; y < map.height; y++) {
-      data[y] = [];
-      for (let x = 0; x < map.width; x++) {
-        data[y][x] = getTile(map, x, y);
-      }
-    }
+    const data = MapRenderer.tileDataFor(map);
 
     if (isExternalTilesetAvailable(this.scene)) {
       const tm = this.scene.make.tilemap({ data, tileWidth: TILE_SIZE, tileHeight: TILE_SIZE });
       const tileset = tm.addTilesetImage('tileset', 'ext_tileset', TILE_SIZE, TILE_SIZE, 0, 0, 0);
       if (tileset) {
         this.tileLayer = tm.createLayer(0, tileset, 0, 0)?.setDepth(0);
-        this.buildAnimatedOverlays(map);
+        this.buildAnimatedOverlays(map, true);
+        this.renderEdgeOverlays();
         this.decorLayer = this.scene.add.container(0, 0).setDepth(6);
         this.renderDecorations();
         return;
@@ -51,13 +55,39 @@ export class MapRenderer {
       this.tileLayer = tm.createLayer(0, tileset, 0, 0)?.setDepth(0);
     }
 
-    this.buildAnimatedOverlays(map);
+    this.buildAnimatedOverlays(map, false);
     this.renderEdgeOverlays();
     this.decorLayer = this.scene.add.container(0, 0).setDepth(6);
     this.renderDecorations();
   }
 
-  private buildAnimatedOverlays(map: GameMap): void {
+  private static tileDataFor(map: GameMap): number[][] {
+    let cached = MapRenderer.tileDataCache.get(map.id);
+    if (cached) return cached;
+    cached = [];
+    for (let y = 0; y < map.height; y++) {
+      cached[y] = [];
+      for (let x = 0; x < map.width; x++) {
+        cached[y][x] = getTile(map, x, y);
+      }
+    }
+    MapRenderer.tileDataCache.set(map.id, cached);
+    return cached;
+  }
+
+  private buildAnimatedOverlays(map: GameMap, external: boolean): void {
+    if (external && this.tileLayer) {
+      for (let y = 0; y < map.height; y++) {
+        for (let x = 0; x < map.width; x++) {
+          const tile = getTile(map, x, y);
+          const alt = ANIM_ALT[tile];
+          if (alt !== undefined) this.animCells.push({ x, y, base: tile, alt });
+        }
+      }
+      this.useTileAnim = this.animCells.length > 0;
+      return;
+    }
+
     const theme: MapTheme = map.mapTheme ?? 'outdoor';
     this.animContainer = this.scene.add.container(0, 0).setDepth(2);
     for (let y = 0; y < map.height; y++) {
@@ -78,13 +108,20 @@ export class MapRenderer {
 
   update(delta: number): void {
     this.animTimer += delta;
-    if (this.animTimer >= 500) {
-      this.animTimer = 0;
-      this.animFrame = 1 - this.animFrame;
-      const theme = this.map.mapTheme;
-      for (const { img, tile } of this.animTiles) {
-        img.setTexture(tileTextureKey(tile, theme, this.animFrame));
+    if (this.animTimer < 500) return;
+    this.animTimer = 0;
+    this.animFrame = 1 - this.animFrame;
+
+    if (this.useTileAnim && this.tileLayer) {
+      for (const { x, y, base, alt } of this.animCells) {
+        this.tileLayer.putTileAt(this.animFrame ? alt : base, x, y);
       }
+      return;
+    }
+
+    const theme = this.map.mapTheme;
+    for (const { img, tile } of this.animTiles) {
+      img.setTexture(tileTextureKey(tile, theme, this.animFrame));
     }
   }
 

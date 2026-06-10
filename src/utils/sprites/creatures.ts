@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { TYPE_COLORS, type ElementType } from '../../data/types';
 import type { CreatureDef } from '../../data/creatures';
+import { isPlaceholderAssets } from '../assetLoader';
 import { darken, lighten } from './colors';
 
 function drawCreature(g: Phaser.GameObjects.Graphics, def: CreatureDef, cx: number, cy: number, size: number): void {
@@ -104,6 +105,7 @@ export function generateCreatureTexture(scene: Phaser.Scene, def: CreatureDef, k
 }
 
 export function ensureAllCreatureTextures(scene: Phaser.Scene, speciesIds: string[], getDef: (id: string) => CreatureDef): void {
+  if (!isPlaceholderAssets()) return;
   for (const id of speciesIds) {
     generateCreatureTexture(scene, getDef(id), `creature_${id}`, 64);
     generateCreatureTexture(scene, getDef(id), `creature_${id}_sm`, 32);

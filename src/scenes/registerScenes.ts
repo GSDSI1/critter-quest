@@ -1,4 +1,4 @@
-import type Phaser from 'phaser';
+import Phaser from 'phaser';
 import type { Types } from 'phaser';
 
 type SceneCtor = Types.Scenes.SceneType;
@@ -23,12 +23,55 @@ const LAZY_SCENES: { key: string; load: () => Promise<Record<string, SceneCtor>>
   { key: 'Nickname', load: () => import('./LearnMoveScene').then(m => ({ NicknameScene: m.NicknameScene })) },
 ];
 
-/** Lazy-register heavy scenes after boot for Vite code-splitting. */
-export async function registerLazyScenes(game: Phaser.Game): Promise<void> {
-  await Promise.all(LAZY_SCENES.map(async ({ key, load }) => {
-    if (game.scene.getScene(key)) return;
-    const mod = await load();
+const loading = new Map<string, Promise<void>>();
+let installed = false;
+
+/** Register a single scene chunk on first use. */
+export async function ensureSceneRegistered(game: Phaser.Game, key: string): Promise<void> {
+  if (game.scene.getScene(key)) return;
+  const entry = LAZY_SCENES.find(s => s.key === key);
+  if (!entry) return;
+  const pending = loading.get(key);
+  if (pending) return pending;
+
+  const p = (async () => {
+    const mod = await entry.load();
     const SceneClass = Object.values(mod).find(v => typeof v === 'function') as SceneCtor;
-    game.scene.add(key, SceneClass, false);
-  }));
+    if (!game.scene.getScene(key)) game.scene.add(key, SceneClass, false);
+  })();
+  loading.set(key, p);
+  await p;
+}
+
+/** Fire-and-forget prefetch for likely-next scenes. */
+export function prefetchScenes(game: Phaser.Game, keys: string[]): void {
+  for (const key of keys) void ensureSceneRegistered(game, key);
+}
+
+/** Patch scene.start/launch so chunks load on demand instead of at boot. */
+export function installLazySceneLoader(game: Phaser.Game): void {
+  if (installed) return;
+  installed = true;
+
+  const sm = game.scene;
+  const origStart = sm.start.bind(sm);
+  sm.start = (key: string, data?: object) => {
+    void ensureSceneRegistered(game, key).then(() => origStart(key, data));
+    return sm;
+  };
+
+  // launch lives on ScenePlugin (this.scene), not SceneManager
+  const proto = Phaser.Scenes.ScenePlugin.prototype as Phaser.Scenes.ScenePlugin & {
+    launch(key: string, data?: object): Phaser.Scenes.ScenePlugin;
+  };
+  const origLaunch = proto.launch;
+  proto.launch = function (this: Phaser.Scenes.ScenePlugin, key: string, data?: object) {
+    void ensureSceneRegistered(this.scene.game, key).then(() => origLaunch.call(this, key, data));
+    return this;
+  };
+}
+
+/** @deprecated Use installLazySceneLoader — kept for verify script compatibility. */
+export async function registerLazyScenes(game: Phaser.Game): Promise<void> {
+  installLazySceneLoader(game);
 }

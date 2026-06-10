@@ -13,6 +13,8 @@ import {
 } from '../ui/titleScreen';
 import { Input } from '../systems/input';
 import { Sfx } from '../utils/audio';
+import { preloadAllRemainingCreatures } from '../utils/assetLoader';
+import { prefetchScenes } from './registerScenes';
 
 export class MenuScene extends Phaser.Scene {
   private selected = 0;
@@ -30,6 +32,8 @@ export class MenuScene extends Phaser.Scene {
   create(): void {
     Input.bind(this);
     this.confirmingDelete = false;
+    prefetchScenes(this.game, ['CharacterSelect', 'Overworld']);
+    void preloadAllRemainingCreatures(this);
 
     const saveStatus = getSaveStatus();
     if (saveStatus === 'corrupt') {

@@ -4,6 +4,7 @@ import { generatePlayerAssets } from './player';
 import { generateNpcAssets } from './npcs';
 import { generateBattleBgAssets } from './battleBg';
 import { generateUiAssets } from './ui';
+import { isExternalTilesetAvailable, hasExternalNpc, isPlaceholderAssets } from '../assetLoader';
 
 export { playerTextureKey, playerBackTextureKey } from './player';
 export { tileTextureKey, proceduralTilesetKey, bakeProceduralTileset } from './tiles';
@@ -23,10 +24,14 @@ function generateFallbackBattleBg(scene: Phaser.Scene): void {
 }
 
 export function generateAssets(scene: Phaser.Scene): void {
-  generateTileAssets(scene);
+  if (isPlaceholderAssets() || !isExternalTilesetAvailable(scene)) {
+    generateTileAssets(scene);
+  }
   generateUiAssets(scene);
   generatePlayerAssets(scene);
-  generateNpcAssets(scene);
+  if (isPlaceholderAssets() || !hasExternalNpc(scene)) {
+    generateNpcAssets(scene);
+  }
   generateBattleBgAssets(scene);
   generateFallbackBattleBg(scene);
 }

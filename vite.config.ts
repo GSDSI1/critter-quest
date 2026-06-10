@@ -1,5 +1,5 @@
-import { readFileSync } from 'fs';
 import { defineConfig } from 'vite';
+import { readFileSync } from 'fs';
 import { VitePWA } from 'vite-plugin-pwa';
 
 const pkg = JSON.parse(readFileSync('./package.json', 'utf8'));
@@ -20,6 +20,20 @@ export default defineConfig({
         display: 'standalone',
         icons: [{ src: 'pwa-192.png', sizes: '192x192', type: 'image/png' }],
       },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,webmanifest,png,wav}'],
+        globIgnores: ['**/critters/**'],
+        runtimeCaching: [
+          {
+            urlPattern: /\/assets\/critters\//,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'critter-sprites',
+              expiration: { maxEntries: 320, maxAgeSeconds: 60 * 60 * 24 * 30 },
+            },
+          },
+        ],
+      },
     }),
   ],
   base: './',
@@ -30,8 +44,9 @@ export default defineConfig({
     chunkSizeWarningLimit: 1600,
     rollupOptions: {
       output: {
-        manualChunks: {
-          phaser: ['phaser'],
+        manualChunks(id) {
+          if (id.includes('node_modules/phaser')) return 'phaser';
+          if (id.includes('/src/data/')) return 'game-data';
         },
       },
     },

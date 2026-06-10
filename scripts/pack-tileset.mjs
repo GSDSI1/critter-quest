@@ -11,7 +11,7 @@ mkdirSync(outDir, { recursive: true });
 const out = join(outDir, 'tileset.png');
 
 const W = 16;
-const COUNT = 19;
+const COUNT = 21;
 const H = W * COUNT;
 
 const C = {
@@ -152,6 +152,10 @@ function drawTile(tileId, frame = 0) {
       fillRect(rgba, W, W, 0, 8, W, 8, [...C.mart, 255]);
       fillRect(rgba, W, W, 0, 8, W, 2, [...shade(C.mart, 40), 255]);
       break;
+    case 19:
+      return drawTile(2, 1);
+    case 20:
+      return drawTile(3, 1);
     default:
       fillRect(rgba, W, W, 0, 0, W, W, [80, 80, 80, 255]);
   }

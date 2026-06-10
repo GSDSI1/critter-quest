@@ -154,8 +154,13 @@ else fail('Too few evolutions');
 
 // ── UI / graphics ──
 const assetLoader = read('src/utils/assetLoader.ts');
-if (assetLoader.includes('isPlaceholderAssets')) ok('Placeholder asset guard');
-if (assetLoader.includes('isExternalTilesetAvailable')) ok('External tileset hook');
+if (assetLoader.includes('preloadBootArt')) ok('Tiered boot asset preload');
+else fail('assetLoader missing preloadBootArt');
+if (existsSync(join(root, 'src/scenes/registerScenes.ts'))) {
+  const reg = read('src/scenes/registerScenes.ts');
+  if (reg.includes('installLazySceneLoader') && reg.includes('ensureSceneRegistered')) ok('On-demand lazy scene loader');
+  else fail('registerScenes.ts missing lazy loader');
+}
 
 if (existsSync(join(root, 'src/ui/screenUi.ts'))) ok('screenUi.ts');
 else fail('screenUi.ts missing');

@@ -11,7 +11,7 @@ import {
 } from '../systems/stats';
 import { addToParty } from '../systems/save';
 import { trySave } from '../utils/saveFeedback';
-import { creatureTextureKey } from '../utils/assetLoader';
+import { creatureTextureKey, preloadCreatureTextures } from '../utils/assetLoader';
 import { buildBattleArena } from '../ui/sceneBackdrops';
 import { Sfx } from '../utils/audio';
 import { startMusic, stopMusic } from '../utils/music';
@@ -63,6 +63,24 @@ export class BattleScene extends Phaser.Scene implements BattleUiHost, BattleFlo
     isRematch?: boolean;
     mapId?: string;
   }): void {
+    void this.initBattle(data);
+  }
+
+  private async initBattle(data: {
+    enemyParty: CritterInstance[];
+    isTrainer?: boolean;
+    trainerId?: string;
+    trainerName?: string;
+    reward?: number;
+    badge?: string;
+    isRematch?: boolean;
+    mapId?: string;
+  }): Promise<void> {
+    const species = new Set<string>();
+    data.enemyParty.forEach(c => species.add(c.speciesId));
+    GameState.player.party.forEach(c => species.add(c.speciesId));
+    await preloadCreatureTextures(this, [...species]);
+
     Sfx.battleStart();
     stopMusic();
     startMusic('battle');
@@ -323,7 +341,7 @@ export class BattleScene extends Phaser.Scene implements BattleUiHost, BattleFlo
     const c = GameState.player.party[index];
     if (!c || isFainted(c) || c.uid === this.playerMon.uid) return;
     this.playerMon = c;
-    this.ui.playerSprite.setTexture(creatureTextureKey(this, c.speciesId));
+    this.ui.refreshPlayerSprite(c.speciesId);
     this.ui.playerSprite.setAlpha(1);
     this.ui.refreshPlayerUi();
     this.ui.abilityText.setText(getAbility(c.ability).name);

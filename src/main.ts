@@ -8,6 +8,7 @@ import { GameState, createCritter, registerSeen, registerCaught } from './system
 import { BootScene } from './scenes/BootScene';
 import { IntroScene } from './scenes/IntroScene';
 import { MenuScene } from './scenes/MenuScene';
+import { installLazySceneLoader } from './scenes/registerScenes';
 import type { BattleScene } from './scenes/BattleScene';
 
 const config = {
@@ -31,6 +32,7 @@ const config = {
 } as Phaser.Types.Core.GameConfig;
 
 const game = new Phaser.Game(config);
+installLazySceneLoader(game);
 
 declare global {
   interface Window {

@@ -3,9 +3,8 @@ import { COLORS, GAME_WIDTH } from '../data/types';
 import { generateAssets, ensureAllCreatureTextures } from '../utils/sprites';
 import { CREATURES } from '../data/creatures';
 import {
-  preloadAssetMeta, preloadExternalArt, applyLoadedAssetMeta, isPlaceholderAssets,
+  preloadAssetMeta, preloadBootArt, applyLoadedAssetMeta, isPlaceholderAssets,
 } from '../utils/assetLoader';
-import { registerLazyScenes } from './registerScenes';
 import { initOptions } from '../systems/options';
 import { bindAudioScene } from '../utils/audio';
 
@@ -64,7 +63,7 @@ export class BootScene extends Phaser.Scene {
     }
 
     this.load.on('complete', () => { void this.finishBoot(); });
-    preloadExternalArt(this);
+    preloadBootArt(this);
     this.load.start();
   }
 
@@ -89,7 +88,6 @@ export class BootScene extends Phaser.Scene {
     this.setBootStatus('Creating critters…', 0.55);
     ensureAllCreatureTextures(this, Object.keys(CREATURES), id => CREATURES[id]);
     this.setBootStatus('Loading scenes…', 0.75);
-    await registerLazyScenes(this.game);
     if (import.meta.env.DEV) {
       console.info(`[Critter Quest] Boot finished in ${Math.round(performance.now() - t0)}ms`);
     }

@@ -32,6 +32,8 @@ export interface NpcManagerCallbacks {
 }
 
 export class NpcManager {
+  private npcSprites: Phaser.GameObjects.Sprite[] = [];
+
   constructor(
     private scene: Phaser.Scene,
     private getMap: () => GameMap,
@@ -54,14 +56,23 @@ export class NpcManager {
   }
 
   spawnNpcs(map: GameMap): void {
+    this.npcSprites = [];
     for (const npc of map.npcs) {
       if (npc.role === 'sign' || npc.id.startsWith('sign')) continue;
       const role = (npc.role ?? 'generic') as NpcRole;
-      this.scene.add.sprite(
+      const spr = this.scene.add.sprite(
         npc.x * TILE_SIZE + TILE_SIZE / 2,
         npc.y * TILE_SIZE + TILE_SIZE / 2,
         npcTextureKey(this.scene, role),
       ).setDepth(9).setScale(1);
+      this.npcSprites.push(spr);
+      if (!npc.trainer && role !== 'rival' && role !== 'leader') {
+        this.scene.time.addEvent({
+          delay: 2500 + Math.random() * 3500,
+          loop: true,
+          callback: () => { if (spr.active) spr.setFlipX(Math.random() > 0.5); },
+        });
+      }
     }
   }
 

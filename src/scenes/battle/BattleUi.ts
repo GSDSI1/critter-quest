@@ -17,7 +17,7 @@ import {
   GameState, type CritterInstance, displayName, expProgress, isFainted, addExp, registerCaught, registerSeen,
 } from '../../systems/stats';
 import { trySave } from '../../utils/saveFeedback';
-import { creatureTextureKey, startCritterIdle } from '../../utils/assetLoader';
+import { creatureTextureKey, startCritterIdle, type CritterIdleHandle } from '../../utils/assetLoader';
 import { Sfx } from '../../utils/audio';
 import { drawHpBar } from '../../ui/HUD';
 import { statusLabel } from '../../systems/status';
@@ -60,6 +60,8 @@ export class BattleUi {
 
   private menuHighlights: Phaser.GameObjects.Graphics[] = [];
   private messageQueue: string[] = [];
+  private enemyIdle?: CritterIdleHandle;
+  private playerIdle?: CritterIdleHandle;
 
   constructor(
     private scene: Phaser.Scene,
@@ -70,7 +72,7 @@ export class BattleUi {
   build(): void {
     this.scene.add.image(480, 175, 'battle_platform').setAlpha(0.9);
     this.enemySprite = this.scene.add.image(480, 130, creatureTextureKey(this.scene, this.host.wild.speciesId)).setScale(1.5);
-    startCritterIdle(this.scene, this.enemySprite, this.host.wild.speciesId, 130);
+    this.enemyIdle = startCritterIdle(this.scene, this.enemySprite, this.host.wild.speciesId, 130);
 
     const eBox = this.scene.add.graphics();
     eBox.fillStyle(COLORS.panel, 0.92);
@@ -85,7 +87,7 @@ export class BattleUi {
 
     this.scene.add.image(180, 340, 'battle_platform').setAlpha(0.9);
     this.playerSprite = this.scene.add.image(160, 290, creatureTextureKey(this.scene, this.host.playerMon.speciesId, false, 'back')).setScale(2).setFlipX(true);
-    startCritterIdle(this.scene, this.playerSprite, this.host.playerMon.speciesId, 290);
+    this.playerIdle = startCritterIdle(this.scene, this.playerSprite, this.host.playerMon.speciesId, 290);
 
     const pBox = this.scene.add.graphics();
     pBox.fillStyle(COLORS.panel, 0.92);
@@ -140,8 +142,10 @@ export class BattleUi {
   syncEnemyUi(animate = true): void {
     const def = getCreature(this.host.wild.speciesId);
     this.enemyNameText.setText(`${def.name}  Lv.${this.host.wild.level}  ${statusLabel(this.host.wild.status)}`);
+    this.enemyIdle?.stop();
     this.enemySprite.setTexture(creatureTextureKey(this.scene, this.host.wild.speciesId));
     this.enemySprite.setAlpha(1);
+    this.enemyIdle = startCritterIdle(this.scene, this.enemySprite, this.host.wild.speciesId, 130);
     this.animateHp(this.enemyHpBar, this.host.wild.currentHp, this.host.wild.maxHp, 356, 68);
     const old = this.scene.children.getByName('enemyTypes');
     if (old) old.destroy();
@@ -149,6 +153,12 @@ export class BattleUi {
       this.scene.add.image(520 + i * 20, 50, `type_${t}`).setScale(0.8).setName('enemyTypes');
     });
     if (animate) this.anims.animateSendOut(this.enemySprite, 480, false);
+  }
+
+  refreshPlayerSprite(speciesId: string): void {
+    this.playerIdle?.stop();
+    this.playerSprite.setTexture(creatureTextureKey(this.scene, speciesId, false, 'back'));
+    this.playerIdle = startCritterIdle(this.scene, this.playerSprite, speciesId, 290);
   }
 
   refreshPlayerUi(): void {
