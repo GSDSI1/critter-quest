@@ -154,7 +154,9 @@ else fail('Too few evolutions');
 
 // ── UI / graphics ──
 const assetLoader = read('src/utils/assetLoader.ts');
-if (assetLoader.includes('preloadBootArt')) ok('Tiered boot asset preload');
+if (existsSync(join(root, 'public/assets/critters/atlas.json'))) ok('Critter texture atlas');
+else fail('public/assets/critters/atlas.json missing — run npm run pack-critters');
+if (assetLoader.includes('usesCreatureAtlas')) ok('Atlas-aware asset loader');
 else fail('assetLoader missing preloadBootArt');
 if (existsSync(join(root, 'src/scenes/registerScenes.ts'))) {
   const reg = read('src/scenes/registerScenes.ts');

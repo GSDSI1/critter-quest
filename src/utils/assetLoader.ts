@@ -6,10 +6,12 @@ export type NpcRole = typeof NPC_ROLES[number];
 
 export const EXTERNAL_CRITTERS = Object.keys(CREATURES);
 
-/** Loaded at boot — starters + first-route wild. Rest load in background. */
+/** Loaded at boot when not using atlas — starters + first-route wild. */
 export const BOOT_SPECIES = ['emberpup', 'aqualet', 'leafkit', 'mossling', 'cinderkit', 'thornling', 'sparkbit'] as const;
 
 const CREATURE_SUFFIXES = ['', '_f2', '_back', '_sm', '_sm_f2', '_sm_back'] as const;
+const LG_ATLAS = 'critters_atlas';
+const SM_ATLAS = 'critters_sm_atlas';
 
 export const SFX_KEYS = [
   'menu_select', 'menu_confirm', 'hit', 'level_up', 'catch', 'heal', 'battle_start',
@@ -18,6 +20,7 @@ export const SFX_KEYS = [
 export interface AssetMeta {
   placeholder: boolean;
   version: number;
+  atlas?: boolean;
 }
 
 let assetMeta: AssetMeta = { placeholder: true, version: 1 };
@@ -30,8 +33,70 @@ export function isPlaceholderAssets(): boolean {
   return assetMeta.placeholder;
 }
 
+export function usesCreatureAtlas(scene?: Phaser.Scene): boolean {
+  if (isPlaceholderAssets() || !assetMeta.atlas) return false;
+  return scene ? scene.textures.exists(LG_ATLAS) : true;
+}
+
 export function preloadAssetMeta(scene: Phaser.Scene): void {
   scene.load.json('asset_meta', 'assets/meta.json');
+}
+
+export function creatureFrameName(
+  speciesId: string,
+  small = false,
+  variant: CreatureTextureVariant = 'front',
+): string {
+  let name = speciesId;
+  if (small) name += '_sm';
+  if (variant === 'f2') name += '_f2';
+  if (variant === 'back') name += '_back';
+  return name;
+}
+
+export interface CreatureTexRef {
+  key: string;
+  frame?: string;
+}
+
+export function creatureTexRef(
+  scene: Phaser.Scene,
+  speciesId: string,
+  small = false,
+  variant: CreatureTextureVariant = 'front',
+): CreatureTexRef {
+  const frame = creatureFrameName(speciesId, small, variant);
+  if (usesCreatureAtlas(scene)) {
+    const atlasKey = small ? SM_ATLAS : LG_ATLAS;
+    if (scene.textures.exists(atlasKey)) return { key: atlasKey, frame };
+  }
+  return { key: creatureTextureKey(scene, speciesId, small, variant) };
+}
+
+export function addCreatureImage(
+  scene: Phaser.Scene,
+  x: number,
+  y: number,
+  speciesId: string,
+  small = false,
+  variant: CreatureTextureVariant = 'front',
+): Phaser.GameObjects.Image {
+  const ref = creatureTexRef(scene, speciesId, small, variant);
+  return ref.frame
+    ? scene.add.image(x, y, ref.key, ref.frame)
+    : scene.add.image(x, y, ref.key);
+}
+
+export function applyCreatureTexture(
+  target: Phaser.GameObjects.Image | Phaser.GameObjects.Sprite,
+  scene: Phaser.Scene,
+  speciesId: string,
+  small = false,
+  variant: CreatureTextureVariant = 'front',
+): void {
+  const ref = creatureTexRef(scene, speciesId, small, variant);
+  if (ref.frame) target.setTexture(ref.key, ref.frame);
+  else target.setTexture(ref.key);
 }
 
 function queueCreatureFiles(scene: Phaser.Scene, id: string): void {
@@ -50,13 +115,26 @@ function startQueuedLoads(scene: Phaser.Scene): Promise<void> {
   });
 }
 
-/** Tileset, NPCs, SFX, and boot-critical critters only. */
+function queueCritterAtlases(scene: Phaser.Scene): void {
+  if (!scene.textures.exists(LG_ATLAS)) {
+    scene.load.atlas(LG_ATLAS, 'assets/critters/atlas.png', 'assets/critters/atlas.json');
+  }
+  if (!scene.textures.exists(SM_ATLAS)) {
+    scene.load.atlas(SM_ATLAS, 'assets/critters/atlas-sm.png', 'assets/critters/atlas-sm.json');
+  }
+}
+
+/** Tileset, NPCs, SFX, and critter art (atlas or boot-critical PNGs). */
 export function preloadBootArt(scene: Phaser.Scene): void {
   scene.load.spritesheet('ext_tileset', 'assets/tiles/tileset.png', {
     frameWidth: 16,
     frameHeight: 16,
   });
-  for (const id of BOOT_SPECIES) queueCreatureFiles(scene, id);
+  if (usesCreatureAtlas(scene)) {
+    queueCritterAtlases(scene);
+  } else {
+    for (const id of BOOT_SPECIES) queueCreatureFiles(scene, id);
+  }
   for (const role of NPC_ROLES) {
     scene.load.image(`ext_npc_${role}`, `assets/npcs/${role}.png`);
   }
@@ -65,22 +143,23 @@ export function preloadBootArt(scene: Phaser.Scene): void {
   }
 }
 
-/** Load specific species PNGs on demand (battle, party, dex). */
+/** Load specific species PNGs on demand (skipped when atlas is loaded). */
 export function preloadCreatureTextures(scene: Phaser.Scene, ids: string[]): Promise<void> {
-  if (isPlaceholderAssets()) return Promise.resolve();
+  if (isPlaceholderAssets() || usesCreatureAtlas(scene)) return Promise.resolve();
   for (const id of ids) queueCreatureFiles(scene, id);
   return startQueuedLoads(scene);
 }
 
 /** Background-load remaining species after menu is visible. */
 export function preloadAllRemainingCreatures(scene: Phaser.Scene): Promise<void> {
-  if (isPlaceholderAssets()) return Promise.resolve();
+  if (isPlaceholderAssets() || usesCreatureAtlas(scene)) return Promise.resolve();
   const rest = EXTERNAL_CRITTERS.filter(id => !(BOOT_SPECIES as readonly string[]).includes(id));
   return preloadCreatureTextures(scene, rest);
 }
 
 export function preloadExternalArt(scene: Phaser.Scene): void {
   preloadBootArt(scene);
+  if (usesCreatureAtlas(scene)) return;
   for (const id of EXTERNAL_CRITTERS) {
     if ((BOOT_SPECIES as readonly string[]).includes(id)) continue;
     queueCreatureFiles(scene, id);
@@ -108,6 +187,12 @@ function isRealExternalTexture(scene: Phaser.Scene, extKey: string): boolean {
   return scene.textures.exists(extKey);
 }
 
+function hasAtlasFrame(scene: Phaser.Scene, frame: string, small: boolean): boolean {
+  const atlasKey = small ? SM_ATLAS : LG_ATLAS;
+  if (!scene.textures.exists(atlasKey)) return false;
+  return scene.textures.getFrame(atlasKey, frame) != null;
+}
+
 export type CreatureTextureVariant = 'front' | 'f2' | 'back';
 
 export function creatureTextureKey(
@@ -116,6 +201,9 @@ export function creatureTextureKey(
   small = false,
   variant: CreatureTextureVariant = 'front',
 ): string {
+  if (usesCreatureAtlas(scene)) {
+    return small ? SM_ATLAS : LG_ATLAS;
+  }
   let suffix = small ? '_sm' : '';
   if (variant === 'f2') suffix += '_f2';
   if (variant === 'back') suffix += '_back';
@@ -123,6 +211,22 @@ export function creatureTextureKey(
   const proc = `creature_${speciesId}${small ? '_sm' : ''}`;
   if (isRealExternalTexture(scene, ext)) return ext;
   return proc;
+}
+
+export function hasCreatureGraphic(
+  scene: Phaser.Scene,
+  speciesId: string,
+  small = false,
+  variant: CreatureTextureVariant = 'front',
+): boolean {
+  if (usesCreatureAtlas(scene)) {
+    return hasAtlasFrame(scene, creatureFrameName(speciesId, small, variant), small);
+  }
+  let suffix = small ? '_sm' : '';
+  if (variant === 'f2') suffix += '_f2';
+  if (variant === 'back') suffix += '_back';
+  if (isRealExternalTexture(scene, `ext_creature_${speciesId}${suffix}`)) return true;
+  return scene.textures.exists(`creature_${speciesId}${small ? '_sm' : ''}`);
 }
 
 export interface CritterIdleHandle {
@@ -139,9 +243,15 @@ export function startCritterIdle(
   let timer: Phaser.Time.TimerEvent | undefined;
   let bob: Phaser.Tweens.Tween | undefined;
 
-  const f1 = creatureTextureKey(scene, speciesId, false, 'front');
-  const f2 = creatureTextureKey(scene, speciesId, false, 'f2');
-  const hasF2 = f2 !== f1 && scene.textures.exists(f2);
+  const atlas = usesCreatureAtlas(scene);
+  const f1 = creatureTexRef(scene, speciesId, false, 'front');
+  const f2 = creatureTexRef(scene, speciesId, false, 'f2');
+  const hasF2 = atlas
+    ? hasAtlasFrame(scene, creatureFrameName(speciesId, false, 'f2'), false)
+    : isRealExternalTexture(scene, `ext_creature_${speciesId}_f2`);
+
+  applyCreatureTexture(sprite, scene, speciesId, false, 'front');
+
   if (hasF2) {
     let frame = 0;
     timer = scene.time.addEvent({
@@ -150,7 +260,11 @@ export function startCritterIdle(
       callback: () => {
         if (stopped) return;
         frame = 1 - frame;
-        sprite.setTexture(frame ? f2 : f1);
+        if (atlas && f1.frame && f2.frame) {
+          sprite.setTexture(f1.key, frame ? f2.frame : f1.frame);
+        } else {
+          sprite.setTexture(frame ? f2.key : f1.key);
+        }
       },
     });
   }
@@ -174,6 +288,7 @@ export function npcTextureKey(scene: Phaser.Scene, role: NpcRole = 'generic'): s
 }
 
 export function hasExternalCreature(scene: Phaser.Scene, id: string): boolean {
+  if (usesCreatureAtlas(scene)) return hasAtlasFrame(scene, id, false);
   return isRealExternalTexture(scene, `ext_creature_${id}`);
 }
 

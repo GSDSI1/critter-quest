@@ -7,6 +7,7 @@ import { formatPlayTime } from '../ui/titleScreen';
 import { Input } from '../systems/input';
 import { Sfx } from '../utils/audio';
 import { trySave } from '../utils/saveFeedback';
+import { fadeToScene, fadeInOnStart } from '../ui/transitions';
 
 export class VictoryScene extends Phaser.Scene {
   private scrollY = 0;
@@ -19,6 +20,7 @@ export class VictoryScene extends Phaser.Scene {
 
   create(): void {
     Input.bind(this);
+    fadeInOnStart(this, this.scene.settings.data as { _fadeIn?: boolean });
     Sfx.levelUp();
     GameState.player.storyFlags.league_ready = true;
     trySave(this);
@@ -85,8 +87,7 @@ export class VictoryScene extends Phaser.Scene {
 
     if (this.canExit && (Input.justPressed('confirm') || Input.justPressed('cancel'))) {
       Sfx.menuConfirm();
-      this.cameras.main.fadeOut(400, 0, 0, 0);
-      this.time.delayedCall(400, () => this.scene.start('Menu'));
+      fadeToScene(this, 'Menu', undefined, 400);
     }
   }
 }

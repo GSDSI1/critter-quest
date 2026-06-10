@@ -8,6 +8,7 @@ import { buildMenuPanel } from '../ui/sceneBackdrops';
 import { createTouchButton } from '../ui/touchButtons';
 import { Input } from '../systems/input';
 import { Sfx } from '../utils/audio';
+import { fadeToScene, fadeInOnStart } from '../ui/transitions';
 
 export class CharacterSelectScene extends Phaser.Scene {
   private selected = 0;
@@ -27,6 +28,7 @@ export class CharacterSelectScene extends Phaser.Scene {
 
   create(): void {
     Input.bind(this);
+    fadeInOnStart(this, this.scene.settings.data as { _fadeIn?: boolean });
     this.selected = 0;
     this.nameText = '';
 
@@ -108,8 +110,7 @@ export class CharacterSelectScene extends Phaser.Scene {
   update(_time: number, delta: number): void {
     Input.update();
     if (Input.justPressed('cancel')) {
-      this.cameras.main.fadeOut(300, 0, 0, 0);
-      this.time.delayedCall(300, () => this.scene.start('Menu'));
+      fadeToScene(this, 'Menu', undefined, 300);
       return;
     }
     if (Input.justPressed('left')) this.cycle(-1);
@@ -154,7 +155,6 @@ export class CharacterSelectScene extends Phaser.Scene {
     const preset = TRAINER_PRESETS[this.selected];
     GameState.player.characterId = preset.id;
     GameState.player.name = this.nameText.trim() || 'Trainer';
-    this.cameras.main.fadeOut(400, 0, 0, 0);
-    this.time.delayedCall(400, () => this.scene.start('LabIntro'));
+    fadeToScene(this, 'LabIntro', undefined, 400);
   }
 }

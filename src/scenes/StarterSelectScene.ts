@@ -3,7 +3,8 @@ import { COLORS, GAME_WIDTH, TYPE_NAMES, TYPE_COLORS, type ElementType } from '.
 import { STARTERS, getCreature } from '../data/creatures';
 import { GameState, createCritter, registerSeen, registerCaught } from '../systems/stats';
 import { trySave } from '../utils/saveFeedback';
-import { creatureTextureKey } from '../utils/assetLoader';
+import { addCreatureImage, applyCreatureTexture } from '../utils/assetLoader';
+import { fadeToScene, fadeInOnStart } from '../ui/transitions';
 import { playerTextureKey } from '../utils/sprites';
 import { buildMenuPanel } from '../ui/sceneBackdrops';
 import { createTouchButton, createTypePill } from '../ui/touchButtons';
@@ -54,6 +55,7 @@ export class StarterSelectScene extends Phaser.Scene {
 
   create(): void {
     Input.bind(this);
+    fadeInOnStart(this, this.scene.settings.data as { _fadeIn?: boolean });
     this.picking = false;
     this.introShown = false;
     this.selected = 0;
@@ -72,7 +74,7 @@ export class StarterSelectScene extends Phaser.Scene {
     );
 
     this.previewGlow = this.add.graphics().setDepth(3);
-    this.creaturePreview = this.add.image(PANEL_CX, LAYOUT.spriteY, creatureTextureKey(this, STARTERS[0]))
+    this.creaturePreview = addCreatureImage(this, PANEL_CX, LAYOUT.spriteY, STARTERS[0])
       .setScale(2).setVisible(false).setDepth(5);
     this.tweens.add({
       targets: this.creaturePreview,
@@ -97,7 +99,7 @@ export class StarterSelectScene extends Phaser.Scene {
     }).setOrigin(0.5).setDepth(6);
 
     STARTERS.forEach((id, i) => {
-      const spr = this.add.image(LAYOUT.orbX[i], LAYOUT.spriteY, creatureTextureKey(this, id))
+      const spr = addCreatureImage(this, LAYOUT.orbX[i], LAYOUT.spriteY, id)
         .setScale(1.5).setDepth(5);
       this.introSprites.push(spr);
       this.tweens.add({
@@ -212,7 +214,8 @@ export class StarterSelectScene extends Phaser.Scene {
     this.nameText.setText(def.name);
     this.statText.setText(`HP ${b.hp}   ATK ${b.atk}   DEF ${b.def}   SPE ${b.spe}`).setVisible(true);
     this.descText.setText(def.description);
-    this.creaturePreview.setTexture(creatureTextureKey(this, id)).setVisible(true);
+    applyCreatureTexture(this.creaturePreview, this, id);
+    this.creaturePreview.setVisible(true);
 
     this.previewGlow.clear();
     this.previewGlow.fillStyle(typeColor, 0.12);
@@ -284,10 +287,7 @@ export class StarterSelectScene extends Phaser.Scene {
       GameState.player.x = 10;
       GameState.player.y = 13;
       trySave(this);
-      this.cameras.main.fadeOut(400, 0, 0, 0);
-      this.time.delayedCall(400, () => {
-        this.scene.start('Overworld', { showIntro: true });
-      });
+      fadeToScene(this, 'Overworld', { showIntro: true }, 400);
     }, 'Prof. Elmwood');
   }
 }

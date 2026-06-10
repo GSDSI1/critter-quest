@@ -4,10 +4,11 @@ import { getCreature, totalSpecies } from '../data/creatures';
 import { getBadge } from '../data/badges';
 import { GameState, displayName } from '../systems/stats';
 import { formatPlayTime } from '../ui/titleScreen';
-import { creatureTextureKey } from '../utils/assetLoader';
+import { addCreatureImage, hasCreatureGraphic } from '../utils/assetLoader';
 import { Input } from '../systems/input';
 import { Sfx } from '../utils/audio';
 import { trySave } from '../utils/saveFeedback';
+import { fadeToScene, fadeInOnStart } from '../ui/transitions';
 
 export class HallOfFameScene extends Phaser.Scene {
   private canExit = false;
@@ -18,6 +19,7 @@ export class HallOfFameScene extends Phaser.Scene {
 
   create(): void {
     Input.bind(this);
+    fadeInOnStart(this, this.scene.settings.data as { _fadeIn?: boolean });
     Sfx.levelUp();
     GameState.player.storyFlags.champion = true;
     if (GameState.player.completionTime == null) {
@@ -50,8 +52,8 @@ export class HallOfFameScene extends Phaser.Scene {
     p.party.forEach((c, i) => {
       const def = getCreature(c.speciesId);
       const y = 130 + i * 72;
-      if (this.textures.exists(creatureTextureKey(this, c.speciesId))) {
-        this.add.image(70, y + 20, creatureTextureKey(this, c.speciesId)).setScale(2);
+      if (hasCreatureGraphic(this, c.speciesId)) {
+        addCreatureImage(this, 70, y + 20, c.speciesId).setScale(2);
       }
       this.add.text(110, y, displayName(c), {
         fontFamily: '"Courier New", monospace', fontSize: '14px', color: '#f0f0f0',
@@ -83,8 +85,7 @@ export class HallOfFameScene extends Phaser.Scene {
     Input.update();
     if (this.canExit && (Input.justPressed('confirm') || Input.justPressed('cancel'))) {
       Sfx.menuConfirm();
-      this.cameras.main.fadeOut(400, 0, 0, 0);
-      this.time.delayedCall(400, () => this.scene.start('Menu'));
+      fadeToScene(this, 'Menu', undefined, 400);
     }
   }
 }

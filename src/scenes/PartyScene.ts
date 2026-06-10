@@ -7,7 +7,7 @@ import { getAbility } from '../data/abilities';
 import { getNature } from '../data/natures';
 import { GameState, displayName, isFainted } from '../systems/stats';
 import { drawHpBar } from '../ui/HUD';
-import { creatureTextureKey } from '../utils/assetLoader';
+import { addCreatureImage } from '../utils/assetLoader';
 import { trySave } from '../utils/saveFeedback';
 import { buildScreenOverlay, buildMenuPanel } from '../ui/sceneBackdrops';
 import { Input } from '../systems/input';
@@ -67,7 +67,7 @@ export class PartyScene extends Phaser.Scene {
       panel.lineStyle(2, fainted ? 0x555555 : COLORS.panelBorder, 1);
       panel.strokeRoundedRect(x, y, 280, showingDetail ? 130 : 115, 8);
 
-      this.add.image(x + 40, y + 58, creatureTextureKey(this, c.speciesId, true)).setScale(2).setAlpha(fainted ? 0.4 : 1);
+      addCreatureImage(this, x + 40, y + 58, c.speciesId, true).setScale(2).setAlpha(fainted ? 0.4 : 1);
 
       def.types.forEach((t, ti) => {
         this.add.image(x + 80 + ti * 18, y + 42, `type_${t}`).setScale(0.6);

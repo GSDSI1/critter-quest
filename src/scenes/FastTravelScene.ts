@@ -6,6 +6,7 @@ import { buildScreenOverlay, buildMenuPanel } from '../ui/sceneBackdrops';
 import { Input } from '../systems/input';
 import { Sfx } from '../utils/audio';
 import { HEAL_RETURN_SPAWN, listFastTravelDestinations } from '../systems/healTravel';
+import { fadeToScene } from '../ui/transitions';
 
 export class FastTravelScene extends Phaser.Scene {
   private selected = 0;
@@ -83,7 +84,7 @@ export class FastTravelScene extends Phaser.Scene {
     trySave(this);
     this.scene.stop('PauseMenu');
     this.scene.stop();
-    this.scene.start('Overworld');
+    fadeToScene(this, 'Overworld', undefined, 300);
   }
 
   private close(): void {

@@ -17,6 +17,7 @@ import { canAlwaysRun } from '../systems/options';
 import { isOutdoorMap, nightTintAlpha } from '../systems/dayNight';
 import { MapRenderer } from './overworld/MapRenderer';
 import { NpcManager } from './overworld/NpcManager';
+import { fadeInOnStart } from '../ui/transitions';
 
 export class OverworldScene extends Phaser.Scene {
   private player!: Phaser.GameObjects.Sprite;
@@ -39,7 +40,8 @@ export class OverworldScene extends Phaser.Scene {
     super('Overworld');
   }
 
-  create(data: { showIntro?: boolean; fromBattle?: boolean; blackout?: boolean }): void {
+  create(data: { showIntro?: boolean; fromBattle?: boolean; blackout?: boolean; _fadeIn?: boolean }): void {
+    fadeInOnStart(this, data, 400);
     resumeAudio();
     setMusicThemeForMap(GameState.player.mapId);
     Input.bind(this);

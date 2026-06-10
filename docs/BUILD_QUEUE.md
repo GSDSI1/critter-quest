@@ -6,32 +6,24 @@ Last updated: 2026-06-10. Source: `GAMEPLAN.md`.
 
 | Phase | Item | Status |
 |-------|------|--------|
-| 0–1 | Foundation + performance | ✓ |
-| 2 | Graphics pipeline (art, audio, UI) | ✓ |
-| 3 | Content + systems + QoL | ✓ |
-| 4 | PWA, deploy, E2E | ✓ |
-| **Opt** | Tiered boot preload (tileset/NPCs/SFX + 7 boot species) | ✓ |
-| **Opt** | On-demand scene chunks (`installLazySceneLoader`) | ✓ |
-| **Opt** | Skip procedural tiles/NPCs/critters when external art loaded | ✓ |
-| **Opt** | Map tile-data cache + tile-layer grass/water anim (no per-cell Images) | ✓ |
-| **Opt** | PWA runtime cache for critter PNGs; `game-data` Vite chunk | ✓ |
-| **Opt** | Battle creature on-demand preload; idle timer cleanup | ✓ |
-| **Opt** | NPC idle facing flips | ✓ |
+| 0–4 | Core game + content + ship | ✓ |
+| **Opt** | Tiered boot / lazy scenes / map cache / PWA | ✓ |
+| **Opt** | Critter texture atlas (135+135 frames, 2 HTTP requests) | ✓ |
+| **Opt** | Screen transitions (`fadeToScene` / `fadeInOnStart`) | ✓ |
+| **Opt** | Grass/path/water edge autotiling + corner fills | ✓ |
+| **Opt** | Battle send-out + faint tween polish | ✓ |
 
 ## Optional polish (future)
 
 | Item | Notes |
 |------|-------|
 | Kenney tileset drop-in | Replace `tileset.png`; re-run `npm run pack-tileset` |
-| Critter texture atlas | Pack 270 PNGs into 1–2 atlases for fewer HTTP requests |
-| 16-case autotiling | Bitmask edges on external tileset |
-| Battle entry/faint tweens | Extra polish beyond current anims |
-| Screen transitions helper | Wire `fadeToScene` into more scene hops |
+| Full 16-case tile bitmask | Dedicated transition tiles in tileset |
+| Trainer rematch roster pass | Post–Elite Four scaling |
 
 ## Verify
 
 ```bash
-npm run gen-assets   # regenerate PNG + tileset + audio
+npm run gen-assets   # PNG + tileset + audio + critter atlases
 npm run verify && npx tsc --noEmit && npm run test:unit && npm run test:e2e
-npm run build        # check game-data chunk + PWA workbox split
 ```

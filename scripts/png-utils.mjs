@@ -1,4 +1,4 @@
-import { writeFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 import zlib from 'zlib';
 
 export function crc32(buf) {
@@ -17,6 +17,42 @@ export function chunk(type, data) {
   const crc = Buffer.alloc(4);
   crc.writeUInt32BE(crc32(Buffer.concat([typeB, data])));
   return Buffer.concat([len, typeB, data, crc]);
+}
+
+export function readPng(path) {
+  const buf = readFileSync(path);
+  let pos = 8;
+  let width = 0;
+  let height = 0;
+  const idats = [];
+  while (pos + 12 <= buf.length) {
+    const len = buf.readUInt32BE(pos);
+    pos += 4;
+    const type = buf.toString('ascii', pos, pos + 4);
+    pos += 4;
+    const data = buf.subarray(pos, pos + len);
+    pos += len + 4;
+    if (type === 'IHDR') {
+      width = data.readUInt32BE(0);
+      height = data.readUInt32BE(4);
+    } else if (type === 'IDAT') {
+      idats.push(data);
+    } else if (type === 'IEND') break;
+  }
+  const raw = zlib.inflateSync(Buffer.concat(idats));
+  const rgba = Buffer.alloc(width * height * 4);
+  let src = 0;
+  for (let y = 0; y < height; y++) {
+    src++; // filter byte (0 = none for our PNGs)
+    for (let x = 0; x < width; x++) {
+      const di = (y * width + x) * 4;
+      rgba[di] = raw[src++];
+      rgba[di + 1] = raw[src++];
+      rgba[di + 2] = raw[src++];
+      rgba[di + 3] = raw[src++];
+    }
+  }
+  return { width, height, rgba };
 }
 
 export function writePng(path, w, h, rgba) {

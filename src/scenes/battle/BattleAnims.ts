@@ -2,6 +2,10 @@ import Phaser from 'phaser';
 import { GAME_WIDTH } from '../../data/types';
 import { Sfx } from '../../utils/audio';
 
+function isPlayerSprite(sprite: Phaser.GameObjects.Image): boolean {
+  return sprite.x < GAME_WIDTH / 2;
+}
+
 export class BattleAnims {
   constructor(private scene: Phaser.Scene) {}
 
@@ -12,13 +16,19 @@ export class BattleAnims {
   }
 
   animateSendOut(sprite: Phaser.GameObjects.Image, endX: number, isPlayer: boolean): void {
+    sprite.setScale(isPlayer ? 2 : 1.5);
     sprite.x = isPlayer ? -80 : GAME_WIDTH + 80;
-    this.scene.tweens.add({ targets: sprite, x: endX, duration: 450, ease: 'Back.easeOut' });
+    sprite.setAlpha(0.6);
+    this.scene.tweens.add({
+      targets: sprite, x: endX, alpha: 1, scaleX: isPlayer ? 2 : 1.5, scaleY: isPlayer ? 2 : 1.5,
+      duration: 480, ease: 'Back.easeOut',
+    });
   }
 
   animateFaint(sprite: Phaser.GameObjects.Image, onDone: () => void): void {
     this.scene.tweens.add({
-      targets: sprite, alpha: 0, y: sprite.y + 30, duration: 500,
+      targets: sprite, alpha: 0, y: sprite.y + 24, scaleY: 0.15, angle: isPlayerSprite(sprite) ? -12 : 12,
+      duration: 550, ease: 'Quad.easeIn',
       onComplete: onDone,
     });
   }

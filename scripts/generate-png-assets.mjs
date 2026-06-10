@@ -185,4 +185,6 @@ spawnSync('node', ['scripts/pack-tileset.mjs'], { cwd: root, stdio: 'inherit' })
 
 spawnSync('node', ['scripts/generate-audio.mjs'], { cwd: root, stdio: 'inherit' });
 
+spawnSync('node', ['scripts/pack-critter-atlas.mjs'], { cwd: root, stdio: 'inherit' });
+
 console.log('Asset pipeline complete.');

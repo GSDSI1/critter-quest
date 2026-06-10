@@ -1,4 +1,5 @@
 {
   "placeholder": false,
-  "version": 2
+  "version": 3,
+  "atlas": true
 }

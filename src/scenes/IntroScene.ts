@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT } from '../data/types';
-import { creatureTextureKey } from '../utils/assetLoader';
+import { addCreatureImage } from '../utils/assetLoader';
+import { fadeToScene } from '../ui/transitions';
 import { buildTitleBackdrop, addTitleLogo, addBlinkingPrompt } from '../ui/titleScreen';
 import { Input } from '../systems/input';
 import { Sfx, resumeAudio } from '../utils/audio';
@@ -33,7 +34,7 @@ export class IntroScene extends Phaser.Scene {
 
     const starters = ['emberpup', 'aqualet', 'leafkit'];
     starters.forEach((id, i) => {
-      const spr = this.add.image(-80, 280 + i * 8, creatureTextureKey(this, id)).setScale(2.2).setAlpha(0);
+      const spr = addCreatureImage(this, -80, 280 + i * 8, id).setScale(2.2).setAlpha(0);
       this.tweens.add({
         targets: spr,
         x: 120 + i * 200,
@@ -50,7 +51,7 @@ export class IntroScene extends Phaser.Scene {
       });
     });
 
-    const sparkbit = this.add.image(GAME_WIDTH + 60, 300, creatureTextureKey(this, 'sparkbit', true)).setScale(2).setAlpha(0);
+    const sparkbit = addCreatureImage(this, GAME_WIDTH + 60, 300, 'sparkbit', true).setScale(2).setAlpha(0);
     this.tweens.add({
       targets: sparkbit, x: GAME_WIDTH - 80, alpha: 1, duration: 800, delay: 1000, ease: 'Quad.easeOut',
     });
@@ -93,7 +94,6 @@ export class IntroScene extends Phaser.Scene {
     if (this.skipping) return;
     this.skipping = true;
     Sfx.menuConfirm();
-    this.cameras.main.fadeOut(400, 0, 0, 0);
-    this.time.delayedCall(400, () => this.scene.start('Menu'));
+    fadeToScene(this, 'Menu', undefined, 400);
   }
 }

@@ -11,7 +11,8 @@ import {
 } from '../systems/stats';
 import { addToParty } from '../systems/save';
 import { trySave } from '../utils/saveFeedback';
-import { creatureTextureKey, preloadCreatureTextures } from '../utils/assetLoader';
+import { preloadCreatureTextures } from '../utils/assetLoader';
+import { startWithFadeIn } from '../ui/transitions';
 import { buildBattleArena } from '../ui/sceneBackdrops';
 import { Sfx } from '../utils/audio';
 import { startMusic, stopMusic } from '../utils/music';
@@ -254,7 +255,7 @@ export class BattleScene extends Phaser.Scene implements BattleUiHost, BattleFlo
     GameState.player.x = 4;
     GameState.player.y = 7;
     trySave(this);
-    this.battleAnims.fadeOut(400, () => this.scene.start('Overworld', { blackout: true }));
+    this.battleAnims.fadeOut(400, () => startWithFadeIn(this, 'Overworld', { blackout: true }));
   }
 
   /** DEV test bridge — resolve battle without playing through message queues. */
@@ -322,9 +323,9 @@ export class BattleScene extends Phaser.Scene implements BattleUiHost, BattleFlo
         }
         clearEliteGauntlet();
       }
-      if (triggerHallOfFame) this.scene.start('HallOfFame');
-      else if (triggerVictory) this.scene.start('Victory');
-      else this.scene.start('Overworld', { fromBattle: true });
+      if (triggerHallOfFame) startWithFadeIn(this, 'HallOfFame');
+      else if (triggerVictory) startWithFadeIn(this, 'Victory');
+      else startWithFadeIn(this, 'Overworld', { fromBattle: true });
     });
   }
 

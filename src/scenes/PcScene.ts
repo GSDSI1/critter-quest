@@ -5,7 +5,7 @@ import { GameState, displayName } from '../systems/stats';
 import { depositToStorage, withdrawFromStorage } from '../systems/save';
 import { trySave } from '../utils/saveFeedback';
 import { drawHpBar } from '../ui/HUD';
-import { creatureTextureKey } from '../utils/assetLoader';
+import { addCreatureImage } from '../utils/assetLoader';
 import { buildScreenOverlay, buildMenuPanel } from '../ui/sceneBackdrops';
 import { Input } from '../systems/input';
 
@@ -88,7 +88,7 @@ export class PcScene extends Phaser.Scene {
       bg.fillRoundedRect(36, y, GAME_WIDTH - 72, 46, 6);
       this.container.add(bg);
 
-      const spr = this.add.image(60, y + 23, creatureTextureKey(this, c.speciesId, true)).setScale(1.8);
+      const spr = addCreatureImage(this, 60, y + 23, c.speciesId, true).setScale(1.8);
       this.container.add(spr);
 
       this.container.add(this.add.text(82, y + 6, `${sel ? '▶ ' : ''}${displayName(c)}  Lv.${c.level}`, {

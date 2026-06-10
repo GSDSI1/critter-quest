@@ -127,10 +127,11 @@ export class MapRenderer {
 
   private renderEdgeOverlays(): void {
     const edgeGfx = this.scene.add.graphics().setDepth(1);
+    const shore = (tile: number) => tile === 0 || tile === 1;
+
     for (let y = 0; y < this.map.height; y++) {
       for (let x = 0; x < this.map.width; x++) {
         const tile = getTile(this.map, x, y);
-        if (tile !== 0 && tile !== 1) continue;
         const px = x * TILE_SIZE;
         const py = y * TILE_SIZE;
         const n = [
@@ -139,18 +140,35 @@ export class MapRenderer {
           getTile(this.map, x, y + 1),
           getTile(this.map, x - 1, y),
         ];
+        const nw = getTile(this.map, x - 1, y - 1);
+        const ne = getTile(this.map, x + 1, y - 1);
+
         if (tile === 0) {
           edgeGfx.fillStyle(0x2d6b27, 0.35);
           if (n[0] === 1) edgeGfx.fillRect(px, py, TILE_SIZE, 2);
           if (n[1] === 1) edgeGfx.fillRect(px + TILE_SIZE - 2, py, 2, TILE_SIZE);
           if (n[2] === 1) edgeGfx.fillRect(px, py + TILE_SIZE - 2, TILE_SIZE, 2);
           if (n[3] === 1) edgeGfx.fillRect(px, py, 2, TILE_SIZE);
-        } else {
+          if (n[0] === 1 && n[3] === 1 && nw !== 1) {
+            edgeGfx.fillStyle(0x3d8b37, 0.45);
+            edgeGfx.fillRect(px, py, 3, 3);
+          }
+          if (n[0] === 1 && n[1] === 1 && ne !== 1) {
+            edgeGfx.fillStyle(0x3d8b37, 0.45);
+            edgeGfx.fillRect(px + TILE_SIZE - 3, py, 3, 3);
+          }
+        } else if (tile === 1) {
           edgeGfx.fillStyle(0x3d8b37, 0.25);
           if (n[0] === 0) edgeGfx.fillRect(px, py, TILE_SIZE, 2);
           if (n[1] === 0) edgeGfx.fillRect(px + TILE_SIZE - 2, py, 2, TILE_SIZE);
           if (n[2] === 0) edgeGfx.fillRect(px, py + TILE_SIZE - 2, TILE_SIZE, 2);
           if (n[3] === 0) edgeGfx.fillRect(px, py, 2, TILE_SIZE);
+        } else if (tile === 3) {
+          edgeGfx.fillStyle(0x1e40af, 0.35);
+          if (shore(n[0])) edgeGfx.fillRect(px, py, TILE_SIZE, 2);
+          if (shore(n[1])) edgeGfx.fillRect(px + TILE_SIZE - 2, py, 2, TILE_SIZE);
+          if (shore(n[2])) edgeGfx.fillRect(px, py + TILE_SIZE - 2, TILE_SIZE, 2);
+          if (shore(n[3])) edgeGfx.fillRect(px, py, 2, TILE_SIZE);
         }
       }
     }

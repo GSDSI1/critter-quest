@@ -5,7 +5,7 @@ import { getEvolutionChain } from '../data/evolutions';
 import { LEARNSETS } from '../data/learnsets';
 import { getMove } from '../data/moves';
 import { GameState } from '../systems/stats';
-import { creatureTextureKey } from '../utils/assetLoader';
+import { addCreatureImage } from '../utils/assetLoader';
 import { buildScreenOverlay, buildMenuPanel } from '../ui/sceneBackdrops';
 import { Input } from '../systems/input';
 
@@ -105,7 +105,7 @@ export class CritterdexScene extends Phaser.Scene {
         });
       }
       if (caught) {
-        this.listContainer.add(this.add.image(270, y + 19, creatureTextureKey(this, id, true)).setScale(1.5));
+        this.listContainer.add(addCreatureImage(this, 270, y + 19, id, true).setScale(1.5));
       }
     });
   }
@@ -143,7 +143,7 @@ export class CritterdexScene extends Phaser.Scene {
     }
 
     if (caught) {
-      this.detailContainer.add(this.add.image(470, 120, creatureTextureKey(this, id)).setScale(1.5));
+      this.detailContainer.add(addCreatureImage(this, 470, 120, id).setScale(1.5));
       this.detailContainer.add(this.add.image(340, 120, `footprint_${def.shape}`).setScale(1.2));
     }
 

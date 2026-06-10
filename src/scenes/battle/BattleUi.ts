@@ -17,7 +17,7 @@ import {
   GameState, type CritterInstance, displayName, expProgress, isFainted, addExp, registerCaught, registerSeen,
 } from '../../systems/stats';
 import { trySave } from '../../utils/saveFeedback';
-import { creatureTextureKey, startCritterIdle, type CritterIdleHandle } from '../../utils/assetLoader';
+import { addCreatureImage, applyCreatureTexture, startCritterIdle, type CritterIdleHandle } from '../../utils/assetLoader';
 import { Sfx } from '../../utils/audio';
 import { drawHpBar } from '../../ui/HUD';
 import { statusLabel } from '../../systems/status';
@@ -71,7 +71,7 @@ export class BattleUi {
 
   build(): void {
     this.scene.add.image(480, 175, 'battle_platform').setAlpha(0.9);
-    this.enemySprite = this.scene.add.image(480, 130, creatureTextureKey(this.scene, this.host.wild.speciesId)).setScale(1.5);
+    this.enemySprite = addCreatureImage(this.scene, 480, 130, this.host.wild.speciesId).setScale(1.5);
     this.enemyIdle = startCritterIdle(this.scene, this.enemySprite, this.host.wild.speciesId, 130);
 
     const eBox = this.scene.add.graphics();
@@ -86,7 +86,7 @@ export class BattleUi {
     this.enemyHpBar = drawHpBar(this.scene, 356, 68, 180, 10, 0, 1);
 
     this.scene.add.image(180, 340, 'battle_platform').setAlpha(0.9);
-    this.playerSprite = this.scene.add.image(160, 290, creatureTextureKey(this.scene, this.host.playerMon.speciesId, false, 'back')).setScale(2).setFlipX(true);
+    this.playerSprite = addCreatureImage(this.scene, 160, 290, this.host.playerMon.speciesId, false, 'back').setScale(2).setFlipX(true);
     this.playerIdle = startCritterIdle(this.scene, this.playerSprite, this.host.playerMon.speciesId, 290);
 
     const pBox = this.scene.add.graphics();
@@ -143,7 +143,7 @@ export class BattleUi {
     const def = getCreature(this.host.wild.speciesId);
     this.enemyNameText.setText(`${def.name}  Lv.${this.host.wild.level}  ${statusLabel(this.host.wild.status)}`);
     this.enemyIdle?.stop();
-    this.enemySprite.setTexture(creatureTextureKey(this.scene, this.host.wild.speciesId));
+    applyCreatureTexture(this.enemySprite, this.scene, this.host.wild.speciesId);
     this.enemySprite.setAlpha(1);
     this.enemyIdle = startCritterIdle(this.scene, this.enemySprite, this.host.wild.speciesId, 130);
     this.animateHp(this.enemyHpBar, this.host.wild.currentHp, this.host.wild.maxHp, 356, 68);
@@ -157,7 +157,7 @@ export class BattleUi {
 
   refreshPlayerSprite(speciesId: string): void {
     this.playerIdle?.stop();
-    this.playerSprite.setTexture(creatureTextureKey(this.scene, speciesId, false, 'back'));
+    applyCreatureTexture(this.playerSprite, this.scene, speciesId, false, 'back');
     this.playerIdle = startCritterIdle(this.scene, this.playerSprite, speciesId, 290);
   }
 

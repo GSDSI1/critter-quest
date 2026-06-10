@@ -6,6 +6,7 @@ import { npcTextureKey } from '../utils/assetLoader';
 import { playerTextureKey } from '../utils/sprites';
 import { GameState } from '../systems/stats';
 import { Input } from '../systems/input';
+import { fadeToScene, fadeInOnStart } from '../ui/transitions';
 
 export class LabIntroScene extends Phaser.Scene {
   private dialog!: DialogBox;
@@ -18,7 +19,7 @@ export class LabIntroScene extends Phaser.Scene {
 
   create(): void {
     Input.bind(this);
-    this.cameras.main.fadeIn(300, 0, 0, 0);
+    fadeInOnStart(this, this.scene.settings.data as { _fadeIn?: boolean });
 
     buildLabInterior(this);
 
@@ -57,10 +58,7 @@ export class LabIntroScene extends Phaser.Scene {
       'This region has 27 unique critter species waiting to be discovered.',
       'Your rival Kai is already out training — you\'ll cross paths soon.',
       `${name}, follow me to the starter table!`,
-    ], () => {
-      this.cameras.main.fadeOut(300, 0, 0, 0);
-      this.time.delayedCall(300, () => this.scene.start('StarterSelect'));
-    }, 'Prof. Elmwood');
+    ], () => fadeToScene(this, 'StarterSelect', undefined, 300), 'Prof. Elmwood');
   }
 
   update(): void {

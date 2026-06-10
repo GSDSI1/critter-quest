@@ -5,7 +5,7 @@ import { loadGame, deleteSave, getSaveStatus } from '../systems/save';
 import { getMap } from '../data/maps';
 import { getCreature } from '../data/creatures';
 import { getTrainer } from '../data/characters';
-import { creatureTextureKey } from '../utils/assetLoader';
+import { addCreatureImage, preloadAllRemainingCreatures } from '../utils/assetLoader';
 import { playerTextureKey } from '../utils/sprites';
 import {
   buildTitleBackdrop, addTitleLogo, addBlinkingPrompt,
@@ -13,8 +13,8 @@ import {
 } from '../ui/titleScreen';
 import { Input } from '../systems/input';
 import { Sfx } from '../utils/audio';
-import { preloadAllRemainingCreatures } from '../utils/assetLoader';
 import { prefetchScenes } from './registerScenes';
+import { fadeToScene, fadeInOnStart } from '../ui/transitions';
 
 export class MenuScene extends Phaser.Scene {
   private selected = 0;
@@ -31,6 +31,7 @@ export class MenuScene extends Phaser.Scene {
 
   create(): void {
     Input.bind(this);
+    fadeInOnStart(this, this.scene.settings.data as { _fadeIn?: boolean });
     this.confirmingDelete = false;
     prefetchScenes(this.game, ['CharacterSelect', 'Overworld']);
     void preloadAllRemainingCreatures(this);
@@ -67,7 +68,7 @@ export class MenuScene extends Phaser.Scene {
       this.showSaveSummary();
     } else {
       ['emberpup', 'aqualet', 'leafkit'].forEach((id, i) => {
-        const spr = this.add.image(GAME_WIDTH / 2 - 100 + i * 100, 200, creatureTextureKey(this, id, true)).setScale(2);
+        const spr = addCreatureImage(this, GAME_WIDTH / 2 - 100 + i * 100, 200, id, true).setScale(2);
         this.tweens.add({
           targets: spr, y: 195, duration: 900 + i * 100, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
         });
@@ -170,12 +171,10 @@ export class MenuScene extends Phaser.Scene {
     Sfx.menuConfirm();
     const choice = this.labels[this.selected];
     if (choice === 'Continue') {
-      this.cameras.main.fadeOut(300, 0, 0, 0);
-      this.time.delayedCall(300, () => this.scene.start('Overworld'));
+      fadeToScene(this, 'Overworld', undefined, 300);
     } else if (choice === 'New Game') {
       GameState.reset();
-      this.cameras.main.fadeOut(300, 0, 0, 0);
-      this.time.delayedCall(300, () => this.scene.start('CharacterSelect'));
+      fadeToScene(this, 'CharacterSelect', undefined, 300);
     } else if (choice === 'Delete Save' || choice === 'Delete Corrupt Save') {
       this.openDeleteDialog();
     }
