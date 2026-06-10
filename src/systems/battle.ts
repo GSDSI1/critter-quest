@@ -12,6 +12,7 @@ import {
   abilityAttackMult, isTypeImmune, onEnterAbility,
   contactAbilityEffect, absorbHeal,
 } from '../data/abilities';
+import { defaultRng, type Rng } from './rng';
 
 export interface BattleResult {
   damage?: number;
@@ -32,7 +33,7 @@ const STAT_LABELS: Record<StatKey, string> = {
   atk: 'Attack', def: 'Defense', spa: 'Sp. Atk', spd: 'Sp. Def', spe: 'Speed',
 };
 
-function stageMult(stage: number): number {
+export function stageMult(stage: number): number {
   return stage >= 0 ? (2 + stage) / 2 : 2 / (2 - stage);
 }
 
@@ -79,6 +80,7 @@ export function calcDamage(
   defender: CritterInstance,
   moveId: string,
   forceCrit = false,
+  rng: Rng = defaultRng,
 ): { damage: number; effectiveness: number; label: string; critical: boolean } {
   const move = getMove(moveId);
   if (move.power === 0) return { damage: 0, effectiveness: 1, label: '', critical: false };
@@ -100,24 +102,24 @@ export function calcDamage(
   const hpRatio = attacker.currentHp / attacker.maxHp;
   const attack = atkStat * stageMult(atkStage) * attackMultiplier(attacker);
   const defense = Math.max(1, defStat * stageMult(defStage));
-  const critical = forceCrit || Math.random() < 0.0625;
+  const critical = forceCrit || rng.chance(0.0625);
   const critMult = critical ? 1.5 : 1;
   const stab = stabBonus(attacker, move.type);
   const abilityMult = abilityAttackMult(attacker.ability, move.type, hpRatio);
   const heldMult = heldTypeBoost(attacker, move.type);
 
   const base = Math.floor(((2 * attacker.level / 5 + 2) * move.power * attack / defense) / 50 + 2);
-  const variance = 0.85 + Math.random() * 0.15;
+  const variance = 0.85 + rng.next() * 0.15;
   const damage = effectiveness <= 0 ? 0 : Math.max(1, Math.floor(base * effectiveness * stab * abilityMult * heldMult * critMult * variance));
 
   return { damage, effectiveness, label: typeLabel(effectiveness), critical };
 }
 
-function applyMoveStatus(defender: CritterInstance, status: StatusCondition, chance: number): string {
+function applyMoveStatus(defender: CritterInstance, status: StatusCondition, chance: number, rng: Rng): string {
   if (!status || defender.status) return '';
   if (isStatusImmune(defender, status)) return '';
-  if (Math.random() * 100 >= chance) return '';
-  if (applyStatus(defender, status, 2 + Math.floor(Math.random() * 3))) {
+  if (rng.next() * 100 >= chance) return '';
+  if (applyStatus(defender, status, 2 + rng.int(0, 2))) {
     const labels: Record<string, string> = {
       burn: 'was burned!', paralyze: 'is paralyzed!', poison: 'was poisoned!',
       sleep: 'fell asleep!', freeze: 'was frozen solid!', confusion: 'became confused!',
@@ -131,8 +133,9 @@ export function executeMove(
   attacker: CritterInstance,
   defender: CritterInstance,
   moveIndex: number,
+  rng: Rng = defaultRng,
 ): BattleResult {
-  const actCheck = canAct(attacker);
+  const actCheck = canAct(attacker, rng);
   if (!actCheck.ok) {
     if (actCheck.attackerFainted) {
       return { message: actCheck.message!, attackerFainted: true, cantMove: true };
@@ -148,7 +151,7 @@ export function executeMove(
   const move = getMove(battleMove.id);
   battleMove.pp--;
 
-  if (Math.random() * 100 > move.accuracy) {
+  if (rng.next() * 100 > move.accuracy) {
     return { missed: true, message: `${displayName(attacker)}'s ${move.name} missed!` };
   }
 
@@ -185,12 +188,12 @@ export function executeMove(
     };
     const status = statusMap[move.effect];
     if (status) {
-      const msg = applyMoveStatus(defender, status, move.effectChance ?? 100);
+      const msg = applyMoveStatus(defender, status, move.effectChance ?? 100, rng);
       return { message: msg || `${displayName(attacker)} used ${move.name}! It had no effect.` };
     }
   }
 
-  const { damage, effectiveness, label, critical } = calcDamage(attacker, defender, battleMove.id);
+  const { damage, effectiveness, label, critical } = calcDamage(attacker, defender, battleMove.id, false, rng);
   if (effectiveness <= 0) {
     return { message: `${displayName(attacker)} used ${move.name}! It doesn't affect ${displayName(defender)}...` };
   }
@@ -207,14 +210,14 @@ export function executeMove(
       burn: 'burn', paralyze: 'paralyze', poison: 'poison', sleep: 'sleep',
     };
     const status = statusMap[move.effect];
-    const statusMsg = status ? applyMoveStatus(defender, status, move.effectChance) : '';
+    const statusMsg = status ? applyMoveStatus(defender, status, move.effectChance, rng) : '';
     if (statusMsg) message += ` ${statusMsg}`;
   }
 
   if (move.category === 'physical' && !fainted) {
-    const contact = contactAbilityEffect(defender.ability);
+    const contact = contactAbilityEffect(defender.ability, rng);
     if (contact) {
-      const msg = applyMoveStatus(attacker, contact, 100);
+      const msg = applyMoveStatus(attacker, contact, 100, rng);
       if (msg) message += ` ${msg}`;
     }
   }
@@ -237,13 +240,13 @@ export function endOfTurnStatus(c: CritterInstance): string | null {
   return applyEndOfTurnStatus(c);
 }
 
-export function tryCatchWithItem(wild: CritterInstance, itemId: string): { caught: boolean; shakes: number; message: string } {
+export function tryCatchWithItem(wild: CritterInstance, itemId: string, rng: Rng = defaultRng): { caught: boolean; shakes: number; message: string } {
   const item = getItem(itemId);
   const def = getCreature(wild.speciesId);
   const hpFactor = (wild.maxHp * 3 - wild.currentHp * 2) / (wild.maxHp * 3);
   const catchValue = hpFactor * (def.catchRate / 255) * (item.catchBonus ?? 1);
   const shakes = catchValue > 0.7 ? 3 : catchValue > 0.4 ? 2 : catchValue > 0.15 ? 1 : 0;
-  const caught = Math.random() < Math.min(0.92, catchValue * 1.15 + 0.14);
+  const caught = rng.chance(Math.min(0.92, catchValue * 1.15 + 0.14));
 
   let message = `You threw a ${item.name}!`;
   if (caught) message += ' Gotcha! Critter was caught!';
@@ -253,28 +256,28 @@ export function tryCatchWithItem(wild: CritterInstance, itemId: string): { caugh
   return { caught, shakes, message };
 }
 
-export function tryRun(playerSpe: number, enemySpe: number, blocked = false): boolean {
+export function tryRun(playerSpe: number, enemySpe: number, blocked = false, rng: Rng = defaultRng): boolean {
   if (blocked) return false;
-  return Math.random() < Math.min(0.95, (playerSpe * 128 / Math.max(1, enemySpe) + 30 * 256) / 256 / 256);
+  return rng.chance(Math.min(0.95, (playerSpe * 128 / Math.max(1, enemySpe) + 30 * 256) / 256 / 256));
 }
 
 export function effectiveSpeed(c: CritterInstance): number {
   return Math.floor(c.stats.spe * speedMultiplier(c));
 }
 
-export function pickAiMove(enemy: CritterInstance, player: CritterInstance): number {
+export function pickAiMove(enemy: CritterInstance, player: CritterInstance, rng: Rng = defaultRng): number {
   const available = enemy.moves.map((m, i) => ({ i, move: getMove(m.id), pp: m.pp })).filter(m => m.pp > 0);
   if (!available.length) return 0;
   let best = available[0];
   let bestScore = -1;
   for (const cand of available) {
     if (cand.move.power === 0) {
-      const score = 5 + Math.random() * 5;
+      const score = 5 + rng.next() * 5;
       if (score > bestScore) { bestScore = score; best = cand; }
       continue;
     }
-    const { damage, effectiveness } = calcDamage(enemy, player, cand.move.id);
-    const score = damage * effectiveness + Math.random() * 10;
+    const { damage, effectiveness } = calcDamage(enemy, player, cand.move.id, false, rng);
+    const score = damage * effectiveness + rng.next() * 10;
     if (score > bestScore) { bestScore = score; best = cand; }
   }
   return best.i;

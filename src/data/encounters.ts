@@ -1,4 +1,5 @@
 import { getCreature } from './creatures';
+import { defaultRng, type Rng } from '../systems/rng';
 
 export interface EncounterEntry {
   id: string;
@@ -59,16 +60,49 @@ export const ENCOUNTER_TABLES: Record<string, EncounterEntry[]> = {
     { id: 'infernox', minLevel: 20, maxLevel: 26, weight: 3 },
     { id: 'rockord', minLevel: 16, maxLevel: 20, weight: 12 },
   ],
+  route4: [
+    { id: 'frostkit', minLevel: 18, maxLevel: 22, weight: 22 },
+    { id: 'snowpuff', minLevel: 17, maxLevel: 21, weight: 20 },
+    { id: 'frostmoss', minLevel: 18, maxLevel: 22, weight: 15 },
+    { id: 'pebblite', minLevel: 17, maxLevel: 21, weight: 12 },
+    { id: 'aurorabit', minLevel: 19, maxLevel: 23, weight: 10 },
+    { id: 'glacetail', minLevel: 20, maxLevel: 24, weight: 6 },
+  ],
+  glacier_pass: [
+    { id: 'glacetail', minLevel: 22, maxLevel: 26, weight: 18 },
+    { id: 'blizzhound', minLevel: 23, maxLevel: 27, weight: 16 },
+    { id: 'frosthorn', minLevel: 22, maxLevel: 26, weight: 15 },
+    { id: 'chillbite', minLevel: 24, maxLevel: 28, weight: 12 },
+    { id: 'arctodon', minLevel: 26, maxLevel: 30, weight: 5 },
+    { id: 'rockord', minLevel: 22, maxLevel: 26, weight: 10 },
+  ],
+  route5: [
+    { id: 'mindling', minLevel: 26, maxLevel: 30, weight: 22 },
+    { id: 'dreamwisp', minLevel: 25, maxLevel: 29, weight: 20 },
+    { id: 'shadeling', minLevel: 26, maxLevel: 30, weight: 12 },
+    { id: 'cerebrain', minLevel: 28, maxLevel: 32, weight: 8 },
+    { id: 'psyknight', minLevel: 28, maxLevel: 32, weight: 6 },
+    { id: 'somnara', minLevel: 30, maxLevel: 34, weight: 4 },
+  ],
+  victory_road: [
+    { id: 'astralyn', minLevel: 34, maxLevel: 40, weight: 10 },
+    { id: 'voidseer', minLevel: 34, maxLevel: 40, weight: 12 },
+    { id: 'glaciorex', minLevel: 35, maxLevel: 41, weight: 14 },
+    { id: 'zenolith', minLevel: 36, maxLevel: 42, weight: 6 },
+    { id: 'shadespecter', minLevel: 34, maxLevel: 40, weight: 15 },
+    { id: 'infernox', minLevel: 36, maxLevel: 42, weight: 8 },
+    { id: 'arctodon', minLevel: 35, maxLevel: 41, weight: 10 },
+  ],
 };
 
-export function pickWildFromTable(tableId: string): { def: ReturnType<typeof getCreature>; level: number } {
+export function pickWildFromTable(tableId: string, rng: Rng = defaultRng): { def: ReturnType<typeof getCreature>; level: number } {
   const table = ENCOUNTER_TABLES[tableId] ?? ENCOUNTER_TABLES.route1;
   const total = table.reduce((s, e) => s + e.weight, 0);
-  let roll = Math.random() * total;
+  let roll = rng.next() * total;
   for (const entry of table) {
     roll -= entry.weight;
     if (roll <= 0) {
-      const level = entry.minLevel + Math.floor(Math.random() * (entry.maxLevel - entry.minLevel + 1));
+      const level = rng.int(entry.minLevel, entry.maxLevel);
       return { def: getCreature(entry.id), level };
     }
   }

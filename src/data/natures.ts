@@ -1,3 +1,5 @@
+import { defaultRng, type Rng } from '../systems/rng';
+
 export interface NatureDef {
   id: string;
   name: string;
@@ -37,8 +39,8 @@ export function getNature(id: string): NatureDef {
   return NATURES.find(n => n.id === id) ?? NATURES[0];
 }
 
-export function randomNature(): string {
-  return NATURES[Math.floor(Math.random() * NATURES.length)].id;
+export function randomNature(rng: Rng = defaultRng): string {
+  return rng.pick(NATURES).id;
 }
 
 export function natureMult(natureId: string, stat: 'atk' | 'def' | 'spa' | 'spd' | 'spe'): number {
@@ -48,8 +50,8 @@ export function natureMult(natureId: string, stat: 'atk' | 'def' | 'spa' | 'spd'
   return 1;
 }
 
-export function randomIvs(): { hp: number; atk: number; def: number; spa: number; spd: number; spe: number } {
-  const r = () => Math.floor(Math.random() * 32);
+export function randomIvs(rng: Rng = defaultRng): { hp: number; atk: number; def: number; spa: number; spd: number; spe: number } {
+  const r = () => rng.int(0, 31);
   return { hp: r(), atk: r(), def: r(), spa: r(), spd: r(), spe: r() };
 }
 

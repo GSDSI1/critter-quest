@@ -103,6 +103,70 @@ export const LEARNSETS: Record<string, LearnEntry[]> = {
   voltite: [
     { level: 1, move: 'spark' }, { level: 5, move: 'tackle' }, { level: 10, move: 'thunderwave' },
   ],
+  frostkit: [
+    { level: 1, move: 'scratch' }, { level: 1, move: 'growl' },
+    { level: 5, move: 'frostbite' }, { level: 9, move: 'iceshard' },
+  ],
+  glacetail: [
+    { level: 1, move: 'frostbite' }, { level: 1, move: 'iceshard' },
+    { level: 20, move: 'icebeam' }, { level: 26, move: 'blizzard' },
+  ],
+  arctodon: [
+    { level: 1, move: 'iceshard' }, { level: 1, move: 'icebeam' },
+    { level: 38, move: 'boulder' }, { level: 42, move: 'earthquake' },
+  ],
+  mindling: [
+    { level: 1, move: 'tackle' }, { level: 1, move: 'growl' },
+    { level: 5, move: 'psybeam' }, { level: 9, move: 'calm_mind' },
+  ],
+  cerebrain: [
+    { level: 1, move: 'psybeam' }, { level: 1, move: 'calm_mind' },
+    { level: 20, move: 'mindblast' }, { level: 24, move: 'hypnosis' },
+  ],
+  astralyn: [
+    { level: 1, move: 'mindblast' }, { level: 1, move: 'calm_mind' },
+    { level: 40, move: 'darkpulse' }, { level: 46, move: 'hypnosis' },
+  ],
+  snowpuff: [
+    { level: 1, move: 'tackle' }, { level: 4, move: 'frostbite' }, { level: 8, move: 'growl' },
+  ],
+  blizzhound: [
+    { level: 1, move: 'frostbite' }, { level: 1, move: 'iceshard' },
+    { level: 22, move: 'blizzard' },
+  ],
+  dreamwisp: [
+    { level: 1, move: 'tackle' }, { level: 6, move: 'psybeam' }, { level: 12, move: 'hypnosis' },
+  ],
+  somnara: [
+    { level: 1, move: 'psybeam' }, { level: 1, move: 'hypnosis' },
+    { level: 32, move: 'mindblast' }, { level: 36, move: 'calm_mind' },
+  ],
+  frosthorn: [
+    { level: 1, move: 'iceshard' }, { level: 1, move: 'tackle' }, { level: 14, move: 'rockthrow' },
+  ],
+  glaciorex: [
+    { level: 1, move: 'icebeam' }, { level: 1, move: 'spark' },
+    { level: 16, move: 'thunderbolt' }, { level: 22, move: 'blizzard' },
+  ],
+  chillbite: [
+    { level: 1, move: 'frostbite' }, { level: 1, move: 'shadowclaw' }, { level: 18, move: 'darkpulse' },
+  ],
+  frostmoss: [
+    { level: 1, move: 'frostbite' }, { level: 1, move: 'vine' }, { level: 12, move: 'photosynthesis' },
+  ],
+  psyknight: [
+    { level: 1, move: 'psybeam' }, { level: 1, move: 'scratch' }, { level: 20, move: 'calm_mind' },
+  ],
+  voidseer: [
+    { level: 1, move: 'mindblast' }, { level: 1, move: 'darkpulse' }, { level: 24, move: 'hypnosis' },
+  ],
+  aurorabit: [
+    { level: 1, move: 'frostbite' }, { level: 5, move: 'tackle' }, { level: 10, move: 'iceshard' },
+  ],
+  zenolith: [
+    { level: 1, move: 'mindblast' }, { level: 1, move: 'rockthrow' },
+    { level: 28, move: 'calm_mind' }, { level: 34, move: 'earthquake' },
+  ],
 };
 
 export function movesKnownAtLevel(speciesId: string, level: number): string[] {

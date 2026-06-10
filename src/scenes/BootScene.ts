@@ -1,10 +1,12 @@
 import Phaser from 'phaser';
-import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../data/types';
+import { COLORS, GAME_WIDTH } from '../data/types';
 import { generateAssets, ensureAllCreatureTextures } from '../utils/sprites';
 import { CREATURES } from '../data/creatures';
 import {
   preloadAssetMeta, preloadExternalArt, applyLoadedAssetMeta, isPlaceholderAssets,
 } from '../utils/assetLoader';
+import { registerLazyScenes } from './registerScenes';
+import { initOptions } from '../systems/options';
 
 export class BootScene extends Phaser.Scene {
   private progressBar!: Phaser.GameObjects.Graphics;
@@ -24,7 +26,7 @@ export class BootScene extends Phaser.Scene {
       stroke: '#e94560', strokeThickness: 2,
     }).setOrigin(0.5);
 
-    this.add.text(cx, 195, 'Loading adventure...', {
+    this.add.text(cx, 195, `Loading adventure... v${import.meta.env.VITE_APP_VERSION ?? '1.0.0'}`, {
       fontFamily: '"Courier New", monospace', fontSize: '12px', color: '#667788',
     }).setOrigin(0.5);
 
@@ -56,21 +58,41 @@ export class BootScene extends Phaser.Scene {
     applyLoadedAssetMeta(this);
 
     if (isPlaceholderAssets()) {
-      this.finishBoot();
+      void this.finishBoot();
       return;
     }
 
-    this.load.on('complete', () => this.finishBoot());
+    this.load.on('complete', () => { void this.finishBoot(); });
     preloadExternalArt(this);
     this.load.start();
   }
 
-  private finishBoot(): void {
-    applyLoadedAssetMeta(this);
-    generateAssets(this);
-    ensureAllCreatureTextures(this, Object.keys(CREATURES), id => CREATURES[id]);
+  private setBootStatus(label: string, progress: number): void {
+    const cx = GAME_WIDTH / 2;
+    this.loadText.setText(label);
+    this.progressBar.clear();
+    this.progressBar.fillStyle(COLORS.accent, 1);
+    this.progressBar.fillRoundedRect(cx - 162, 286, 324 * progress, 16, 4);
+    this.progressBar.fillStyle(COLORS.gold, 0.4);
+    this.progressBar.fillRoundedRect(cx - 162, 286, 324 * progress, 4, 2);
+  }
 
-    this.loadText.setText('Ready!');
+  private async finishBoot(): Promise<void> {
+    const t0 = import.meta.env.DEV ? performance.now() : 0;
+    initOptions();
+    this.setBootStatus('Preparing options…', 0.15);
+    applyLoadedAssetMeta(this);
+    this.setBootStatus('Drawing world tiles…', 0.35);
+    generateAssets(this);
+    this.setBootStatus('Creating critters…', 0.55);
+    ensureAllCreatureTextures(this, Object.keys(CREATURES), id => CREATURES[id]);
+    this.setBootStatus('Loading scenes…', 0.75);
+    await registerLazyScenes(this.game);
+    if (import.meta.env.DEV) {
+      console.info(`[Critter Quest] Boot finished in ${Math.round(performance.now() - t0)}ms`);
+    }
+
+    this.setBootStatus('Ready!', 1);
     this.tweens.add({
       targets: this.loadText,
       scale: 1.15,

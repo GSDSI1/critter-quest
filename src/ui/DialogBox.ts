@@ -3,12 +3,12 @@ import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../data/types';
 import { pinContainerChildren } from './screenUi';
 import { createTouchButton } from './touchButtons';
 import { Sfx } from '../utils/audio';
+import { autoAdvanceMs } from '../systems/options';
 
 const BOX_X = 16;
 const BOX_Y = GAME_HEIGHT - 112;
 const BOX_W = GAME_WIDTH - 32;
 const BOX_H = 96;
-const AUTO_ADVANCE_MS = 12_000;
 
 export class DialogBox {
   private scene: Phaser.Scene;
@@ -133,7 +133,7 @@ export class DialogBox {
 
   private resetAutoTimer(): void {
     this.clearAutoTimer();
-    this.autoTimer = this.scene.time.delayedCall(AUTO_ADVANCE_MS, () => {
+    this.autoTimer = this.scene.time.delayedCall(autoAdvanceMs(), () => {
       if (this.visible) this.advance();
     });
   }

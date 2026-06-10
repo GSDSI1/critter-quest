@@ -1,3 +1,5 @@
+import { defaultRng, type Rng } from '../systems/rng';
+
 export interface AbilityDef {
   id: string;
   name: string;
@@ -19,6 +21,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
   flash_fire: { id: 'flash_fire', name: 'Flash Fire', description: 'Immune to Flame; boosts next Flame move.' },
   rock_head: { id: 'rock_head', name: 'Rock Head', description: 'No recoil damage.' },
   swift_swim: { id: 'swift_swim', name: 'Swift Swim', description: 'Doubles Speed in rain.' },
+  snow_cloak: { id: 'snow_cloak', name: 'Snow Cloak', description: 'Boosts evasion in hail or snow.' },
+  thick_fat: { id: 'thick_fat', name: 'Thick Fat', description: 'Halves Flame and Ice damage.' },
+  insomnia: { id: 'insomnia', name: 'Insomnia', description: 'Cannot fall asleep.' },
+  synchronize: { id: 'synchronize', name: 'Synchronize', description: 'Passes status to the foe.' },
   inner_focus: { id: 'inner_focus', name: 'Inner Focus', description: 'Cannot flinch.' },
 };
 
@@ -33,6 +39,8 @@ export function defaultAbilityForTypes(types: string[]): string {
   if (types.includes('volt')) return 'static';
   if (types.includes('shadow')) return 'shadow_tag';
   if (types.includes('stone')) return 'sturdy';
+  if (types.includes('ice')) return 'snow_cloak';
+  if (types.includes('psychic')) return 'synchronize';
   return 'inner_focus';
 }
 
@@ -61,8 +69,8 @@ export function onEnterAbility(abilityId: string): { stat: string; stages: numbe
   return null;
 }
 
-export function contactAbilityEffect(abilityId: string): 'paralyze' | null {
-  if (abilityId === 'static') return Math.random() < 0.3 ? 'paralyze' : null;
+export function contactAbilityEffect(abilityId: string, rng: Rng = defaultRng): 'paralyze' | null {
+  if (abilityId === 'static') return rng.chance(0.3) ? 'paralyze' : null;
   return null;
 }
 

@@ -1,4 +1,5 @@
 import type { CritterInstance } from './stats';
+import { defaultRng, type Rng } from './rng';
 
 export type StatusCondition = 'burn' | 'paralyze' | 'poison' | 'sleep' | 'freeze' | 'confusion' | null;
 
@@ -26,10 +27,10 @@ export function statusLabel(s: StatusCondition): string {
   }
 }
 
-export function canAct(c: CritterInstance): ActCheckResult {
+export function canAct(c: CritterInstance, rng: Rng = defaultRng): ActCheckResult {
   const name = c.nickname ?? c.speciesId;
   if (c.status === 'freeze') {
-    if (Math.random() < 0.2) {
+    if (rng.chance(0.2)) {
       c.status = null;
       return { ok: true, message: `${name} thawed out!` };
     }
@@ -46,7 +47,7 @@ export function canAct(c: CritterInstance): ActCheckResult {
     return { ok: false, message: `${name} is fast asleep!` };
   }
   if (c.status === 'confusion') {
-    if (Math.random() < 0.33) {
+    if (rng.chance(0.33)) {
       const dmg = Math.max(1, Math.floor(c.maxHp / CONFUSION_SELF_DAMAGE_DIVISOR));
       c.currentHp = Math.max(0, c.currentHp - dmg);
       const attackerFainted = c.currentHp <= 0;
@@ -64,7 +65,7 @@ export function canAct(c: CritterInstance): ActCheckResult {
       c.statusTurns = 0;
     }
   }
-  if (c.status === 'paralyze' && Math.random() < 0.25) {
+  if (c.status === 'paralyze' && rng.chance(0.25)) {
     return { ok: false, message: `${name} is paralyzed! It can't move!` };
   }
   return { ok: true };

@@ -8,7 +8,7 @@ import { Input } from '../systems/input';
 import { Sfx } from '../utils/audio';
 export class PauseMenuScene extends Phaser.Scene {
   private selected = 0;
-  private options = ['Critterdex', 'Party', 'Save Game', 'Close'];
+  private options = ['Critterdex', 'Party', 'Options', 'Save Game', 'Close'];
 
   constructor() {
     super('PauseMenu');
@@ -17,7 +17,7 @@ export class PauseMenuScene extends Phaser.Scene {
   create(): void {
     Input.bind(this);
     buildScreenOverlay(this, 0.65);
-    buildMenuPanel(this, 170, 80, 300, 320, 5);
+    buildMenuPanel(this, 170, 70, 300, 360, 5);
 
     this.add.text(GAME_WIDTH / 2, 110, 'MENU', {
       fontFamily: '"Courier New", monospace', fontSize: '24px', color: '#f5c542',
@@ -77,6 +77,9 @@ export class PauseMenuScene extends Phaser.Scene {
       this.scene.pause();
     } else if (opt === 'Party') {
       this.scene.launch('Party', { fromPause: true });
+      this.scene.pause();
+    } else if (opt === 'Options') {
+      this.scene.launch('Options');
       this.scene.pause();
     } else if (opt === 'Save Game') {
       trySave(this);

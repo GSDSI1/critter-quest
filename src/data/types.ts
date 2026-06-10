@@ -23,7 +23,7 @@ export const COLORS = {
   roofLight: 0xdc2626,
 };
 
-export type ElementType = 'flame' | 'tide' | 'leaf' | 'volt' | 'stone' | 'shadow';
+export type ElementType = 'flame' | 'tide' | 'leaf' | 'volt' | 'stone' | 'shadow' | 'ice' | 'psychic';
 
 export const TYPE_COLORS: Record<ElementType, number> = {
   flame: 0xff6b35,
@@ -32,6 +32,8 @@ export const TYPE_COLORS: Record<ElementType, number> = {
   volt: 0xfacc15,
   stone: 0xa8a29e,
   shadow: 0x7c3aed,
+  ice: 0x67e8f9,
+  psychic: 0xf472b6,
 };
 
 export const TYPE_NAMES: Record<ElementType, string> = {
@@ -41,16 +43,20 @@ export const TYPE_NAMES: Record<ElementType, string> = {
   volt: 'Volt',
   stone: 'Stone',
   shadow: 'Shadow',
+  ice: 'Ice',
+  psychic: 'Psychic',
 };
 
 /** type -> types it deals 2x damage to */
 export const TYPE_CHART: Record<ElementType, ElementType[]> = {
-  flame: ['leaf', 'stone'],
+  flame: ['leaf', 'stone', 'ice'],
   tide: ['flame', 'stone'],
   leaf: ['tide', 'stone'],
   volt: ['tide', 'leaf'],
-  stone: ['flame', 'volt'],
-  shadow: ['shadow'],
+  stone: ['flame', 'volt', 'ice'],
+  shadow: ['shadow', 'psychic'],
+  ice: ['leaf', 'tide', 'stone'],
+  psychic: ['shadow', 'leaf'],
 };
 
 export function typeMultiplier(attack: ElementType, defend: ElementType): number {

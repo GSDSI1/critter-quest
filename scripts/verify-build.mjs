@@ -14,6 +14,18 @@ function read(rel) { return readFileSync(join(root, rel), 'utf8'); }
 
 console.log('Critter Quest — verification\n');
 
+if (existsSync(join(root, 'GAMEPLAN.md'))) ok('GAMEPLAN.md in repo');
+else fail('GAMEPLAN.md missing');
+
+if (read('package.json').includes('"test:unit"')) ok('vitest test:unit script');
+else fail('test:unit script missing');
+
+if (existsSync(join(root, 'src/systems/rng.ts'))) ok('injectable Rng module');
+else fail('src/systems/rng.ts missing');
+
+if (existsSync(join(root, '.github/workflows/ci.yml'))) ok('GitHub Actions CI');
+else fail('.github/workflows/ci.yml missing');
+
 // ── Assets ──
 const metaPath = join(root, 'public/assets/meta.json');
 if (existsSync(metaPath)) {
@@ -28,13 +40,20 @@ ok(`${critterPngs.length} critter PNGs on disk`);
 // ── Data catalog ──
 const creatures = read('src/data/creatures.ts');
 const speciesIds = [...creatures.matchAll(/^\s{2}[a-z]+: \{/gm)];
-if (speciesIds.length === 27) ok('27 species in creatures.ts');
-else fail(`Expected 27 species, found ${speciesIds.length}`);
+if (speciesIds.length === 45) ok('45 species in creatures.ts');
+else fail(`Expected 45 species, found ${speciesIds.length}`);
 
-const mapsSrc = read('src/data/maps.ts');
+function readMapsBundle() {
+  const index = read('src/data/maps/index.ts');
+  const dir = join(root, 'src/data/maps');
+  const parts = readdirSync(dir).filter(f => f.endsWith('.ts') && f !== 'index.ts' && f !== 'types.ts' && f !== 'tiles.ts' && f !== 'helpers.ts');
+  return index + parts.map(f => read(`src/data/maps/${f}`)).join('\n');
+}
+const mapsSrc = readMapsBundle();
 const ALL_MAPS = [
   'town', 'heal_center', 'mart', 'lab', 'route1', 'forest', 'route2', 'mossgrove',
   'gym1', 'crystal_cave', 'route3', 'ember_city', 'gym2', 'volcanic_path',
+  'route4', 'glacier_pass', 'frostvale', 'gym3', 'route5', 'mindspire', 'gym4', 'victory_road',
 ];
 for (const mapId of ALL_MAPS) {
   if (mapsSrc.includes(`${mapId}:`)) ok(`Map "${mapId}"`);
@@ -51,22 +70,27 @@ for (const rival of ['rival', 'rival_forest', 'rival2', 'rival3']) {
   else fail(`Rival "${rival}" missing`);
 }
 
-for (const leader of ['gym_leader', 'gym_leader_cole']) {
+for (const leader of ['gym_leader', 'gym_leader_cole', 'gym_leader_glacier', 'gym_leader_sage']) {
   if (mapsSrc.includes(`id: '${leader}'`)) ok(`Gym leader "${leader}"`);
   else fail(`Gym leader "${leader}" missing`);
 }
 
 // ── Scenes registered ──
 const main = read('src/main.ts');
-const REQUIRED_SCENES = [
-  'BootScene', 'IntroScene', 'MenuScene', 'CharacterSelectScene', 'LabIntroScene',
-  'StarterSelectScene', 'OverworldScene', 'TrainerIntroScene', 'BattleScene',
-  'PartyScene', 'ShopScene', 'PcScene', 'CritterdexScene', 'PauseMenuScene',
-  'LearnMoveScene', 'NicknameScene', 'VictoryScene',
+const registerScenes = existsSync(join(root, 'src/scenes/registerScenes.ts'))
+  ? read('src/scenes/registerScenes.ts') : '';
+const EAGER_SCENES = ['BootScene', 'IntroScene', 'MenuScene'];
+const LAZY_SCENE_KEYS = [
+  'CharacterSelect', 'LabIntro', 'StarterSelect', 'Overworld', 'TrainerIntro', 'Battle',
+  'Party', 'Shop', 'PC', 'Critterdex', 'PauseMenu', 'Options', 'HallOfFame', 'LearnMove', 'Nickname', 'Victory',
 ];
-for (const scene of REQUIRED_SCENES) {
-  if (main.includes(scene)) ok(`${scene} registered`);
+for (const scene of EAGER_SCENES) {
+  if (main.includes(scene)) ok(`${scene} registered (eager)`);
   else fail(`${scene} not in main.ts`);
+}
+for (const key of LAZY_SCENE_KEYS) {
+  if (registerScenes.includes(`'${key}'`)) ok(`Scene "${key}" lazy-registered`);
+  else fail(`Scene "${key}" missing from registerScenes.ts`);
 }
 if (main.includes('gamepad: true')) ok('Gamepad enabled in Phaser config');
 else fail('Gamepad not enabled');
@@ -145,13 +169,20 @@ else fail('DialogBox missing touch advance');
 if (read('src/ui/ControlsPanel.ts').includes('pointerdown')) ok('ControlsPanel click/tap advance');
 else fail('ControlsPanel missing pointer advance');
 
-const sprites = read('src/utils/sprites.ts');
+function readSpritesBundle() {
+  const dir = join(root, 'src/utils/sprites');
+  if (!existsSync(dir)) return read('src/utils/sprites.ts');
+  const files = readdirSync(dir).filter(f => f.endsWith('.ts'));
+  return read('src/utils/sprites.ts') + files.map(f => read(`src/utils/sprites/${f}`)).join('\n');
+}
+const sprites = readSpritesBundle();
 for (const tex of ['title_banner', 'starter_lab_bg', 'starter_orb_${type}', 'tileTextureKey', 'playerTextureKey', 'player_back_']) {
   if (sprites.includes(tex)) ok(`sprites: ${tex}`);
-  else fail(`sprites.ts missing ${tex}`);
+  else fail(`sprites bundle missing ${tex}`);
 }
-if (sprites.includes('dialog_frame') && sprites.includes('drawNpc32')) ok('Upgraded sprites (dialog_frame + 32px NPCs)');
-else fail('sprites.ts missing dialog_frame or drawNpc32');
+if (sprites.includes('dialog_frame') && (sprites.includes('drawNpc32') || sprites.includes('generateNpcAssets'))) {
+  ok('Upgraded sprites (dialog_frame + 32px NPCs)');
+} else fail('sprites bundle missing dialog_frame or NPC generator');
 
 if (existsSync(join(root, 'src/data/characters.ts'))) {
   const chars = read('src/data/characters.ts');
@@ -164,11 +195,16 @@ const overworld = read('src/scenes/OverworldScene.ts');
 if (existsSync(join(root, 'src/ui/touchButtons.ts'))) ok('touchButtons.ts on-screen controls');
 else fail('src/ui/touchButtons.ts missing');
 
+const npcMgr = existsSync(join(root, 'src/scenes/overworld/NpcManager.ts'))
+  ? read('src/scenes/overworld/NpcManager.ts') : '';
+const owBundle = overworld + npcMgr;
 if (overworld.includes('OverworldTouchPad')) ok('Overworld touch D-pad');
 else fail('OverworldScene missing touch pad');
-if (overworld.includes('playerTextureKey') && overworld.includes('applyOverworldCamera')) {
+if (owBundle.includes('playerTextureKey') && overworld.includes('applyOverworldCamera')) {
   ok('Overworld: player sprite + camera');
 } else fail('OverworldScene incomplete');
+if (existsSync(join(root, 'src/scenes/overworld/MapRenderer.ts'))) ok('MapRenderer extracted');
+else fail('MapRenderer.ts missing');
 
 const trainerIntro = read('src/scenes/TrainerIntroScene.ts');
 if (trainerIntro.includes('playerBackTextureKey') && trainerIntro.includes('GameState.player.name')) {
@@ -179,7 +215,7 @@ if (trainerIntro.includes('playerBackTextureKey') && trainerIntro.includes('Game
 const inputScenes = [
   'IntroScene', 'MenuScene', 'CharacterSelectScene', 'LabIntroScene', 'StarterSelectScene',
   'OverworldScene', 'BattleScene', 'PartyScene', 'ShopScene', 'PcScene', 'CritterdexScene',
-  'PauseMenuScene', 'LearnMoveScene',
+  'PauseMenuScene', 'OptionsScene', 'LearnMoveScene',
 ];
 for (const s of inputScenes) {
   const src = read(`src/scenes/${s}.ts`);
@@ -192,8 +228,9 @@ if (existsSync(join(root, 'src/ui/mapBanner.ts'))) ok('Map banner + toast UI');
 else fail('mapBanner.ts missing');
 
 const victory = read('src/scenes/VictoryScene.ts');
-if (victory.includes("'Victory'") && victory.includes('champion')) ok('VictoryScene endgame credits');
-else fail('VictoryScene incomplete');
+if (victory.includes("'Victory'") && (victory.includes('champion') || victory.includes('league_ready'))) {
+  ok('VictoryScene endgame credits');
+} else fail('VictoryScene incomplete');
 
 const battleSrc = read('src/scenes/BattleScene.ts');
 if (battleSrc.includes("'Victory'") && battleSrc.includes('rival3')) ok('Battle triggers Victory after rival3');

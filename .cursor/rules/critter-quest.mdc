@@ -4,9 +4,15 @@ alwaysApply: true
 ---
 - Phaser 3 + TypeScript, strict mode. Never introduce `any` or non-null `!` without justification.
 - Game logic lives in src/systems/ as pure functions; scenes (src/scenes/) only render and route input. Never put battle math in a scene.
-- All randomness goes through the injectable Rng — never call Math.random directly in src/systems/ (planned; battle.ts still migrating).
+- All randomness goes through the injectable Rng — never call Math.random directly in src/systems/ or src/data/.
 - Content lives in src/data/ as typed tables; no gameplay constants inline — use src/data/constants.ts when added.
-- After any change: npm run verify && npx tsc --noEmit must pass; npm run test:e2e for flow changes.
+- After any change: npm run verify && npx tsc --noEmit must pass; npm run test:unit for systems changes; npm run test:e2e for flow changes.
 - Saves: never change PlayerState shape without bumping SAVE_KEY version and adding a migration + test.
 - Keep files under ~300 lines; extract before they grow.
 - Use trySave(scene) from src/utils/saveFeedback.ts instead of saveGame() in scenes.
+- Unit tests (vitest) are required for any change to src/systems/ — use SeededRng, never real randomness in tests.
+- All new art goes through the asset pipeline (scripts/generate-png-assets.mjs or public/assets/ PNG overrides) — never inline base64 or new procedural drawing in scenes.
+- New maps use the ASCII t() format, one file per map in src/data/maps/, and must be registered in the maps index + have an encounter table + at least one warp in AND out.
+- New species/moves/items must update verify-build.mjs counts in the same PR.
+- Performance: never add per-tile GameObjects; map rendering goes through MapRenderer/tilemap layers.
+- Audio: all sounds via the Sfx/music API in src/utils/audio.ts; respect persisted volume settings.

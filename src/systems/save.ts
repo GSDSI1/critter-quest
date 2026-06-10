@@ -40,7 +40,7 @@ export function validateSaveData(data: unknown): data is Record<string, unknown>
   return true;
 }
 
-function migrate(data: Record<string, unknown>): PlayerState {
+export function migrateSaveData(data: Record<string, unknown>): PlayerState {
   const base = defaultPlayer();
   const items = { ...emptyBag(), ...(typeof data.items === 'object' && data.items && !Array.isArray(data.items) ? data.items as PlayerState['items'] : {}) };
   if (typeof data.captureOrbs === 'number') {
@@ -103,7 +103,7 @@ export function loadGame(): boolean {
   try {
     const parsed = JSON.parse(raw) as unknown;
     if (!validateSaveData(parsed)) return false;
-    GameState.player = migrate(parsed);
+    GameState.player = migrateSaveData(parsed);
     return GameState.player.started;
   } catch {
     return false;

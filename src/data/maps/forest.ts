@@ -1,0 +1,44 @@
+import type { GameMap } from './types';
+import { t } from './tiles';
+
+export const forest: GameMap = {
+  id: 'forest', name: 'Verdant Forest', width: 24, height: 22,
+  spawn: { x: 12, y: 20 }, encounterRate: 0.22, encounterTable: 'forest',
+  warps: [
+    { x: 12, y: 21, toMap: 'route1', toX: 12, toY: 1 },
+    { x: 23, y: 10, toMap: 'route2', toX: 1, toY: 10 },
+  ],
+  npcs: [
+    { id: 'ranger', x: 16, y: 8, name: 'Ranger Mia', role: 'trainer_f', lines: ['Rare critters lurk here!', 'Head east to Mossgrove City when you\'re ready.'],
+      trainer: { party: [{ creatureId: 'vineclaw', level: 11 }, { creatureId: 'shadeling', level: 12 }], reward: 350 } },
+    { id: 'rival_forest', x: 12, y: 4, name: 'Kai', role: 'rival', lines: ['Not bad getting this far!', 'But you still can\'t beat me!'],
+      trainer: { party: [{ creatureId: '__RIVAL_EVO__', level: 12 }, { creatureId: 'pebblite', level: 11 }], reward: 400 } },
+    { id: 'bugcatcher', x: 8, y: 14, name: 'Ben', role: 'trainer_m', lines: ['Bug-type? We have leaf types!', 'En garde!'],
+      trainer: { party: [{ creatureId: 'mossling', level: 10 }, { creatureId: 'bloomoss', level: 11 }], reward: 220 } },
+    { id: 'sign3', x: 12, y: 19, name: 'Sign', lines: ['Verdant Forest', '↓ Route 1  |  → Route 2 / Mossgrove City'] },
+  ],
+  tiles: t([
+    'TTTTTTTTTTTTTTTTTTTTTTTT',
+    'T#######........#######T',
+    'T#######........#######T',
+    'T##.................=..T',
+    'T##..OOOO...........=..T',
+    'T##.................=..T',
+    'T....####...####....=..T',
+    'T....####...####....=..T',
+    'T...................=..T',
+    'T....*........*.....=..T',
+    'T...................=..T',
+    'T..####.......####..=..T',
+    'T..####.......####..=..T',
+    'T...................=..T',
+    'T.......======......=..T',
+    'T.......======......=..T',
+    'T...................=..T',
+    'T.............S.....=..T',
+    'T...................=..T',
+    'T...................=..T',
+    'T...................=..T',
+    'TTTTTTTTTTTTTTTTTTTTTTTT',
+  ]),
+};

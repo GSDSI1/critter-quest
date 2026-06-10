@@ -20,7 +20,7 @@ export class VictoryScene extends Phaser.Scene {
   create(): void {
     Input.bind(this);
     Sfx.levelUp();
-    GameState.player.storyFlags.champion = true;
+    GameState.player.storyFlags.league_ready = true;
     trySave(this);
 
     const bg = this.add.graphics();

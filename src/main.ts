@@ -5,19 +5,6 @@ import { GameState, createCritter, registerSeen, registerCaught } from './system
 import { BootScene } from './scenes/BootScene';
 import { IntroScene } from './scenes/IntroScene';
 import { MenuScene } from './scenes/MenuScene';
-import { CharacterSelectScene } from './scenes/CharacterSelectScene';
-import { LabIntroScene } from './scenes/LabIntroScene';
-import { StarterSelectScene } from './scenes/StarterSelectScene';
-import { OverworldScene } from './scenes/OverworldScene';
-import { BattleScene } from './scenes/BattleScene';
-import { PartyScene } from './scenes/PartyScene';
-import { ShopScene } from './scenes/ShopScene';
-import { PcScene } from './scenes/PcScene';
-import { CritterdexScene } from './scenes/CritterdexScene';
-import { PauseMenuScene } from './scenes/PauseMenuScene';
-import { TrainerIntroScene } from './scenes/TrainerIntroScene';
-import { VictoryScene } from './scenes/VictoryScene';
-import { LearnMoveScene, NicknameScene } from './scenes/LearnMoveScene';
 
 const config = {
   type: Phaser.AUTO,
@@ -34,11 +21,7 @@ const config = {
     autoCenter: Phaser.Scale.CENTER_BOTH,
     zoom: 1,
   },
-  scene: [
-    BootScene, IntroScene, MenuScene, CharacterSelectScene, LabIntroScene, StarterSelectScene, OverworldScene,
-    TrainerIntroScene, VictoryScene, BattleScene, PartyScene, ShopScene, PcScene, CritterdexScene,
-    PauseMenuScene, LearnMoveScene, NicknameScene,
-  ],
+  scene: [BootScene, IntroScene, MenuScene],
   render: { antialias: false, roundPixels: true },
   pauseOnBlur: false,
 } as Phaser.Types.Core.GameConfig;
@@ -57,6 +40,8 @@ declare global {
       startStarterSelect: () => void;
       pickStarter: (id?: string) => void;
       completeTutorial: () => void;
+      startWildBattle: (speciesId?: string) => void;
+      giveBadge: (id: string) => void;
     };
   }
 }
@@ -109,6 +94,17 @@ if (import.meta.env.DEV) {
     },
     completeTutorial() {
       GameState.player.storyFlags.saw_controls = true;
+      saveGame();
+    },
+    startWildBattle(speciesId = 'mossling') {
+      if (!GameState.player.party.length) {
+        GameState.player.party = [createCritter('emberpup', 10)];
+      }
+      const wild = createCritter(speciesId, 5);
+      game.scene.start('Battle', { enemyParty: [wild], mapId: 'route1' });
+    },
+    giveBadge(id: string) {
+      if (!GameState.player.badges.includes(id)) GameState.player.badges.push(id);
       saveGame();
     },
   };

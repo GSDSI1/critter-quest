@@ -1,3 +1,5 @@
+import { effectiveSfxVolume } from '../systems/audioSettings';
+
 let ctx: AudioContext | null = null;
 
 function ac(): AudioContext {
@@ -7,12 +9,14 @@ function ac(): AudioContext {
 
 function beep(freq: number, dur: number, type: OscillatorType = 'square', vol = 0.08): void {
   try {
+    const scaled = vol * effectiveSfxVolume();
+    if (scaled <= 0) return;
     const c = ac();
     const o = c.createOscillator();
     const g = c.createGain();
     o.type = type;
     o.frequency.value = freq;
-    g.gain.value = vol;
+    g.gain.value = scaled;
     g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + dur);
     o.connect(g);
     g.connect(c.destination);
