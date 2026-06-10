@@ -36,6 +36,7 @@ export class MapRenderer {
       const tileset = tm.addTilesetImage('tileset', 'ext_tileset', TILE_SIZE, TILE_SIZE, 0, 0, 0);
       if (tileset) {
         this.tileLayer = tm.createLayer(0, tileset, 0, 0)?.setDepth(0);
+        this.buildAnimatedOverlays(map);
         this.decorLayer = this.scene.add.container(0, 0).setDepth(6);
         this.renderDecorations();
         return;
@@ -50,6 +51,14 @@ export class MapRenderer {
       this.tileLayer = tm.createLayer(0, tileset, 0, 0)?.setDepth(0);
     }
 
+    this.buildAnimatedOverlays(map);
+    this.renderEdgeOverlays();
+    this.decorLayer = this.scene.add.container(0, 0).setDepth(6);
+    this.renderDecorations();
+  }
+
+  private buildAnimatedOverlays(map: GameMap): void {
+    const theme: MapTheme = map.mapTheme ?? 'outdoor';
     this.animContainer = this.scene.add.container(0, 0).setDepth(2);
     for (let y = 0; y < map.height; y++) {
       for (let x = 0; x < map.width; x++) {
@@ -65,10 +74,6 @@ export class MapRenderer {
         }
       }
     }
-
-    this.renderEdgeOverlays();
-    this.decorLayer = this.scene.add.container(0, 0).setDepth(6);
-    this.renderDecorations();
   }
 
   update(delta: number): void {

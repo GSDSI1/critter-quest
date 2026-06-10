@@ -61,7 +61,7 @@ export class NpcManager {
         npc.x * TILE_SIZE + TILE_SIZE / 2,
         npc.y * TILE_SIZE + TILE_SIZE / 2,
         npcTextureKey(this.scene, role),
-      ).setDepth(9).setScale(0.5);
+      ).setDepth(9).setScale(1);
     }
   }
 
@@ -125,8 +125,13 @@ export class NpcManager {
         this.callbacks.setMoving(false);
 
         const landedTile = getTile(map, nx, ny);
-        if (landedTile === 2) Sfx.footstepGrass();
-        else if (landedTile === 0 || landedTile === 1) Sfx.footstepPath();
+        if (landedTile === 2) {
+          Sfx.footstepGrass();
+          this.spawnWalkFx(player.x, player.y, 0x4ade80);
+        } else if (landedTile === 0 || landedTile === 1) {
+          Sfx.footstepPath();
+          if (landedTile === 1) this.spawnWalkFx(player.x, player.y, 0xc4a574);
+        }
 
         const warp = isWarpTile(map, nx, ny);
         if (warp) {
@@ -151,6 +156,15 @@ export class NpcManager {
           this.startWildBattle();
         }
       },
+    });
+  }
+
+  private spawnWalkFx(x: number, y: number, color: number): void {
+    const p = this.scene.add.graphics().setDepth(11);
+    p.fillStyle(color, 0.5);
+    p.fillCircle(x, y + 4, 3);
+    this.scene.tweens.add({
+      targets: p, alpha: 0, y: y - 6, duration: 280, onComplete: () => p.destroy(),
     });
   }
 

@@ -67,6 +67,7 @@ export function migrateSaveData(data: Record<string, unknown>): PlayerState {
     defeatedTrainers: isStringArray(data.defeatedTrainers) ? data.defeatedTrainers : [],
     defeatedRematch: isStringArray(data.defeatedRematch) ? data.defeatedRematch : [],
     visitedHealCenters: isStringArray(data.visitedHealCenters) ? data.visitedHealCenters : [],
+    completionTime: typeof data.completionTime === 'number' ? data.completionTime : undefined,
     storage: Array.isArray(data.storage) ? data.storage as CritterInstance[] : [],
     party: Array.isArray(data.party) ? data.party as CritterInstance[] : [],
   };

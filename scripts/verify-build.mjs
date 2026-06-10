@@ -28,11 +28,18 @@ else fail('.github/workflows/ci.yml missing');
 
 // ── Assets ──
 const metaPath = join(root, 'public/assets/meta.json');
-if (existsSync(metaPath)) {
+  if (existsSync(metaPath)) {
   const meta = JSON.parse(readFileSync(metaPath, 'utf8'));
   if (meta.placeholder === true) ok('meta.json placeholder mode (procedural art active)');
   else ok('meta.json custom art mode');
 } else fail('public/assets/meta.json missing');
+
+if (existsSync(join(root, 'public/assets/tiles/tileset.png'))) ok('tileset.png present');
+else fail('public/assets/tiles/tileset.png missing');
+
+const audioDir = join(root, 'public/assets/audio');
+if (existsSync(join(audioDir, 'menu_select.wav'))) ok('Generated SFX audio');
+else fail('public/assets/audio missing');
 
 const critterPngs = readdirSync(join(root, 'public/assets/critters')).filter(f => f.endsWith('.png') && !f.includes('_sm'));
 ok(`${critterPngs.length} critter PNGs on disk`);

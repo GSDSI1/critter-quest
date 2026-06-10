@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../data/types';
-import { SHOP_STOCK, getItem, addItem } from '../data/items';
+import { SHOP_STOCK, getItem, addItem, removeItem } from '../data/items';
 import { GameState } from '../systems/stats';
 import { trySave } from '../utils/saveFeedback';
 import { buildMartInterior, buildScreenOverlay, buildMenuPanel } from '../ui/sceneBackdrops';
@@ -9,6 +9,7 @@ import { Sfx } from '../utils/audio';
 
 export class ShopScene extends Phaser.Scene {
   private selected = 0;
+  private mode: 'buy' | 'sell' = 'buy';
   private returnMap = 'town';
 
   constructor() {
@@ -33,7 +34,7 @@ export class ShopScene extends Phaser.Scene {
 
     this.renderList();
 
-    this.add.text(GAME_WIDTH / 2, 450, '↑↓ select  ·  Z buy  ·  ESC leave', {
+    this.add.text(GAME_WIDTH / 2, 450, '↑↓ item  ·  ←→ mode  ·  Z confirm  ·  ESC leave', {
       fontFamily: '"Courier New", monospace', fontSize: '11px', color: '#667788',
     }).setOrigin(0.5);
 
@@ -47,7 +48,11 @@ export class ShopScene extends Phaser.Scene {
     Input.update();
     if (Input.justPressed('up')) { this.selected = Math.max(0, this.selected - 1); this.renderList(); }
     if (Input.justPressed('down')) { this.selected = Math.min(SHOP_STOCK.length - 1, this.selected + 1); this.renderList(); }
-    if (Input.justPressed('confirm')) this.buy();
+    if (Input.justPressed('left') || Input.justPressed('right')) {
+      this.mode = this.mode === 'buy' ? 'sell' : 'buy';
+      this.renderList();
+    }
+    if (Input.justPressed('confirm')) this.transact();
     if (Input.justPressed('cancel')) this.leave();
   }
 
@@ -56,6 +61,12 @@ export class ShopScene extends Phaser.Scene {
   private renderList(): void {
     this.itemTexts.forEach(t => t.destroy());
     this.itemTexts = [];
+    this.children.getByName('modeLabel')?.destroy();
+    this.children.getByName('desc')?.destroy();
+
+    this.add.text(GAME_WIDTH / 2, 28, this.mode === 'buy' ? 'BUY' : 'SELL', {
+      fontFamily: '"Press Start 2P", "Courier New", monospace', fontSize: '14px', color: '#f5c542',
+    }).setOrigin(0.5).setName('modeLabel');
 
     SHOP_STOCK.forEach((id, i) => {
       const item = getItem(id);
@@ -77,14 +88,27 @@ export class ShopScene extends Phaser.Scene {
     // desc recreated each render - fine
   }
 
-  private buy(): void {
+  private transact(): void {
     const id = SHOP_STOCK[this.selected];
     const item = getItem(id);
-    if (GameState.player.money < item.price) return;
-    GameState.player.money -= item.price;
-    addItem(GameState.player.items, id);
+    if (this.mode === 'buy') {
+      if (GameState.player.money < item.price) return;
+      GameState.player.money -= item.price;
+      addItem(GameState.player.items, id);
+    } else {
+      if ((GameState.player.items[id] ?? 0) <= 0) return;
+      const sellPrice = Math.max(1, Math.floor(item.price / 2));
+      removeItem(GameState.player.items, id);
+      GameState.player.money += sellPrice;
+    }
+    Sfx.menuConfirm();
     trySave(this);
     this.renderList();
+  }
+
+  private buy(): void {
+    this.mode = 'buy';
+    this.transact();
   }
 
   private leave(): void {

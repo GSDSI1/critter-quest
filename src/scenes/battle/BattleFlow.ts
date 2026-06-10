@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { getCreature } from '../../data/creatures';
 import { getItem, removeItem } from '../../data/items';
+import { getMove } from '../../data/moves';
 import { getBadge } from '../../data/badges';
 import {
   executeMove, tryCatchWithItem, tryRun, pickAiMove, expGain,
@@ -94,7 +95,8 @@ export class BattleFlow {
       return;
     }
     if (result.damage && result.damage > 0) {
-      this.host.battleAnims.playHitOnEnemy(this.host.ui.enemySprite);
+      const moveType = getMove(this.host.playerMon.moves[index].id).type;
+      this.host.battleAnims.playHitOnEnemy(this.host.ui.enemySprite, moveType);
       this.host.ui.animateEnemyHp();
       this.host.battleAnims.applyEffectivenessTint(this.host.ui.enemySprite, result.effectiveness);
     }
@@ -129,10 +131,12 @@ export class BattleFlow {
       }
     }
     this.host.phase = 'enemy';
-    const result = executeMove(this.host.wild, this.host.playerMon, pickAiMove(this.host.wild, this.host.playerMon));
+    const aiMove = pickAiMove(this.host.wild, this.host.playerMon);
+    const result = executeMove(this.host.wild, this.host.playerMon, aiMove);
     this.host.ui.queueMessage(result.message);
     if (result.damage && result.damage > 0) {
-      this.host.battleAnims.playHitOnPlayer(this.host.ui.playerSprite);
+      const moveType = getMove(this.host.wild.moves[aiMove].id).type;
+      this.host.battleAnims.playHitOnPlayer(this.host.ui.playerSprite, moveType);
       this.host.ui.refreshPlayerUi();
     }
     const enemyStatus = endOfTurnStatus(this.host.wild);

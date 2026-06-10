@@ -11,6 +11,7 @@ import { OverworldTouchPad } from '../ui/touchButtons';
 import { pinToScreen } from '../ui/screenUi';
 import { applyOverworldCamera } from '../utils/camera';
 import { resumeAudio } from '../utils/audio';
+import { setMusicThemeForMap, startMusic, stopMusic } from '../utils/music';
 import { Input } from '../systems/input';
 import { canAlwaysRun } from '../systems/options';
 import { isOutdoorMap, nightTintAlpha } from '../systems/dayNight';
@@ -40,6 +41,7 @@ export class OverworldScene extends Phaser.Scene {
 
   create(data: { showIntro?: boolean; fromBattle?: boolean; blackout?: boolean }): void {
     resumeAudio();
+    setMusicThemeForMap(GameState.player.mapId);
     Input.bind(this);
     this.map = getMap(GameState.player.mapId);
     this.dialog = new DialogBox(this);

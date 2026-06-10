@@ -20,6 +20,9 @@ export class HallOfFameScene extends Phaser.Scene {
     Input.bind(this);
     Sfx.levelUp();
     GameState.player.storyFlags.champion = true;
+    if (GameState.player.completionTime == null) {
+      GameState.player.completionTime = GameState.player.playTime;
+    }
     trySave(this);
 
     const bg = this.add.graphics();
@@ -61,6 +64,7 @@ export class HallOfFameScene extends Phaser.Scene {
     this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 72, [
       `Dex: ${p.dexCaught.length}/${totalSpecies()}  ·  $${p.money}`,
       `Play time: ${formatPlayTime(p.playTime)}`,
+      p.completionTime != null ? `Champion run: ${formatPlayTime(p.completionTime)}` : '',
       '',
       'Thank you for playing Critter Quest!',
     ].join('\n'), {

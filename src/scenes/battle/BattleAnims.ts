@@ -23,16 +23,32 @@ export class BattleAnims {
     });
   }
 
-  playHitOnEnemy(enemySprite: Phaser.GameObjects.Image): void {
+  playHitOnEnemy(enemySprite: Phaser.GameObjects.Image, moveType?: string): void {
     Sfx.hit();
     this.scene.cameras.main.shake(120, 0.004);
     this.scene.tweens.add({ targets: enemySprite, x: 490, duration: 50, yoyo: true, repeat: 3 });
+    if (moveType) this.playMoveVfx(moveType, enemySprite.x, enemySprite.y);
   }
 
-  playHitOnPlayer(playerSprite: Phaser.GameObjects.Image): void {
+  playHitOnPlayer(playerSprite: Phaser.GameObjects.Image, moveType?: string): void {
     Sfx.hit();
     this.scene.cameras.main.shake(120, 0.004);
     this.scene.tweens.add({ targets: playerSprite, x: 150, duration: 50, yoyo: true, repeat: 3 });
+    if (moveType) this.playMoveVfx(moveType, playerSprite.x, playerSprite.y);
+  }
+
+  playMoveVfx(element: string, x: number, y: number): void {
+    const colors: Record<string, number> = {
+      flame: 0xff6b35, tide: 0x3b82f6, leaf: 0x22c55e, volt: 0xfacc15,
+      stone: 0xa8a29e, shadow: 0x7c3aed, ice: 0x67e8f9, psychic: 0xf472b6,
+    };
+    const g = this.scene.add.graphics().setDepth(200);
+    g.fillStyle(colors[element] ?? 0xffffff, 0.85);
+    g.fillCircle(x, y, 10);
+    this.scene.tweens.add({
+      targets: g, scaleX: 2.5, scaleY: 2.5, alpha: 0, duration: 320,
+      onComplete: () => g.destroy(),
+    });
   }
 
   applyEffectivenessTint(

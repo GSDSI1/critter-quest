@@ -6,49 +6,28 @@ Last updated: 2026-06-10. Source: `GAMEPLAN.md`.
 
 | Phase | Item | Status |
 |-------|------|--------|
-| 0.1 | Vitest + unit tests | ✓ |
-| 0.2 | Injectable RNG | ✓ |
-| 0.3 | File splits (sprites, maps, overworld, battle orchestration) | ✓ partial — `BattleUi.ts` still large |
-| 0.4 | ESLint, CI, manualChunks | ✓ |
-| 1.1 | Tilemap MapRenderer | ✓ |
-| 1.2 | Texture exists guards | ✓ |
-| 1.3 | Lazy scene loading | ✓ |
-| 3.1 | 45 species, Ice/Psychic | ✓ |
-| 3.2 | Gyms 3–4, routes 4–5 | ✓ |
-| 4.1 | PWA, deploy workflow | ✓ |
-| 4.2 | E2E battle/shop/PC/gym | ✓ |
-| — | Starter Select layout fix | ✓ |
+| 0–1 | Foundation + performance | ✓ |
+| 2.1 | Pixel tileset (`pack-tileset.mjs` + `tileset.png`) | ✓ |
+| 2.2 | 45-species PNG pipeline (front/f2/back, 64+32) | ✓ |
+| 2.3 | Battle idle frames + move VFX particles | ✓ |
+| 2.4 | Walk FX particles, 32px NPCs | ✓ |
+| 2.5 | Press Start 2P font + ui_panel nine-slice | ✓ |
+| 2.6 | WAV SFX + procedural map/battle music | ✓ |
+| 3.1–3.5 | Content + systems + QoL | ✓ |
+| 4 | PWA, deploy, E2E | ✓ |
 
-## Done (2026-06-10 batch)
-
-| Phase | Item | Notes |
-|-------|------|-------|
-| 3.3 | Elite Four gauntlet + champion chain | Registrar, 4 elites, chained battles, Hall of Fame |
-| 3.4 | Held items (scope + type boosters), rematch +3 after champion, day/night tint | |
-| 3.5 | Critterdex moves/evo tabs, fast travel (Frost badge), party nickname | |
-| 0.3 | Split `BattleFlow` → `battle/BattleFlow.ts` | `BattleUi.ts` now ~319 lines |
-
-## Queued — Phase 2 (graphics, needs art pipeline)
-
-| Item | Blocker |
-|------|---------|
-| 2.1 Real CC0 tileset + autotiling | Kenney pack download / `meta.json` flip |
-| 2.2 Pixel-art critter PNG upgrade (45 species) | `generate-png-assets.mjs` overhaul |
-| 2.3 Battle idle/VFX animations | Depends on 2.2 frames |
-| 2.4 Overworld walk polish + grass particles | Depends on 2.2 |
-| 2.5 9-slice UI theme + pixel webfont | Font link easy; panels need texture gen |
-| 2.6 CC0 audio files + map music | Asset sourcing |
-
-## Queued — Phase 3 remainder
+## Optional polish (future)
 
 | Item | Notes |
 |------|-------|
-| Shop sell flow | Buy only today |
-| Hall of Fame save record | Scene exists; persist completion time to save field |
-| Trainer rematch full roster pass | Scaling hook only after champion |
+| Kenney tileset drop-in | Replace `tileset.png` from external pack; re-run pack script |
+| Battle entry/faint tweens | Extra anims beyond idle + VFX |
+| NPC random facing idle | Cosmetic overworld |
+| Options audio controls | Music/SFX volume steps + mute in Options scene | ✓ |
 
-## Verify after each batch
+## Verify
 
 ```bash
+npm run gen-assets   # regenerate PNG + tileset + audio
 npm run verify && npx tsc --noEmit && npm run test:unit && npm run test:e2e
 ```

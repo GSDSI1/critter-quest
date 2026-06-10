@@ -10,7 +10,12 @@ export function buildMenuPanel(
   w: number,
   h: number,
   depth = 5,
-): Phaser.GameObjects.Graphics {
+): Phaser.GameObjects.Graphics | Phaser.GameObjects.NineSlice {
+  if (scene.textures.exists('ui_panel')) {
+    scene.add.nineslice(x, y, 'ui_panel', undefined, w, h, 12, 12, 12, 12).setDepth(depth);
+    const g = scene.add.graphics().setDepth(depth);
+    return g;
+  }
   const panel = scene.add.graphics().setDepth(depth);
   panel.fillStyle(COLORS.panel, 0.94);
   panel.fillRoundedRect(x, y, w, h, 12);

@@ -28,3 +28,9 @@ export function effectiveSfxVolume(): number {
   if (s.muted) return 0;
   return s.master * s.sfx;
 }
+
+export function effectiveMusicVolume(): number {
+  const s = loadAudioSettings();
+  if (s.muted) return 0;
+  return s.master * s.music;
+}

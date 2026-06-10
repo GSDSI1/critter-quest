@@ -17,7 +17,7 @@ import {
   GameState, type CritterInstance, displayName, expProgress, isFainted, addExp, registerCaught, registerSeen,
 } from '../../systems/stats';
 import { trySave } from '../../utils/saveFeedback';
-import { creatureTextureKey } from '../../utils/assetLoader';
+import { creatureTextureKey, startCritterIdle } from '../../utils/assetLoader';
 import { Sfx } from '../../utils/audio';
 import { drawHpBar } from '../../ui/HUD';
 import { statusLabel } from '../../systems/status';
@@ -70,7 +70,7 @@ export class BattleUi {
   build(): void {
     this.scene.add.image(480, 175, 'battle_platform').setAlpha(0.9);
     this.enemySprite = this.scene.add.image(480, 130, creatureTextureKey(this.scene, this.host.wild.speciesId)).setScale(1.5);
-    this.anims.addIdleBob(this.enemySprite, 125, 1200);
+    startCritterIdle(this.scene, this.enemySprite, this.host.wild.speciesId, 130);
 
     const eBox = this.scene.add.graphics();
     eBox.fillStyle(COLORS.panel, 0.92);
@@ -84,8 +84,8 @@ export class BattleUi {
     this.enemyHpBar = drawHpBar(this.scene, 356, 68, 180, 10, 0, 1);
 
     this.scene.add.image(180, 340, 'battle_platform').setAlpha(0.9);
-    this.playerSprite = this.scene.add.image(160, 290, creatureTextureKey(this.scene, this.host.playerMon.speciesId)).setScale(2).setFlipX(true);
-    this.anims.addIdleBob(this.playerSprite, 285, 1400);
+    this.playerSprite = this.scene.add.image(160, 290, creatureTextureKey(this.scene, this.host.playerMon.speciesId, false, 'back')).setScale(2).setFlipX(true);
+    startCritterIdle(this.scene, this.playerSprite, this.host.playerMon.speciesId, 290);
 
     const pBox = this.scene.add.graphics();
     pBox.fillStyle(COLORS.panel, 0.92);

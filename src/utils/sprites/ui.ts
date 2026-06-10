@@ -50,6 +50,18 @@ function generateDecorAssets(scene: Phaser.Scene): void {
 export function generateUiAssets(scene: Phaser.Scene): void {
   generateDecorAssets(scene);
 
+  if (!scene.textures.exists('ui_panel')) {
+    const panelG = scene.make.graphics({ x: 0, y: 0 });
+    panelG.fillStyle(COLORS.panel, 0.98);
+    panelG.fillRoundedRect(0, 0, 48, 48, 10);
+    panelG.lineStyle(3, COLORS.gold, 0.9);
+    panelG.strokeRoundedRect(1, 1, 46, 46, 9);
+    panelG.fillStyle(COLORS.accent, 0.25);
+    panelG.fillRect(6, 6, 36, 4);
+    panelG.generateTexture('ui_panel', 48, 48);
+    panelG.destroy();
+  }
+
   const labG = scene.make.graphics({ x: 0, y: 0 });
   labG.fillGradientStyle(0x2d3748, 0x2d3748, 0x4a5568, 0x553c9a, 1);
   labG.fillRect(0, 0, 640, 480);

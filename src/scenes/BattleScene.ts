@@ -14,6 +14,7 @@ import { trySave } from '../utils/saveFeedback';
 import { creatureTextureKey } from '../utils/assetLoader';
 import { buildBattleArena } from '../ui/sceneBackdrops';
 import { Sfx } from '../utils/audio';
+import { startMusic, stopMusic } from '../utils/music';
 import { Input } from '../systems/input';
 import { BattleAnims } from './battle/BattleAnims';
 import { BattleUi, MENU_ITEMS, type BattlePhase, type BattleUiHost } from './battle/BattleUi';
@@ -63,6 +64,8 @@ export class BattleScene extends Phaser.Scene implements BattleUiHost, BattleFlo
     mapId?: string;
   }): void {
     Sfx.battleStart();
+    stopMusic();
+    startMusic('battle');
     this.enemyParty = data.enemyParty.map(c => structuredClone(c));
     this.enemyIndex = 0;
     this.wild = this.enemyParty[0];

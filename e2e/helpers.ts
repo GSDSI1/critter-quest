@@ -34,6 +34,17 @@ export async function waitForScene(page: Page, key: string, timeoutMs = 20_000):
   throw new Error(`Timed out waiting for scene "${key}". Active: ${keys.join(', ') || 'none'}`);
 }
 
+export async function waitForAnyScene(page: Page, targets: string[], timeoutMs = 20_000): Promise<void> {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    const keys = await sceneKeys(page);
+    if (targets.some(t => keys.includes(t))) return;
+    await page.waitForTimeout(200);
+  }
+  const keys = await sceneKeys(page);
+  throw new Error(`Timed out waiting for scenes [${targets.join(', ')}]. Active: ${keys.join(', ') || 'none'}`);
+}
+
 export async function clearSave(page: Page): Promise<void> {
   await page.evaluate(() => {
     ['critter-quest-save-v3', 'critter-quest-save-v2', 'critter-quest-save'].forEach(k => localStorage.removeItem(k));
@@ -92,7 +103,7 @@ export async function chooseNewGame(page: Page): Promise<void> {
   if ((await sceneKeys(page)).includes('Menu')) {
     await page.evaluate(() => window.__cq?.startNewGame());
   }
-  await waitForScene(page, 'CharacterSelect', 15_000);
+  await waitForAnyScene(page, ['CharacterSelect', 'LabIntro'], 15_000);
 }
 
 export async function startNewGameToOverworld(page: Page): Promise<void> {

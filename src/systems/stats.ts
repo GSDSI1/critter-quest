@@ -56,6 +56,7 @@ export interface PlayerState {
   defeatedTrainers: string[];
   defeatedRematch: string[];
   visitedHealCenters: string[];
+  completionTime?: number;
   playTime: number;
   started: boolean;
 }

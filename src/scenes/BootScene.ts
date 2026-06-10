@@ -7,6 +7,7 @@ import {
 } from '../utils/assetLoader';
 import { registerLazyScenes } from './registerScenes';
 import { initOptions } from '../systems/options';
+import { bindAudioScene } from '../utils/audio';
 
 export class BootScene extends Phaser.Scene {
   private progressBar!: Phaser.GameObjects.Graphics;
@@ -80,6 +81,7 @@ export class BootScene extends Phaser.Scene {
   private async finishBoot(): Promise<void> {
     const t0 = import.meta.env.DEV ? performance.now() : 0;
     initOptions();
+    bindAudioScene(this);
     this.setBootStatus('Preparing options…', 0.15);
     applyLoadedAssetMeta(this);
     this.setBootStatus('Drawing world tiles…', 0.35);
