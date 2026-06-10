@@ -1,5 +1,6 @@
 import { getCreature } from './creatures';
 import { defaultRng, type Rng } from '../systems/rng';
+import { isNight } from '../systems/dayNight';
 
 export interface EncounterEntry {
   id: string;
@@ -84,6 +85,31 @@ export const ENCOUNTER_TABLES: Record<string, EncounterEntry[]> = {
     { id: 'psyknight', minLevel: 28, maxLevel: 32, weight: 6 },
     { id: 'somnara', minLevel: 30, maxLevel: 34, weight: 4 },
   ],
+  /** Night variants — ghost/psychic skew (see dayNight.isNight). */
+  forest_night: [
+    { id: 'shadeling', minLevel: 6, maxLevel: 10, weight: 28 },
+    { id: 'shadespecter', minLevel: 8, maxLevel: 12, weight: 22 },
+    { id: 'dreamwisp', minLevel: 9, maxLevel: 13, weight: 18 },
+    { id: 'mossling', minLevel: 5, maxLevel: 8, weight: 12 },
+    { id: 'somnara', minLevel: 12, maxLevel: 16, weight: 8 },
+    { id: 'crystalynx', minLevel: 12, maxLevel: 16, weight: 4 },
+  ],
+  route3_night: [
+    { id: 'shadeling', minLevel: 13, maxLevel: 17, weight: 24 },
+    { id: 'dreamwisp', minLevel: 14, maxLevel: 18, weight: 22 },
+    { id: 'shadespecter', minLevel: 15, maxLevel: 19, weight: 18 },
+    { id: 'cinderkit', minLevel: 12, maxLevel: 16, weight: 14 },
+    { id: 'voltite', minLevel: 11, maxLevel: 15, weight: 12 },
+    { id: 'somnara', minLevel: 16, maxLevel: 20, weight: 6 },
+  ],
+  route5_night: [
+    { id: 'somnara', minLevel: 28, maxLevel: 34, weight: 26 },
+    { id: 'dreamwisp', minLevel: 26, maxLevel: 30, weight: 22 },
+    { id: 'shadespecter', minLevel: 28, maxLevel: 32, weight: 18 },
+    { id: 'cerebrain', minLevel: 28, maxLevel: 32, weight: 12 },
+    { id: 'mindling', minLevel: 26, maxLevel: 30, weight: 10 },
+    { id: 'astralyn', minLevel: 30, maxLevel: 34, weight: 6 },
+  ],
   victory_road: [
     { id: 'astralyn', minLevel: 34, maxLevel: 40, weight: 10 },
     { id: 'voidseer', minLevel: 34, maxLevel: 40, weight: 12 },
@@ -94,6 +120,12 @@ export const ENCOUNTER_TABLES: Record<string, EncounterEntry[]> = {
     { id: 'arctodon', minLevel: 35, maxLevel: 41, weight: 10 },
   ],
 };
+
+export function resolveEncounterTable(tableId: string, playTimeSec = 0): string {
+  if (!isNight(playTimeSec)) return tableId;
+  const nightId = `${tableId}_night`;
+  return ENCOUNTER_TABLES[nightId] ? nightId : tableId;
+}
 
 export function pickWildFromTable(tableId: string, rng: Rng = defaultRng): { def: ReturnType<typeof getCreature>; level: number } {
   const table = ENCOUNTER_TABLES[tableId] ?? ENCOUNTER_TABLES.route1;

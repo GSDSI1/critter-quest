@@ -4,7 +4,7 @@ import {
   getTile, isWalkable, isEncounterTile, isWarpTile,
   resolveTrainerParty, type MapNpc, type GameMap,
 } from '../../data/maps';
-import { pickWildFromTable } from '../../data/encounters';
+import { pickWildFromTable, resolveEncounterTable } from '../../data/encounters';
 import { hasBadge } from '../../data/badges';
 import {
   GameState, healParty, firstAlive, createCritter, registerSeen,
@@ -334,7 +334,8 @@ export class NpcManager {
     }
 
     const map = this.getMap();
-    const tableId = map.encounterTable ?? map.id;
+    const baseTable = map.encounterTable ?? map.id;
+    const tableId = resolveEncounterTable(baseTable, GameState.player.playTime);
     const { def, level } = pickWildFromTable(tableId);
     registerSeen(GameState.player.dexSeen, def.id);
     const wild = createCritter(def.id, level);

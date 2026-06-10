@@ -13,13 +13,14 @@ Last updated: 2026-06-10. Source: `GAMEPLAN.md`.
 | **Opt** | Grass/path/water edge autotiling + corner fills | ✓ |
 | **Opt** | Battle send-out + faint tween polish | ✓ |
 | **Opt** | Post-champion trainer rematch roster pass (`src/data/rematches.ts`) | ✓ |
+| **Opt** | Grass↔path 16-case autotile bitmask + night encounter tables | ✓ |
 
 ## Optional polish (future)
 
 | Item | Notes |
 |------|-------|
 | Kenney tileset drop-in | Replace `tileset.png`; re-run `npm run pack-tileset` |
-| Full 16-case tile bitmask | Dedicated transition tiles in tileset |
+| Water shore autotile bitmask | Extend tileset beyond grass↔path transitions |
 
 ## Verify
 

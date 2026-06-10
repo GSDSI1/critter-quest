@@ -15,3 +15,8 @@ export const OUTDOOR_MAP_PREFIXES = ['town', 'route', 'forest', 'mossgrove', 'em
 export function isOutdoorMap(mapId: string): boolean {
   return OUTDOOR_MAP_PREFIXES.some(p => mapId === p || mapId.startsWith(p));
 }
+
+/** True during the dimmest ~35% of the cycle (night window). */
+export function isNight(playTimeSec: number): boolean {
+  return dayFactor(playTimeSec) < 0.35;
+}

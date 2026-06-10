@@ -11,7 +11,9 @@ mkdirSync(outDir, { recursive: true });
 const out = join(outDir, 'tileset.png');
 
 const W = 16;
-const COUNT = 21;
+const BASE_COUNT = 21;
+const AUTOTILE_COUNT = 15;
+const COUNT = BASE_COUNT + AUTOTILE_COUNT;
 const H = W * COUNT;
 
 const C = {
@@ -162,9 +164,30 @@ function drawTile(tileId, frame = 0) {
   return rgba;
 }
 
+/** Grass tile with path edges for 4-bit neighbor mask (1–15). */
+function drawGrassPathAutotile(mask) {
+  const rgba = Buffer.alloc(W * W * 4, 0);
+  fillRect(rgba, W, W, 0, 0, W, W, [...C.grass, 255]);
+  const edge = 5;
+  if (mask & 1) fillRect(rgba, W, W, 0, 0, W, edge, [...C.path, 255]);
+  if (mask & 2) fillRect(rgba, W, W, W - edge, 0, edge, W, [...C.path, 255]);
+  if (mask & 4) fillRect(rgba, W, W, 0, W - edge, W, edge, [...C.path, 255]);
+  if (mask & 8) fillRect(rgba, W, W, 0, 0, edge, W, [...C.path, 255]);
+  if ((mask & 3) === 3) fillRect(rgba, W, W, W - edge, 0, edge, edge, [...C.path, 255]);
+  if ((mask & 6) === 6) fillRect(rgba, W, W, W - edge, W - edge, edge, edge, [...C.path, 255]);
+  if ((mask & 9) === 9) fillRect(rgba, W, W, 0, 0, edge, edge, [...C.path, 255]);
+  if ((mask & 12) === 12) fillRect(rgba, W, W, 0, W - edge, edge, edge, [...C.path, 255]);
+  for (let i = 0; i < 4; i++) {
+    const bx = (i * 3 + mask) % 12 + 2;
+    const by = (i * 2 + mask) % 10 + 3;
+    setPx(rgba, W, bx, by, [...shade(C.grassDark, 10), 255]);
+  }
+  return rgba;
+}
+
 const sheet = Buffer.alloc(W * H * 4, 0);
 for (let id = 0; id < COUNT; id++) {
-  const tile = drawTile(id, id % 2);
+  const tile = id >= BASE_COUNT ? drawGrassPathAutotile(id - BASE_COUNT + 1) : drawTile(id, id % 2);
   for (let y = 0; y < W; y++) {
     tile.copy(sheet, ((id * W + y) * W) * 4, y * W * 4, (y + 1) * W * 4);
   }

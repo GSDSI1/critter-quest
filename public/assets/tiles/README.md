@@ -34,6 +34,8 @@ Must match the legend in [`src/data/maps.ts`](../../src/data/maps.ts):
 | 16 | Cave floor |
 | 17 | Cave wall |
 | 18 | Mart counter |
+| 19–20 | Tall grass / water anim alt frames |
+| 21–35 | Grass↔path autotile (16-case bitmask, masks 1–15) |
 
 ## Recommended sources
 

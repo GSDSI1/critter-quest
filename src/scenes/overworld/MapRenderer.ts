@@ -3,6 +3,7 @@ import { TILE_SIZE } from '../../data/types';
 import { getTile, type GameMap, type MapTheme } from '../../data/maps';
 import { isExternalTilesetAvailable } from '../../utils/assetLoader';
 import { isSmallInterior } from '../../utils/camera';
+import { applyGrassPathAutotiles } from '../../utils/tileAutotile';
 import { tileTextureKey, proceduralTilesetKey, bakeProceduralTileset } from '../../utils/sprites';
 
 /** Alternate tileset frames for animated tall grass / water (see pack-tileset.mjs). */
@@ -39,8 +40,9 @@ export class MapRenderer {
       const tileset = tm.addTilesetImage('tileset', 'ext_tileset', TILE_SIZE, TILE_SIZE, 0, 0, 0);
       if (tileset) {
         this.tileLayer = tm.createLayer(0, tileset, 0, 0)?.setDepth(0);
+        if (this.tileLayer) applyGrassPathAutotiles(map, this.tileLayer);
         this.buildAnimatedOverlays(map, true);
-        this.renderEdgeOverlays();
+        this.renderEdgeOverlays(true);
         this.decorLayer = this.scene.add.container(0, 0).setDepth(6);
         this.renderDecorations();
         return;
@@ -56,7 +58,7 @@ export class MapRenderer {
     }
 
     this.buildAnimatedOverlays(map, false);
-    this.renderEdgeOverlays();
+    this.renderEdgeOverlays(false);
     this.decorLayer = this.scene.add.container(0, 0).setDepth(6);
     this.renderDecorations();
   }
@@ -125,7 +127,7 @@ export class MapRenderer {
     }
   }
 
-  private renderEdgeOverlays(): void {
+  private renderEdgeOverlays(waterOnly: boolean): void {
     const edgeGfx = this.scene.add.graphics().setDepth(1);
     const shore = (tile: number) => tile === 0 || tile === 1;
 
@@ -143,7 +145,7 @@ export class MapRenderer {
         const nw = getTile(this.map, x - 1, y - 1);
         const ne = getTile(this.map, x + 1, y - 1);
 
-        if (tile === 0) {
+        if (!waterOnly && tile === 0) {
           edgeGfx.fillStyle(0x2d6b27, 0.35);
           if (n[0] === 1) edgeGfx.fillRect(px, py, TILE_SIZE, 2);
           if (n[1] === 1) edgeGfx.fillRect(px + TILE_SIZE - 2, py, 2, TILE_SIZE);
@@ -157,7 +159,7 @@ export class MapRenderer {
             edgeGfx.fillStyle(0x3d8b37, 0.45);
             edgeGfx.fillRect(px + TILE_SIZE - 3, py, 3, 3);
           }
-        } else if (tile === 1) {
+        } else if (!waterOnly && tile === 1) {
           edgeGfx.fillStyle(0x3d8b37, 0.25);
           if (n[0] === 0) edgeGfx.fillRect(px, py, TILE_SIZE, 2);
           if (n[1] === 0) edgeGfx.fillRect(px + TILE_SIZE - 2, py, 2, TILE_SIZE);

@@ -249,6 +249,18 @@ if (existsSync(join(root, 'src/data/rematches.ts'))) {
   else fail(`Expected ≥35 rematch rosters, found ${rosterCount}`);
 } else fail('src/data/rematches.ts missing');
 
+if (existsSync(join(root, 'src/utils/tileAutotile.ts'))) {
+  const autotile = read('src/utils/tileAutotile.ts');
+  if (autotile.includes('applyGrassPathAutotiles') && autotile.includes('AUTOTILE_GRASS_PATH_BASE')) {
+    ok('Grass↔path 16-case autotile helper');
+  } else fail('tileAutotile.ts incomplete');
+} else fail('src/utils/tileAutotile.ts missing');
+
+const encounters = read('src/data/encounters.ts');
+if (encounters.includes('resolveEncounterTable') && encounters.includes('forest_night')) {
+  ok('Day/night encounter table variants');
+} else fail('encounters.ts missing night tables');
+
 if (existsSync(join(root, 'src/ui/mapBanner.ts'))) ok('Map banner + toast UI');
 else fail('mapBanner.ts missing');
 
