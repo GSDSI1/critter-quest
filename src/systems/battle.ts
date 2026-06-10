@@ -19,14 +19,36 @@ export interface BattleResult {
   critical?: boolean;
   effectiveness?: number;
   fainted?: boolean;
+  attackerFainted?: boolean;
   message: string;
   healed?: number;
   statChange?: { stat: string; stages: number; target: 'attacker' | 'defender' };
   cantMove?: boolean;
 }
 
+type StatKey = 'atk' | 'def' | 'spa' | 'spd' | 'spe';
+
+const STAT_LABELS: Record<StatKey, string> = {
+  atk: 'Attack', def: 'Defense', spa: 'Sp. Atk', spd: 'Sp. Def', spe: 'Speed',
+};
+
 function stageMult(stage: number): number {
   return stage >= 0 ? (2 + stage) / 2 : 2 / (2 - stage);
+}
+
+function applyStageChange(c: CritterInstance, stat: StatKey, delta: number): number {
+  const before = c.statStages[stat];
+  c.statStages[stat] = Math.max(-6, Math.min(6, before + delta));
+  return c.statStages[stat] - before;
+}
+
+function stageChangeMessage(creature: CritterInstance, stat: StatKey, applied: number, intended: number): string {
+  const label = STAT_LABELS[stat];
+  if (applied === 0) {
+    const dir = intended > 0 ? 'higher' : 'lower';
+    return `${displayName(creature)}'s ${label} won't go any ${dir}!`;
+  }
+  return `${displayName(creature)}'s ${label} ${applied > 0 ? 'rose!' : 'fell!'}`;
 }
 
 function stabBonus(attacker: CritterInstance, moveType: string): number {
@@ -40,6 +62,16 @@ function heldTypeBoost(c: CritterInstance, moveType: string): number {
     magnet: 'volt', hard_stone: 'stone', shadow_cloth: 'shadow',
   };
   return boosts[c.heldItem] === moveType ? 1.2 : 1;
+}
+
+function isStatusImmune(c: CritterInstance, status: StatusCondition): boolean {
+  if (!status) return true;
+  const types = typesOf(c);
+  if (status === 'burn' && types.includes('flame')) return true;
+  if (status === 'paralyze' && types.includes('volt')) return true;
+  if (status === 'poison' && types.includes('stone')) return true;
+  if (status === 'freeze' && types.includes('flame')) return true;
+  return false;
 }
 
 export function calcDamage(
@@ -83,6 +115,7 @@ export function calcDamage(
 
 function applyMoveStatus(defender: CritterInstance, status: StatusCondition, chance: number): string {
   if (!status || defender.status) return '';
+  if (isStatusImmune(defender, status)) return '';
   if (Math.random() * 100 >= chance) return '';
   if (applyStatus(defender, status, 2 + Math.floor(Math.random() * 3))) {
     const labels: Record<string, string> = {
@@ -101,8 +134,8 @@ export function executeMove(
 ): BattleResult {
   const actCheck = canAct(attacker);
   if (!actCheck.ok) {
-    if (actCheck.message?.includes('confusion') && attacker.currentHp <= 0) {
-      return { message: actCheck.message!, fainted: false };
+    if (actCheck.attackerFainted) {
+      return { message: actCheck.message!, attackerFainted: true, cantMove: true };
     }
     return { message: actCheck.message!, cantMove: true };
   }
@@ -133,16 +166,16 @@ export function executeMove(
     return { healed: attacker.currentHp - before, message: `${displayName(attacker)} recovered ${attacker.currentHp - before} HP!` };
   }
 
-  if (move.effect === 'boost-atk') {
-    const change = move.effectValue ?? -1;
-    defender.statStages.atk = Math.max(-6, Math.min(6, defender.statStages.atk + change));
-    return { message: change < 0 ? `${displayName(defender)}'s Attack fell!` : `${displayName(attacker)}'s Attack rose!`,
-      statChange: { stat: 'atk', stages: change, target: 'defender' } };
-  }
-
-  if (move.effect === 'boost-def') {
-    defender.statStages.def = Math.max(-6, Math.min(6, defender.statStages.def + (move.effectValue ?? -1)));
-    return { message: `${displayName(defender)}'s Defense fell!` };
+  if (move.effect === 'boost-atk' || move.effect === 'boost-def') {
+    const stat: StatKey = move.effect === 'boost-atk' ? 'atk' : 'def';
+    const intended = move.effectValue ?? -1;
+    const targetSide = move.effectTarget ?? 'foe';
+    const target = targetSide === 'self' ? attacker : defender;
+    const applied = applyStageChange(target, stat, intended);
+    return {
+      message: stageChangeMessage(target, stat, applied, intended),
+      statChange: { stat, stages: applied, target: targetSide === 'self' ? 'attacker' : 'defender' },
+    };
   }
 
   if (move.power === 0 && move.effect) {

@@ -18,7 +18,8 @@ import {
   GameState, type CritterInstance, displayName, firstAlive,
   isFainted, addExp, healParty, registerCaught, registerSeen, expProgress,
 } from '../systems/stats';
-import { saveGame, addToParty } from '../systems/save';
+import { addToParty } from '../systems/save';
+import { trySave } from '../utils/saveFeedback';
 import { drawHpBar } from '../ui/HUD';
 import { statusLabel } from '../systems/status';
 import { creatureTextureKey, battleBgForMap } from '../utils/assetLoader';
@@ -399,6 +400,18 @@ export class BattleScene extends Phaser.Scene {
     const result = executeMove(this.playerMon, this.wild, index);
     this.queueMessage(result.message);
 
+    if (result.cantMove) {
+      this.refreshPlayerUi();
+      this.phase = 'message';
+      this.showNextMessage();
+      if (result.attackerFainted || isFainted(this.playerMon)) {
+        this.time.delayedCall(800, () => this.onPlayerFainted());
+      } else {
+        this.time.delayedCall(600, () => this.enemyTurn());
+      }
+      return;
+    }
+
     if (result.damage && result.damage > 0) {
       Sfx.hit();
       this.cameras.main.shake(120, 0.004);
@@ -546,7 +559,7 @@ export class BattleScene extends Phaser.Scene {
       onDone: (nickname: string | undefined) => {
         if (nickname) caught.nickname = nickname;
         addToParty(caught);
-        saveGame();
+        trySave(this);
         this.endBattle(true);
       },
     });
@@ -612,7 +625,7 @@ export class BattleScene extends Phaser.Scene {
       }
     }
 
-    saveGame();
+    trySave(this);
     this.refreshPlayerUi();
     this.phase = 'message';
     this.showNextMessage();
@@ -678,7 +691,7 @@ export class BattleScene extends Phaser.Scene {
       this.queueMessage(`It evolved into ${getCreature(to).name}!`);
       this.queueMessage(`Base stats — HP:${b.hp} ATK:${b.atk} DEF:${b.def} SPA:${b.spa} SPD:${b.spd} SPE:${b.spe}`);
       this.pendingEvolution = null;
-      saveGame();
+      trySave(this);
       this.showNextMessage();
       this.time.delayedCall(1200, () => this.processPostVictory());
     }
@@ -701,7 +714,7 @@ export class BattleScene extends Phaser.Scene {
     GameState.player.mapId = 'heal_center';
     GameState.player.x = 4;
     GameState.player.y = 7;
-    saveGame();
+    trySave(this);
     this.cameras.main.fadeOut(400, 0, 0, 0);
     this.time.delayedCall(400, () => {
       this.scene.start('Overworld', { blackout: true });

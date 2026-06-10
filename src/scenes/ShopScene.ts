@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../data/types';
 import { SHOP_STOCK, getItem, addItem } from '../data/items';
 import { GameState } from '../systems/stats';
-import { saveGame } from '../systems/save';
+import { trySave } from '../utils/saveFeedback';
 import { Input } from '../systems/input';
 import { Sfx } from '../utils/audio';
 
@@ -80,7 +80,7 @@ export class ShopScene extends Phaser.Scene {
     if (GameState.player.money < item.price) return;
     GameState.player.money -= item.price;
     addItem(GameState.player.items, id);
-    saveGame();
+    trySave(this);
     this.renderList();
   }
 

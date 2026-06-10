@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../data/types';
 import { GameState } from '../systems/stats';
-import { hasSave, loadGame, deleteSave } from '../systems/save';
+import { loadGame, deleteSave, getSaveStatus } from '../systems/save';
 import { getMap } from '../data/maps';
 import { getCreature } from '../data/creatures';
 import { getTrainer } from '../data/characters';
@@ -30,10 +30,23 @@ export class MenuScene extends Phaser.Scene {
   create(): void {
     Input.bind(this);
     this.confirmingDelete = false;
-    this.canContinue = hasSave() && loadGame();
+
+    const saveStatus = getSaveStatus();
+    if (saveStatus === 'corrupt') {
+      this.canContinue = false;
+      this.labels = ['New Game', 'Delete Corrupt Save'];
+      this.selected = 0;
+      this.buildMenu(saveStatus);
+      return;
+    }
+
+    this.canContinue = saveStatus === 'valid' && loadGame();
     this.labels = this.canContinue ? ['Continue', 'New Game', 'Delete Save'] : ['New Game'];
     this.selected = 0;
+    this.buildMenu(saveStatus);
+  }
 
+  private buildMenu(saveStatus: ReturnType<typeof getSaveStatus>): void {
     buildTitleBackdrop(this);
     addTitleLogo(this, 88);
 
@@ -41,7 +54,12 @@ export class MenuScene extends Phaser.Scene {
       fontFamily: '"Courier New", monospace', fontSize: '12px', color: '#8899aa',
     }).setOrigin(0.5);
 
-    if (this.canContinue) {
+    if (saveStatus === 'corrupt') {
+      this.add.text(GAME_WIDTH / 2, 200, 'Save file is corrupted.\nDelete it to start fresh.', {
+        fontFamily: '"Courier New", monospace', fontSize: '12px', color: '#e94560',
+        align: 'center',
+      }).setOrigin(0.5);
+    } else if (this.canContinue) {
       this.showSaveSummary();
     } else {
       ['emberpup', 'aqualet', 'leafkit'].forEach((id, i) => {
@@ -145,7 +163,7 @@ export class MenuScene extends Phaser.Scene {
       GameState.reset();
       this.cameras.main.fadeOut(300, 0, 0, 0);
       this.time.delayedCall(300, () => this.scene.start('CharacterSelect'));
-    } else if (choice === 'Delete Save') {
+    } else if (choice === 'Delete Save' || choice === 'Delete Corrupt Save') {
       this.openDeleteDialog();
     }
   }

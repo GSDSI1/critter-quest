@@ -9,7 +9,7 @@ import { hasBadge } from '../data/badges';
 import {
   GameState, healParty, firstAlive, createCritter, registerSeen,
 } from '../systems/stats';
-import { saveGame } from '../systems/save';
+import { trySave } from '../utils/saveFeedback';
 import { DialogBox } from '../ui/DialogBox';
 import { ControlsPanel } from '../ui/ControlsPanel';
 import { OverworldHUD } from '../ui/HUD';
@@ -67,7 +67,7 @@ export class OverworldScene extends Phaser.Scene {
       this.inputLocked = true;
       this.controlsPanel.show(() => {
         GameState.player.storyFlags.saw_controls = true;
-        saveGame();
+        trySave(this);
         this.dialog.show([
           'Welcome to Verdant Town!',
           'Walk into tall grass to find wild critters.',
@@ -101,7 +101,7 @@ export class OverworldScene extends Phaser.Scene {
       this.time.delayedCall(400, () => showMapBannerForCurrentMap(this));
     }
 
-    if (data.fromBattle) saveGame();
+    if (data.fromBattle) trySave(this);
   }
 
   private addVignette(): void {
@@ -408,7 +408,7 @@ export class OverworldScene extends Phaser.Scene {
     GameState.player.mapId = mapId;
     GameState.player.x = x;
     GameState.player.y = y;
-    saveGame();
+    trySave(this);
     this.scene.restart({ fromBattle: false });
   }
 
@@ -477,7 +477,7 @@ export class OverworldScene extends Phaser.Scene {
       this.dialog.show(welcome, () => {
         healParty(GameState.player.party);
         Sfx.heal();
-        saveGame();
+        trySave(this);
         showToast(this, 'Critters restored to full health!');
         this.dialog.show('We hope to see you again!', () => { this.inputLocked = false; });
       });

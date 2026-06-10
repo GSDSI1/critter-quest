@@ -1,0 +1,12 @@
+---
+description: Critter Quest project rules
+alwaysApply: true
+---
+- Phaser 3 + TypeScript, strict mode. Never introduce `any` or non-null `!` without justification.
+- Game logic lives in src/systems/ as pure functions; scenes (src/scenes/) only render and route input. Never put battle math in a scene.
+- All randomness goes through the injectable Rng — never call Math.random directly in src/systems/ (planned; battle.ts still migrating).
+- Content lives in src/data/ as typed tables; no gameplay constants inline — use src/data/constants.ts when added.
+- After any change: npm run verify && npx tsc --noEmit must pass; npm run test:e2e for flow changes.
+- Saves: never change PlayerState shape without bumping SAVE_KEY version and adding a migration + test.
+- Keep files under ~300 lines; extract before they grow.
+- Use trySave(scene) from src/utils/saveFeedback.ts instead of saveGame() in scenes.

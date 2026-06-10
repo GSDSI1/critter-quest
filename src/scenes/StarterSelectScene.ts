@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { COLORS, GAME_WIDTH, GAME_HEIGHT, TYPE_NAMES } from '../data/types';
 import { STARTERS, getCreature } from '../data/creatures';
 import { GameState, createCritter, registerSeen, registerCaught } from '../systems/stats';
-import { saveGame } from '../systems/save';
+import { trySave } from '../utils/saveFeedback';
 import { creatureTextureKey, npcTextureKey } from '../utils/assetLoader';
 import { playerTextureKey } from '../utils/sprites';
 import { Input } from '../systems/input';
@@ -195,7 +195,7 @@ export class StarterSelectScene extends Phaser.Scene {
       GameState.player.mapId = 'town';
       GameState.player.x = 10;
       GameState.player.y = 13;
-      saveGame();
+      trySave(this);
       this.cameras.main.fadeOut(400, 0, 0, 0);
       this.time.delayedCall(400, () => {
         this.scene.start('Overworld', { showIntro: true });

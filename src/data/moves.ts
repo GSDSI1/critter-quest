@@ -11,6 +11,8 @@ export interface MoveDef {
   effect?: 'heal' | 'sleep' | 'boost-atk' | 'boost-def' | 'burn' | 'paralyze' | 'poison' | 'thunderwave' | 'hypnosis';
   effectChance?: number;
   effectValue?: number;
+  /** Who receives stat-stage changes from boost-* moves. Defaults to 'foe'. */
+  effectTarget?: 'self' | 'foe';
 }
 
 export const MOVES: Record<string, MoveDef> = {
@@ -36,8 +38,8 @@ export const MOVES: Record<string, MoveDef> = {
   shadowclaw: { id: 'shadowclaw', name: 'Shadow Claw', type: 'shadow', power: 60, accuracy: 95, pp: 15, category: 'physical' },
   darkpulse: { id: 'darkpulse', name: 'Dark Pulse', type: 'shadow', power: 80, accuracy: 90, pp: 10, category: 'special' },
   hypnosis: { id: 'hypnosis', name: 'Hypnosis', type: 'shadow', power: 0, accuracy: 60, pp: 20, category: 'status', effect: 'sleep' },
-  growl: { id: 'growl', name: 'Growl', type: 'stone', power: 0, accuracy: 100, pp: 20, category: 'status', effect: 'boost-atk', effectValue: -1 },
-  leer: { id: 'leer', name: 'Leer', type: 'stone', power: 0, accuracy: 100, pp: 20, category: 'status', effect: 'boost-def', effectValue: -1 },
+  growl: { id: 'growl', name: 'Growl', type: 'stone', power: 0, accuracy: 100, pp: 20, category: 'status', effect: 'boost-atk', effectValue: -1, effectTarget: 'foe' },
+  leer: { id: 'leer', name: 'Leer', type: 'stone', power: 0, accuracy: 100, pp: 20, category: 'status', effect: 'boost-def', effectValue: -1, effectTarget: 'foe' },
   poison_sting: { id: 'poison_sting', name: 'Poison Sting', type: 'leaf', power: 35, accuracy: 100, pp: 20, category: 'physical', effect: 'poison', effectChance: 30 },
 };
 

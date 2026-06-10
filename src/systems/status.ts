@@ -2,6 +2,18 @@ import type { CritterInstance } from './stats';
 
 export type StatusCondition = 'burn' | 'paralyze' | 'poison' | 'sleep' | 'freeze' | 'confusion' | null;
 
+/** Confusion self-hit: ~maxHp/16 (typeless physical chip, classic games use ~40 BP). */
+export const CONFUSION_SELF_DAMAGE_DIVISOR = 16;
+
+export interface ActCheckResult {
+  ok: boolean;
+  message?: string;
+  /** Damage dealt to self (confusion). */
+  selfDamage?: number;
+  /** Attacker fainted from self-inflicted damage before acting. */
+  attackerFainted?: boolean;
+}
+
 export function statusLabel(s: StatusCondition): string {
   switch (s) {
     case 'burn': return 'BRN';
@@ -14,7 +26,7 @@ export function statusLabel(s: StatusCondition): string {
   }
 }
 
-export function canAct(c: CritterInstance): { ok: boolean; message?: string } {
+export function canAct(c: CritterInstance): ActCheckResult {
   const name = c.nickname ?? c.speciesId;
   if (c.status === 'freeze') {
     if (Math.random() < 0.2) {
@@ -24,23 +36,33 @@ export function canAct(c: CritterInstance): { ok: boolean; message?: string } {
     return { ok: false, message: `${name} is frozen solid!` };
   }
   if (c.status === 'sleep') {
-    if ((c.statusTurns ?? 0) > 0) {
-      c.statusTurns = (c.statusTurns ?? 1) - 1;
-      if (c.statusTurns <= 0) {
-        c.status = null;
-        return { ok: true, message: `${name} woke up!` };
-      }
-      return { ok: false, message: `${name} is fast asleep!` };
+    const turnsLeft = c.statusTurns ?? 1;
+    c.statusTurns = turnsLeft - 1;
+    if (c.statusTurns <= 0) {
+      c.status = null;
+      c.statusTurns = 0;
+      return { ok: true, message: `${name} woke up!` };
     }
+    return { ok: false, message: `${name} is fast asleep!` };
   }
   if (c.status === 'confusion') {
     if (Math.random() < 0.33) {
-      const dmg = Math.max(1, Math.floor(c.maxHp / 16));
+      const dmg = Math.max(1, Math.floor(c.maxHp / CONFUSION_SELF_DAMAGE_DIVISOR));
       c.currentHp = Math.max(0, c.currentHp - dmg);
-      return { ok: false, message: `${name} hurt itself in confusion!` };
+      const attackerFainted = c.currentHp <= 0;
+      return {
+        ok: false,
+        message: `${name} hurt itself in confusion!`,
+        selfDamage: dmg,
+        attackerFainted,
+      };
     }
-    if ((c.statusTurns ?? 0) > 0) c.statusTurns = (c.statusTurns ?? 1) - 1;
-    if ((c.statusTurns ?? 0) <= 0) c.status = null;
+    const turnsLeft = c.statusTurns ?? 1;
+    c.statusTurns = turnsLeft - 1;
+    if (c.statusTurns <= 0) {
+      c.status = null;
+      c.statusTurns = 0;
+    }
   }
   if (c.status === 'paralyze' && Math.random() < 0.25) {
     return { ok: false, message: `${name} is paralyzed! It can't move!` };
@@ -66,7 +88,6 @@ export function applyEndOfTurnStatus(c: CritterInstance): string | null {
 
 export function applyStatus(c: CritterInstance, status: StatusCondition, turns = 3): boolean {
   if (c.status || !status) return false;
-  if (status === 'freeze' && c.status === 'burn') return false;
   c.status = status;
   if (status === 'sleep' || status === 'confusion') c.statusTurns = turns;
   return true;

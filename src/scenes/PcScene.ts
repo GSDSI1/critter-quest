@@ -2,7 +2,8 @@ import Phaser from 'phaser';
 import { COLORS, GAME_WIDTH, GAME_HEIGHT, TYPE_NAMES } from '../data/types';
 import { getCreature } from '../data/creatures';
 import { GameState, displayName } from '../systems/stats';
-import { depositToStorage, withdrawFromStorage, saveGame } from '../systems/save';
+import { depositToStorage, withdrawFromStorage } from '../systems/save';
+import { trySave } from '../utils/saveFeedback';
 import { drawHpBar } from '../ui/HUD';
 import { creatureTextureKey } from '../utils/assetLoader';
 import { Input } from '../systems/input';
@@ -100,9 +101,9 @@ export class PcScene extends Phaser.Scene {
 
   private action(): void {
     if (this.mode === 'party') {
-      if (depositToStorage(this.selected)) { saveGame(); this.render(); }
+      if (depositToStorage(this.selected)) { trySave(this); this.render(); }
     } else {
-      if (withdrawFromStorage(this.selected)) { saveGame(); this.render(); }
+      if (withdrawFromStorage(this.selected)) { trySave(this); this.render(); }
     }
   }
 }

@@ -8,7 +8,7 @@ import { getNature } from '../data/natures';
 import { GameState, displayName, isFainted } from '../systems/stats';
 import { drawHpBar } from '../ui/HUD';
 import { creatureTextureKey } from '../utils/assetLoader';
-import { saveGame } from '../systems/save';
+import { trySave } from '../utils/saveFeedback';
 import { Input } from '../systems/input';
 
 const HELD_ITEMS = ['oran_berry', 'charcoal', 'mystic_water'];
@@ -151,7 +151,7 @@ export class PartyScene extends Phaser.Scene {
         if ((GameState.player.items[id] ?? 0) <= 0) return;
         removeItem(GameState.player.items, id);
         GameState.player.party[0].heldItem = id;
-        saveGame();
+        trySave(this);
         this.render();
       });
     });

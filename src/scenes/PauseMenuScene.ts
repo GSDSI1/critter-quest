@@ -2,11 +2,9 @@ import Phaser from 'phaser';
 import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../data/types';
 import { getBadge } from '../data/badges';
 import { GameState } from '../systems/stats';
-import { saveGame } from '../systems/save';
+import { trySave } from '../utils/saveFeedback';
 import { Input } from '../systems/input';
 import { Sfx } from '../utils/audio';
-import { showToast } from '../ui/mapBanner';
-
 export class PauseMenuScene extends Phaser.Scene {
   private selected = 0;
   private options = ['Critterdex', 'Party', 'Save Game', 'Close'];
@@ -85,10 +83,8 @@ export class PauseMenuScene extends Phaser.Scene {
       this.scene.launch('Party', { fromPause: true });
       this.scene.pause();
     } else if (opt === 'Save Game') {
-      saveGame();
-      const ow = this.scene.get('Overworld');
+      trySave(this);
       this.close();
-      if (ow) ow.time.delayedCall(100, () => showToast(ow, 'Game saved!'));
     } else {
       this.close();
     }

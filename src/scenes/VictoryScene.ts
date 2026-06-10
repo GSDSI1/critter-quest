@@ -6,7 +6,7 @@ import { getBadge } from '../data/badges';
 import { formatPlayTime } from '../ui/titleScreen';
 import { Input } from '../systems/input';
 import { Sfx } from '../utils/audio';
-import { saveGame } from '../systems/save';
+import { trySave } from '../utils/saveFeedback';
 
 export class VictoryScene extends Phaser.Scene {
   private scrollY = 0;
@@ -21,7 +21,7 @@ export class VictoryScene extends Phaser.Scene {
     Input.bind(this);
     Sfx.levelUp();
     GameState.player.storyFlags.champion = true;
-    saveGame();
+    trySave(this);
 
     const bg = this.add.graphics();
     bg.fillGradientStyle(0x0f0f1a, 0x16213e, 0x1a2e1a, 0x0f3460, 1);
