@@ -238,6 +238,17 @@ for (const s of inputScenes) {
 }
 
 // ── Production build ──
+if (npcMgr.includes('resolveRematch') && npcMgr.includes('storyFlags.champion')) {
+  ok('NpcManager post-champion rematch gate');
+} else fail('NpcManager missing champion rematch gate');
+
+if (existsSync(join(root, 'src/data/rematches.ts'))) {
+  const rematchSrc = read('src/data/rematches.ts');
+  const rosterCount = (rematchSrc.match(/^\s+[a-z0-9_]+: \{/gm) ?? []).length;
+  if (rosterCount >= 35) ok(`${rosterCount} post-champion rematch rosters`);
+  else fail(`Expected ≥35 rematch rosters, found ${rosterCount}`);
+} else fail('src/data/rematches.ts missing');
+
 if (existsSync(join(root, 'src/ui/mapBanner.ts'))) ok('Map banner + toast UI');
 else fail('mapBanner.ts missing');
 

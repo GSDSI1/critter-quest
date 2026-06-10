@@ -12,6 +12,7 @@ Last updated: 2026-06-10. Source: `GAMEPLAN.md`.
 | **Opt** | Screen transitions (`fadeToScene` / `fadeInOnStart`) | ✓ |
 | **Opt** | Grass/path/water edge autotiling + corner fills | ✓ |
 | **Opt** | Battle send-out + faint tween polish | ✓ |
+| **Opt** | Post-champion trainer rematch roster pass (`src/data/rematches.ts`) | ✓ |
 
 ## Optional polish (future)
 
@@ -19,7 +20,6 @@ Last updated: 2026-06-10. Source: `GAMEPLAN.md`.
 |------|-------|
 | Kenney tileset drop-in | Replace `tileset.png`; re-run `npm run pack-tileset` |
 | Full 16-case tile bitmask | Dedicated transition tiles in tileset |
-| Trainer rematch roster pass | Post–Elite Four scaling |
 
 ## Verify
 

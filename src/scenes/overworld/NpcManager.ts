@@ -16,6 +16,7 @@ import { npcTextureKey, type NpcRole } from '../../utils/assetLoader';
 import { playerTextureKey } from '../../utils/sprites';
 import { showExclamationBubble } from '../TrainerIntroScene';
 import { Sfx } from '../../utils/audio';
+import { resolveRematch } from '../../data/rematches';
 import {
   startEliteGauntlet, findGauntletNpc, buildTrainerBattleData, rematchLevelBonus,
 } from '../../systems/eliteGauntlet';
@@ -241,8 +242,10 @@ export class NpcManager {
 
     const defeated = GameState.player.defeatedTrainers.includes(npc.id);
     const rematched = GameState.player.defeatedRematch.includes(npc.id);
+    const rematchDef = resolveRematch(npc.id, npc.rematch);
+    const champion = GameState.player.storyFlags.champion;
 
-    if (npc.rematch && defeated && !rematched) {
+    if (champion && rematchDef && defeated && !rematched && npc.trainer) {
       this.dialog.show(['Want a rematch? I\'ve gotten stronger!'], () => {
         this.startTrainerBattle(npc, true);
       });
@@ -263,7 +266,10 @@ export class NpcManager {
     }
 
     if (defeated && npc.trainer) {
-      this.dialog.show(['You already defeated me!', 'Keep training!'], () => { this.callbacks.setInputLocked(false); });
+      const lines = rematched
+        ? ['You beat me again!', 'I\'ll keep training for next time.']
+        : ['You already defeated me!', 'Keep training!'];
+      this.dialog.show(lines, () => { this.callbacks.setInputLocked(false); });
       return;
     }
 
@@ -302,7 +308,7 @@ export class NpcManager {
       this.dialog.show([
         `${GameState.player.name}! The whole region is talking about you!`,
         'Champion of Verdant — you make me proud.',
-        'Keep training. Who knows what adventures await?',
+        'Trainers across the region want rematches now. Visit anyone you\'ve beaten!',
       ], () => { this.callbacks.setInputLocked(false); });
       return;
     }
@@ -361,8 +367,9 @@ export class NpcManager {
 
   private startTrainerBattle(npc: MapNpc, isRematch: boolean): void {
     if (!npc.trainer) { this.callbacks.setInputLocked(false); return; }
-    const partySpec = isRematch && npc.rematch ? npc.rematch.party : npc.trainer.party;
-    const reward = isRematch && npc.rematch ? npc.rematch.reward : npc.trainer.reward;
+    const rematchDef = isRematch ? resolveRematch(npc.id, npc.rematch) : undefined;
+    const partySpec = rematchDef?.party ?? npc.trainer.party;
+    const reward = rematchDef?.reward ?? npc.trainer.reward;
     const resolved = resolveTrainerParty(partySpec, GameState.player.starterId);
     const bonus = isRematch ? rematchLevelBonus() : 0;
     const party = resolved.map(m => {
