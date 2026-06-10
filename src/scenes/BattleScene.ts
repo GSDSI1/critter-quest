@@ -2,12 +2,12 @@ import Phaser from 'phaser';
 import { getCreature } from '../data/creatures';
 import { getMove } from '../data/moves';
 import { getAbility } from '../data/abilities';
-import { applyEnterAbility, moneyLossOnBlackout } from '../systems/battle';
+import { applyEnterAbility, expGain, moneyLossOnBlackout } from '../systems/battle';
 import { evolutionMessage } from '../systems/evolution';
 import { getBattleUsableItems } from '../systems/items';
 import {
   GameState, type CritterInstance, displayName, firstAlive,
-  isFainted, healParty, registerSeen,
+  isFainted, healParty, registerSeen, registerCaught, addExp,
 } from '../systems/stats';
 import { addToParty } from '../systems/save';
 import { trySave } from '../utils/saveFeedback';
@@ -231,6 +231,46 @@ export class BattleScene extends Phaser.Scene implements BattleUiHost, BattleFlo
     GameState.player.y = 7;
     trySave(this);
     this.battleAnims.fadeOut(400, () => this.scene.start('Overworld', { blackout: true }));
+  }
+
+  /** DEV test bridge — resolve battle without playing through message queues. */
+  resolveBattle(outcome: 'win' | 'lose' | 'catch'): void {
+    this.pendingLearnMoves = [];
+    this.pendingEvolution = null;
+    if (outcome === 'lose') {
+      this.blackout();
+      return;
+    }
+    if (outcome === 'catch') {
+      if (this.isTrainer) return;
+      registerCaught(GameState.player.dexCaught, this.wild.speciesId, GameState.player.dexSeen);
+      if (GameState.player.party.length < 6) addToParty(this.wild);
+      else GameState.player.storage.push(this.wild);
+      trySave(this);
+      this.endBattle(true);
+      return;
+    }
+    if (this.isTrainer) {
+      GameState.player.money += this.reward;
+      if (this.isRematch) {
+        if (!GameState.player.defeatedRematch.includes(this.trainerId)) {
+          GameState.player.defeatedRematch.push(this.trainerId);
+        }
+      } else if (!GameState.player.defeatedTrainers.includes(this.trainerId)) {
+        GameState.player.defeatedTrainers.push(this.trainerId);
+      }
+      if (this.badgeId && !GameState.player.badges.includes(this.badgeId)) {
+        GameState.player.badges.push(this.badgeId);
+        if (this.badgeId === 'verdant') GameState.player.storyFlags.verdant_badge = true;
+        if (this.badgeId === 'ember') GameState.player.storyFlags.ember_badge = true;
+        if (this.badgeId === 'frost') GameState.player.storyFlags.frost_badge = true;
+        if (this.badgeId === 'psyche') GameState.player.storyFlags.psyche_badge = true;
+      }
+    } else {
+      addExp(this.playerMon, expGain(this.wild, true));
+    }
+    trySave(this);
+    this.endBattle(false);
   }
 
   endBattle(_caught: boolean): void {
