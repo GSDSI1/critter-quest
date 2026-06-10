@@ -574,22 +574,46 @@ export function generateAssets(scene: Phaser.Scene): void {
   posterG.generateTexture('decor_poster', 16, 16);
   posterG.destroy();
 
-  // Lab bench + starter orbs for starter select scene
-  const benchG = scene.make.graphics({ x: 0, y: 0 });
-  benchG.fillStyle(0x6366f1, 0.15);
-  benchG.fillRect(0, 0, 640, 480);
-  benchG.fillStyle(0x4338ca, 1);
-  benchG.fillRoundedRect(80, 280, 480, 24, 4);
-  benchG.fillStyle(0x312e81, 1);
-  benchG.fillRect(80, 304, 480, 8);
-  benchG.fillStyle(0x57534e, 1);
-  for (let i = 0; i < 3; i++) {
-    const px = 160 + i * 160;
-    benchG.fillRect(px - 20, 260, 40, 20);
-    benchG.fillRect(px - 8, 250, 16, 10);
+  // Starter select lab interior (pre-baked backdrop)
+  const labG = scene.make.graphics({ x: 0, y: 0 });
+  labG.fillGradientStyle(0x2d3748, 0x2d3748, 0x4a5568, 0x553c9a, 1);
+  labG.fillRect(0, 0, 640, 480);
+  labG.fillStyle(0xe2e8f0, 1);
+  labG.fillRect(0, 340, 640, 140);
+  for (let x = 0; x < 640; x += 32) {
+    labG.fillStyle((x / 32) % 2 === 0 ? 0xcbd5e1 : 0xe2e8f0, 0.6);
+    labG.fillRect(x, 340, 32, 140);
   }
-  benchG.generateTexture('lab_bench', 640, 480);
-  benchG.destroy();
+  labG.lineStyle(2, 0x94a3b8, 0.5);
+  labG.lineBetween(0, 340, 640, 340);
+  labG.fillStyle(0x78350f, 1);
+  labG.fillRect(24, 60, 80, 200);
+  labG.fillRect(536, 60, 80, 200);
+  labG.fillStyle(0x92400e, 1);
+  for (let row = 0; row < 5; row++) {
+    labG.fillRect(28, 80 + row * 38, 72, 4);
+    labG.fillRect(540, 80 + row * 38, 72, 4);
+    labG.fillStyle(0x6366f1, 0.7);
+    labG.fillRect(32 + (row % 3) * 18, 88 + row * 38, 14, 22);
+    labG.fillStyle(0x22c55e, 0.7);
+    labG.fillRect(52 + (row % 2) * 16, 88 + row * 38, 14, 22);
+    labG.fillStyle(0x92400e, 1);
+  }
+  labG.fillStyle(0x0ea5e9, 0.35);
+  labG.fillRoundedRect(260, 40, 120, 80, 6);
+  labG.lineStyle(3, 0x94a3b8, 1);
+  labG.strokeRoundedRect(260, 40, 120, 80, 6);
+  labG.lineStyle(2, 0xcbd5e1, 0.8);
+  labG.lineBetween(320, 40, 320, 120);
+  labG.lineBetween(260, 80, 380, 80);
+  labG.fillStyle(0xffffff, 0.12);
+  labG.fillTriangle(270, 50, 300, 50, 270, 75);
+  labG.fillStyle(0x4338ca, 1);
+  labG.fillRoundedRect(100, 300, 440, 18, 4);
+  labG.fillStyle(0x312e81, 1);
+  labG.fillRect(100, 318, 440, 6);
+  labG.generateTexture('starter_lab_bg', 640, 480);
+  labG.destroy();
 
   for (const [type, color] of [['flame', 0xff6b35], ['tide', 0x3b82f6], ['leaf', 0x22c55e]] as const) {
     const og = scene.make.graphics({ x: 0, y: 0 });

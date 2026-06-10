@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { GAME_WIDTH, GAME_HEIGHT, SCALE } from './data/types';
+import { GAME_WIDTH, GAME_HEIGHT } from './data/types';
 import { saveGame } from './systems/save';
 import { GameState, createCritter, registerSeen, registerCaught } from './systems/stats';
 import { BootScene } from './scenes/BootScene';
@@ -32,7 +32,7 @@ const config = {
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
-    zoom: SCALE / 2,
+    zoom: 1,
   },
   scene: [
     BootScene, IntroScene, MenuScene, CharacterSelectScene, LabIntroScene, StarterSelectScene, OverworldScene,

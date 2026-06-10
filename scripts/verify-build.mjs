@@ -146,7 +146,7 @@ if (read('src/ui/ControlsPanel.ts').includes('pointerdown')) ok('ControlsPanel c
 else fail('ControlsPanel missing pointer advance');
 
 const sprites = read('src/utils/sprites.ts');
-for (const tex of ['title_banner', 'lab_bench', 'starter_orb_${type}', 'tileTextureKey', 'playerTextureKey', 'player_back_']) {
+for (const tex of ['title_banner', 'starter_lab_bg', 'starter_orb_${type}', 'tileTextureKey', 'playerTextureKey', 'player_back_']) {
   if (sprites.includes(tex)) ok(`sprites: ${tex}`);
   else fail(`sprites.ts missing ${tex}`);
 }

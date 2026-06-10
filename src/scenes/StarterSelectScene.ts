@@ -3,9 +3,9 @@ import { COLORS, GAME_WIDTH, GAME_HEIGHT, TYPE_NAMES, TYPE_COLORS, type ElementT
 import { STARTERS, getCreature } from '../data/creatures';
 import { GameState, createCritter, registerSeen, registerCaught } from '../systems/stats';
 import { trySave } from '../utils/saveFeedback';
-import { creatureTextureKey, npcTextureKey } from '../utils/assetLoader';
+import { creatureTextureKey } from '../utils/assetLoader';
 import { playerTextureKey } from '../utils/sprites';
-import { buildLabInterior, buildMenuPanel } from '../ui/sceneBackdrops';
+import { buildMenuPanel } from '../ui/sceneBackdrops';
 import { createTouchButton, createTypePill } from '../ui/touchButtons';
 import { Input } from '../systems/input';
 import { Sfx } from '../utils/audio';
@@ -13,11 +13,13 @@ import { DialogBox } from '../ui/DialogBox';
 import { addItem } from '../data/items';
 
 const ORB_TYPES = ['flame', 'tide', 'leaf'] as const;
+const INTRO_SPRITE_X = [240, 320, 400] as const;
 
 export class StarterSelectScene extends Phaser.Scene {
   private selected = 0;
   private orbs: Phaser.GameObjects.Container[] = [];
   private typePills: Phaser.GameObjects.Container[] = [];
+  private introSprites: Phaser.GameObjects.Image[] = [];
   private statText!: Phaser.GameObjects.Text;
   private descText!: Phaser.GameObjects.Text;
   private nameText!: Phaser.GameObjects.Text;
@@ -40,39 +42,39 @@ export class StarterSelectScene extends Phaser.Scene {
     this.introShown = false;
     this.selected = 0;
 
-    buildLabInterior(this);
+    this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'starter_lab_bg').setDepth(-5);
 
-    // Showcase panel
     buildMenuPanel(this, 120, 72, 400, 200, 2);
     this.previewGlow = this.add.graphics().setDepth(3);
     this.creaturePreview = this.add.image(GAME_WIDTH / 2, 155, creatureTextureKey(this, STARTERS[0]))
-      .setScale(2.8).setVisible(false).setDepth(4);
+      .setScale(3).setVisible(false).setDepth(4);
     this.tweens.add({
       targets: this.creaturePreview, y: 150, duration: 900, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
     });
 
-    this.nameText = this.add.text(GAME_WIDTH / 2, 88, '', {
+    this.nameText = this.add.text(GAME_WIDTH / 2, 88, 'Choose your partner!', {
       fontFamily: '"Courier New", monospace', fontSize: '20px', color: '#f5c542', fontStyle: 'bold',
     }).setOrigin(0.5).setDepth(5);
 
     this.statText = this.add.text(GAME_WIDTH / 2, 210, '', {
       fontFamily: '"Courier New", monospace', fontSize: '12px', color: '#c0c0c0',
-    }).setOrigin(0.5).setDepth(5);
+    }).setOrigin(0.5).setDepth(5).setVisible(false);
 
-    this.descText = this.add.text(GAME_WIDTH / 2, 232, '', {
+    this.descText = this.add.text(GAME_WIDTH / 2, 232, 'Listen to Prof. Elmwood, then pick an orb.', {
       fontFamily: '"Courier New", monospace', fontSize: '11px', color: '#8899aa',
       wordWrap: { width: 360 }, align: 'center',
     }).setOrigin(0.5).setDepth(5);
 
-    buildProfCorner(this);
-    buildTrainerCorner(this);
+    STARTERS.forEach((id, i) => {
+      const spr = this.add.image(INTRO_SPRITE_X[i], 155, creatureTextureKey(this, id))
+        .setScale(2).setDepth(4);
+      this.introSprites.push(spr);
+      this.tweens.add({
+        targets: spr, y: 150, duration: 900 + i * 120, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
+      });
+    });
 
-    // Orb pedestals on bench
-    const bench = this.add.graphics().setDepth(1);
-    bench.fillStyle(0x4338ca, 0.9);
-    bench.fillRoundedRect(60, 318, GAME_WIDTH - 120, 20, 6);
-    bench.fillStyle(0x312e81, 1);
-    bench.fillRect(60, 338, GAME_WIDTH - 120, 8);
+    buildTrainerCorner(this);
 
     STARTERS.forEach((id, i) => {
       const x = 160 + i * 160;
@@ -120,6 +122,7 @@ export class StarterSelectScene extends Phaser.Scene {
     ], () => {
       this.picking = true;
       this.introShown = true;
+      this.introSprites.forEach(s => s.setVisible(false));
       this.setPickerButtons(true);
       this.refresh();
     }, 'Prof. Elmwood');
@@ -161,7 +164,7 @@ export class StarterSelectScene extends Phaser.Scene {
     const typeColor = TYPE_COLORS[def.types[0] as ElementType];
 
     this.nameText.setText(def.name);
-    this.statText.setText(`HP ${b.hp}   ATK ${b.atk}   DEF ${b.def}   SPE ${b.spe}`);
+    this.statText.setText(`HP ${b.hp}   ATK ${b.atk}   DEF ${b.def}   SPE ${b.spe}`).setVisible(true);
     this.descText.setText(def.description);
     this.creaturePreview.setTexture(creatureTextureKey(this, id)).setVisible(true);
 
@@ -173,7 +176,7 @@ export class StarterSelectScene extends Phaser.Scene {
 
     this.orbs.forEach((orb, i) => {
       const sel = i === this.selected;
-      orb.setScale(sel ? 1.12 : 1);
+      orb.setScale(sel ? 1.25 : 1);
       const ring = orb.list[2] as Phaser.GameObjects.Graphics;
       ring.clear();
       if (sel) {
@@ -241,22 +244,12 @@ export class StarterSelectScene extends Phaser.Scene {
   }
 }
 
-function buildProfCorner(scene: Phaser.Scene): void {
-  buildMenuPanel(scene, 20, 20, 210, 130, 4);
-  scene.add.image(56, 88, npcTextureKey(scene, 'prof')).setScale(1.6).setDepth(5);
-  scene.add.text(130, 38, 'Prof. Elmwood', {
-    fontFamily: '"Courier New", monospace', fontSize: '13px', color: '#f5c542',
-  }).setDepth(5);
-  scene.add.text(130, 56, 'Choose your partner!', {
-    fontFamily: '"Courier New", monospace', fontSize: '10px', color: '#c0c0c0',
-  }).setDepth(5);
-}
-
 function buildTrainerCorner(scene: Phaser.Scene): void {
-  buildMenuPanel(scene, GAME_WIDTH - 118, GAME_HEIGHT - 108, 98, 88, 4);
-  scene.add.text(GAME_WIDTH - 69, GAME_HEIGHT - 98, GameState.player.name, {
+  const panelY = GAME_HEIGHT - 148;
+  buildMenuPanel(scene, GAME_WIDTH - 118, panelY, 98, 88, 4);
+  scene.add.text(GAME_WIDTH - 69, panelY + 10, GameState.player.name, {
     fontFamily: '"Courier New", monospace', fontSize: '11px', color: '#f5c542',
   }).setOrigin(0.5).setDepth(5);
-  scene.add.sprite(GAME_WIDTH - 69, GAME_HEIGHT - 62, playerTextureKey(GameState.player.characterId, 'down', 0))
-    .setScale(2.8).setDepth(5);
+  scene.add.sprite(GAME_WIDTH - 69, panelY + 46, playerTextureKey(GameState.player.characterId, 'down', 0))
+    .setScale(3).setDepth(5);
 }

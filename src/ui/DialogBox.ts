@@ -43,14 +43,16 @@ export class DialogBox {
 
     this.speakerText = scene.add.text(BOX_X + 16, BOX_Y + 8, '', {
       fontFamily: '"Courier New", monospace',
-      fontSize: '11px',
+      fontSize: '12px',
       color: '#f5c542',
     });
 
-    this.textObj = scene.add.text(BOX_X + 16, BOX_Y + 26, '', {
+    this.textObj = scene.add.text(BOX_X + 16, BOX_Y + 28, '', {
       fontFamily: '"Courier New", monospace',
-      fontSize: '14px',
+      fontSize: '15px',
       color: '#f0f0f0',
+      stroke: '#0a0a14',
+      strokeThickness: 2,
       wordWrap: { width: BOX_W - 140 },
       lineSpacing: 4,
     });

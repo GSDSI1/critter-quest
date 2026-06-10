@@ -10,6 +10,32 @@ export interface TouchButton {
   destroy(): void;
 }
 
+function lighten(c: number, amt: number): number {
+  const r = Math.min(255, ((c >> 16) & 0xff) + amt);
+  const g = Math.min(255, ((c >> 8) & 0xff) + amt);
+  const b = Math.min(255, (c & 0xff) + amt);
+  return (r << 16) | (g << 8) | b;
+}
+
+function drawButtonBg(
+  g: Phaser.GameObjects.Graphics,
+  w: number,
+  h: number,
+  hover: boolean,
+): void {
+  g.clear();
+  const fill = hover ? lighten(COLORS.panel, 12) : COLORS.panel;
+  const border = hover ? COLORS.gold : COLORS.panelBorder;
+  g.fillStyle(fill, 0.95);
+  g.fillRoundedRect(-w / 2, -h / 2, w, h, 6);
+  g.lineStyle(2, border, 1);
+  g.strokeRoundedRect(-w / 2, -h / 2, w, h, 6);
+  if (hover) {
+    g.fillStyle(COLORS.gold, 0.15);
+    g.fillRect(-w / 2 + 4, -h / 2 + 4, w - 8, 4);
+  }
+}
+
 export function createTouchButton(
   scene: Phaser.Scene,
   x: number,
@@ -23,7 +49,8 @@ export function createTouchButton(
   const depth = opts?.depth ?? 1200;
 
   const container = scene.add.container(x, y).setDepth(depth);
-  const bg = scene.add.image(0, 0, 'btn_normal').setDisplaySize(w, h);
+  const bg = scene.add.graphics();
+  drawButtonBg(bg, w, h, false);
   const text = scene.add.text(0, 0, label, {
     fontFamily: '"Courier New", monospace',
     fontSize: opts?.fontSize ?? '13px',
@@ -62,10 +89,10 @@ export function createTouchButton(
   container.on('pointerup', stopRepeat);
   container.on('pointerout', () => {
     stopRepeat();
-    bg.setTexture('btn_normal');
+    drawButtonBg(bg, w, h, false);
   });
   container.on('pointerover', () => {
-    if (enabled) bg.setTexture('btn_hover');
+    if (enabled) drawButtonBg(bg, w, h, true);
   });
 
   return {
