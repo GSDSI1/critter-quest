@@ -8,6 +8,7 @@ import { Input } from '../systems/input';
 import { Sfx } from '../utils/audio';
 import { canFastTravel } from '../systems/healTravel';
 import { loadAudioSettings, saveAudioSettings } from '../systems/audioSettings';
+import { refreshMusicVolume } from '../utils/music';
 
 export class PauseMenuScene extends Phaser.Scene {
   private selected = 0;
@@ -39,6 +40,10 @@ export class PauseMenuScene extends Phaser.Scene {
 
     this.add.text(GAME_WIDTH / 2, 152, `$${GameState.player.money}  |  Badges: ${GameState.player.badges.length}`, {
       fontFamily: '"Courier New", monospace', fontSize: '11px', color: '#8899aa',
+    }).setOrigin(0.5);
+
+    this.add.text(GAME_WIDTH / 2, 168, `v${import.meta.env.VITE_APP_VERSION ?? '1.0.0'}`, {
+      fontFamily: '"Courier New", monospace', fontSize: '9px', color: '#556677',
     }).setOrigin(0.5);
 
     if (GameState.player.badges.length > 0) {
@@ -95,6 +100,7 @@ export class PauseMenuScene extends Phaser.Scene {
       const settings = loadAudioSettings();
       settings.muted = !settings.muted;
       saveAudioSettings(settings);
+      refreshMusicVolume();
       this.muted = settings.muted;
       this.options = ['Critterdex', 'Party', 'Options', this.muted ? 'Unmute' : 'Mute'];
       if (canFastTravel()) this.options.push('Fly');

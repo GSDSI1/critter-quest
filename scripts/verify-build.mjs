@@ -40,6 +40,8 @@ else fail('public/assets/tiles/tileset.png missing');
 const audioDir = join(root, 'public/assets/audio');
 if (existsSync(join(audioDir, 'menu_select.wav'))) ok('Generated SFX audio');
 else fail('public/assets/audio missing');
+if (existsSync(join(audioDir, 'music_overworld.wav'))) ok('Chiptune BGM loops');
+else fail('music_overworld.wav missing — run npm run gen-assets');
 
 const critterPngs = readdirSync(join(root, 'public/assets/critters')).filter(f => f.endsWith('.png') && !f.includes('_sm'));
 ok(`${critterPngs.length} critter PNGs on disk`);
@@ -275,6 +277,14 @@ if (battleScene.includes('shouldAutoAdvanceText') && battleScene.includes('messa
 const battleAnims = read('src/scenes/battle/BattleAnims.ts');
 if (battleAnims.includes('ELEMENT_BURSTS')) ok('Element-typed battle move VFX');
 else fail('BattleAnims missing element VFX');
+
+const musicTs = read('src/utils/music.ts');
+if (musicTs.includes('bgm_') && musicTs.includes('bindMusicScene')) ok('Phaser BGM loop player');
+else fail('music.ts missing BGM loop support');
+
+const critterdex = read('src/scenes/CritterdexScene.ts');
+if (critterdex.includes('learnScroll')) ok('Critterdex learnset scroll');
+else fail('CritterdexScene missing learnset scroll');
 
 const encounters = read('src/data/encounters.ts');
 if (encounters.includes('resolveEncounterTable') && encounters.includes('forest_night')) {

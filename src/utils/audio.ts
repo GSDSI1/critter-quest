@@ -61,8 +61,8 @@ export const Sfx = {
     }
   },
   introJingle: () => { [392, 494, 587, 784].forEach((f, i) => setTimeout(() => beep(f, 0.1, 'sine'), i * 100)); },
-  footstepGrass: () => beep(120, 0.04, 'triangle', 0.04),
-  footstepPath: () => beep(90, 0.03, 'triangle', 0.03),
+  footstepGrass: () => sfx('footstep_grass', () => beep(120, 0.04, 'triangle', 0.04)),
+  footstepPath: () => sfx('footstep_path', () => beep(90, 0.03, 'triangle', 0.03)),
   battleStart: () => sfx('battle_start', () => { beep(220, 0.1); setTimeout(() => beep(330, 0.15), 100); }),
   hit: () => sfx('hit', () => beep(180, 0.08, 'sawtooth', 0.06)),
   levelUp: () => sfx('level_up', () => { [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => beep(f, 0.1), i * 80)); }),

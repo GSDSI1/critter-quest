@@ -13,6 +13,7 @@ export class CritterdexScene extends Phaser.Scene {
   private selected = 0;
   private fromPause = false;
   private tab: 'info' | 'area' | 'moves' | 'evo' = 'info';
+  private learnScroll = 0;
 
   constructor() {
     super('Critterdex');
@@ -43,8 +44,23 @@ export class CritterdexScene extends Phaser.Scene {
 
   update(): void {
     Input.update();
-    if (Input.justPressed('up')) { this.selected = Math.max(0, this.selected - 1); this.renderList(); }
-    if (Input.justPressed('down')) { this.selected = Math.min(DEX_ORDER.length - 1, this.selected + 1); this.renderList(); }
+    if (this.tab === 'moves') {
+      const id = DEX_ORDER[this.selected];
+      const total = (LEARNSETS[id] ?? []).length;
+      const maxScroll = Math.max(0, total - 12);
+      if (Input.justPressed('up')) {
+        this.learnScroll = Math.max(0, this.learnScroll - 1);
+        this.renderDetail();
+        return;
+      }
+      if (Input.justPressed('down')) {
+        this.learnScroll = Math.min(maxScroll, this.learnScroll + 1);
+        this.renderDetail();
+        return;
+      }
+    }
+    if (Input.justPressed('up')) { this.selected = Math.max(0, this.selected - 1); this.learnScroll = 0; this.renderList(); }
+    if (Input.justPressed('down')) { this.selected = Math.min(DEX_ORDER.length - 1, this.selected + 1); this.learnScroll = 0; this.renderList(); }
     if (Input.justPressed('left')) this.cycleTab(-1);
     if (Input.justPressed('right')) this.cycleTab(1);
     if (Input.justPressed('cancel') || Input.justPressed('confirm')) this.close();
@@ -55,6 +71,7 @@ export class CritterdexScene extends Phaser.Scene {
   private cycleTab(dir: number): void {
     const idx = this.tabs.indexOf(this.tab);
     this.tab = this.tabs[(idx + dir + this.tabs.length) % this.tabs.length];
+    this.learnScroll = 0;
     this.renderDetail();
   }
 
@@ -185,11 +202,17 @@ export class CritterdexScene extends Phaser.Scene {
       }).setOrigin(0.5, 0));
     } else if (this.tab === 'moves' && caught) {
       const entries = LEARNSETS[id] ?? [];
-      const lines = entries.slice(0, 10).map(e => `Lv.${String(e.level).padStart(2)}  ${getMove(e.move).name}`);
+      const visible = entries.slice(this.learnScroll, this.learnScroll + 12);
+      const lines = visible.map(e => `Lv.${String(e.level).padStart(2)}  ${getMove(e.move).name}`);
       this.detailContainer.add(this.add.text(330, 270, lines.join('\n') || 'No learnset data.', {
         fontFamily: '"Courier New", monospace', fontSize: '10px', color: '#c0c0c0',
         lineSpacing: 4,
       }));
+      if (entries.length > 12) {
+        this.detailContainer.add(this.add.text(330, 390, `↑↓ scroll  ${this.learnScroll + 1}-${Math.min(this.learnScroll + 12, entries.length)} / ${entries.length}`, {
+          fontFamily: '"Courier New", monospace', fontSize: '9px', color: '#667788',
+        }));
+      }
     } else if (this.tab === 'evo' && (seen || caught)) {
       const chain = getEvolutionChain(id);
       const chainText = chain.map(sid => getCreature(sid).name).join(' → ');

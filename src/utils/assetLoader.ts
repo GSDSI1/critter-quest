@@ -15,7 +15,10 @@ const SM_ATLAS = 'critters_sm_atlas';
 
 export const SFX_KEYS = [
   'menu_select', 'menu_confirm', 'hit', 'level_up', 'catch', 'heal', 'battle_start',
+  'footstep_grass', 'footstep_path',
 ] as const;
+
+export const BGM_KEYS = ['overworld', 'battle', 'town'] as const;
 
 export interface AssetMeta {
   placeholder: boolean;
@@ -140,6 +143,9 @@ export function preloadBootArt(scene: Phaser.Scene): void {
   }
   for (const key of SFX_KEYS) {
     scene.load.audio(`sfx_${key}`, `assets/audio/${key}.wav`);
+  }
+  for (const theme of BGM_KEYS) {
+    scene.load.audio(`bgm_${theme}`, `assets/audio/music_${theme}.wav`);
   }
 }
 

@@ -6,7 +6,7 @@ import { Input } from '../systems/input';
 import { Sfx } from '../utils/audio';
 
 import { loadAudioSettings, saveAudioSettings, type AudioSettings } from '../systems/audioSettings';
-import { startMusic } from '../utils/music';
+import { startMusic, refreshMusicVolume } from '../utils/music';
 
 const SPEEDS: TextSpeed[] = ['slow', 'normal', 'fast'];
 const VOL_STEPS = [0, 0.25, 0.5, 0.75, 1];
@@ -112,6 +112,7 @@ export class OptionsScene extends Phaser.Scene {
       this.audio.music = VOL_STEPS[(idx + 1) % VOL_STEPS.length];
       saveAudioSettings(this.audio);
       startMusic('overworld');
+      refreshMusicVolume();
     } else if (this.selected === 3) {
       const idx = volIndex(this.audio.sfx);
       this.audio.sfx = VOL_STEPS[(idx + 1) % VOL_STEPS.length];
@@ -120,6 +121,7 @@ export class OptionsScene extends Phaser.Scene {
       this.audio.muted = !this.audio.muted;
       saveAudioSettings(this.audio);
       if (!this.audio.muted) startMusic('overworld');
+      refreshMusicVolume();
     }
     this.renderOptions();
   }
