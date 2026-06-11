@@ -227,6 +227,26 @@ export const LEARNSETS: Record<string, LearnEntry[]> = {
     { level: 1, move: 'tackle' }, { level: 1, move: 'vine' },
     { level: 8, move: 'thorn_lash' }, { level: 14, move: 'leafblade' },
   ],
+  tidemast: [
+    { level: 1, move: 'brine_splash' }, { level: 1, move: 'splash' },
+    { level: 26, move: 'tidal_maul' }, { level: 30, move: 'tsunami' },
+  ],
+  thornqueen: [
+    { level: 1, move: 'thorn_lash' }, { level: 1, move: 'vine' },
+    { level: 24, move: 'rose_strike' }, { level: 28, move: 'sleep_powder' },
+  ],
+  prismdon: [
+    { level: 1, move: 'prism_beam' }, { level: 1, move: 'psybeam' },
+    { level: 28, move: 'crystal_lance' }, { level: 32, move: 'mindblast' },
+  ],
+  ashpuff: [
+    { level: 1, move: 'ember' }, { level: 1, move: 'tackle' },
+    { level: 8, move: 'cinder_swipe' }, { level: 12, move: 'coalsurge' },
+  ],
+  voltchick: [
+    { level: 1, move: 'tackle' }, { level: 1, move: 'leer' },
+    { level: 6, move: 'static_peck' }, { level: 10, move: 'spark' },
+  ],
 };
 
 export function movesKnownAtLevel(speciesId: string, level: number): string[] {

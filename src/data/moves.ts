@@ -61,6 +61,11 @@ export const MOVES: Record<string, MoveDef> = {
   prism_beam: { id: 'prism_beam', name: 'Prism Beam', type: 'psychic', power: 70, accuracy: 100, pp: 15, category: 'special' },
   brine_splash: { id: 'brine_splash', name: 'Brine Splash', type: 'tide', power: 55, accuracy: 100, pp: 20, category: 'physical' },
   thorn_lash: { id: 'thorn_lash', name: 'Thorn Lash', type: 'leaf', power: 65, accuracy: 95, pp: 15, category: 'physical', effect: 'poison', effectChance: 15 },
+  tidal_maul: { id: 'tidal_maul', name: 'Tidal Maul', type: 'tide', power: 85, accuracy: 90, pp: 10, category: 'physical' },
+  rose_strike: { id: 'rose_strike', name: 'Rose Strike', type: 'leaf', power: 80, accuracy: 95, pp: 12, category: 'physical', effect: 'poison', effectChance: 20 },
+  crystal_lance: { id: 'crystal_lance', name: 'Crystal Lance', type: 'psychic', power: 90, accuracy: 90, pp: 8, category: 'special' },
+  cinder_swipe: { id: 'cinder_swipe', name: 'Cinder Swipe', type: 'flame', power: 50, accuracy: 100, pp: 20, category: 'physical', effect: 'burn', effectChance: 15 },
+  static_peck: { id: 'static_peck', name: 'Static Peck', type: 'volt', power: 45, accuracy: 100, pp: 25, category: 'physical', effect: 'paralyze', effectChance: 15 },
 };
 
 export function getMove(id: string): MoveDef {

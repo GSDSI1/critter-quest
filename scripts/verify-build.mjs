@@ -49,15 +49,15 @@ ok(`${critterPngs.length} critter PNGs on disk`);
 // ── Data catalog ──
 const creatures = read('src/data/creatures.ts');
 const speciesIds = [...creatures.matchAll(/^\s{2}[a-z]+: \{/gm)];
-if (speciesIds.length === 60) ok('60 species in creatures.ts');
-else fail(`Expected 60 species, found ${speciesIds.length}`);
+if (speciesIds.length === 65) ok('65 species in creatures.ts');
+else fail(`Expected 65 species, found ${speciesIds.length}`);
 
 const movesSrc = read('src/data/moves.ts');
 const moveCount = (movesSrc.match(/^\s{2}[a-z][a-z0-9_]*: \{ id:/gm) ?? []).length;
-if (moveCount >= 45) ok(`${moveCount} moves in moves.ts`);
-else fail(`Expected ≥45 moves, found ${moveCount}`);
-if (movesSrc.includes('glacier_fang') && movesSrc.includes('thorn_lash')) ok('Batch-3 species moves');
-else fail('moves.ts missing glacier_fang/thorn_lash');
+if (moveCount >= 50) ok(`${moveCount} moves in moves.ts`);
+else fail(`Expected ≥50 moves, found ${moveCount}`);
+if (movesSrc.includes('tidal_maul') && movesSrc.includes('crystal_lance')) ok('Batch-4 species moves');
+else fail('moves.ts missing tidal_maul/crystal_lance');
 
 function readMapsBundle() {
   const index = read('src/data/maps/index.ts');
@@ -231,6 +231,8 @@ if (existsSync(join(root, 'src/ui/statDisplay.ts'))) ok('Stat display helper (6 
 else fail('statDisplay.ts missing');
 if (existsSync(join(root, 'scripts/critter-art/starters.mjs'))) ok('Starter pixel art overrides');
 else fail('critter-art/starters.mjs missing');
+if (existsSync(join(root, 'src/scenes/overworld/CaveSparkles.ts'))) ok('Cave sparkle overlay');
+else fail('CaveSparkles.ts missing');
 if (owBundle.includes('playerTextureKey') && overworld.includes('applyOverworldCamera')) {
   ok('Overworld: player sprite + camera');
 } else fail('OverworldScene incomplete');

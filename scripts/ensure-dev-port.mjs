@@ -20,11 +20,20 @@ for (const pid of pids) {
     console.log(`Stopped prior dev server on :${PORT} (pid ${pid})`);
   } catch { /* already gone */ }
 }
-if (pids.length) execSync('sleep 0.3');
+if (pids.length) execSync('sleep 0.5');
 
-const remaining = portPids();
+let remaining = portPids();
+for (const pid of remaining) {
+  try {
+    process.kill(Number(pid), 'SIGKILL');
+    console.log(`Force-stopped stubborn process on :${PORT} (pid ${pid})`);
+  } catch { /* already gone */ }
+}
+if (remaining.length) execSync('sleep 0.2');
+
+remaining = portPids();
 if (remaining.length) {
   console.error(`\nPort ${PORT} is still in use (pids: ${remaining.join(', ')}).`);
-  console.error(`Run: lsof -i :${PORT}   then stop the other process.\n`);
+  console.error(`Run: kill -9 ${remaining.join(' ')}\n`);
   process.exit(1);
 }

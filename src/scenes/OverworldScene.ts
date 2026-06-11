@@ -20,6 +20,7 @@ import { MapRenderer } from './overworld/MapRenderer';
 import { NpcManager } from './overworld/NpcManager';
 import { buildSkyLayer } from './overworld/SkyLayer';
 import { buildCityAtmosphere } from './overworld/CityAtmosphere';
+import { buildCaveSparkles } from './overworld/CaveSparkles';
 import { buildHealInterior } from '../ui/sceneBackdrops';
 import { fadeInOnStart, wipeInOnStart } from '../ui/transitions';
 import { markTouchPreferred, shouldShowOverworldTouchPad } from '../ui/touchMenuNav';
@@ -68,6 +69,7 @@ export class OverworldScene extends Phaser.Scene {
 
     if (isOutdoorMap(this.map.id)) buildSkyLayer(this, this.map.id);
     buildCityAtmosphere(this, this.map.id);
+    if (this.map.id === 'crystal_cave') buildCaveSparkles(this);
     if (this.map.id === 'heal_center') buildHealInterior(this);
 
     this.mapRenderer = new MapRenderer(this);

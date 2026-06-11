@@ -482,6 +482,46 @@ export const CREATURES: Record<string, CreatureDef> = {
     description: 'Rosebud shell hides sharp thorns until threatened.',
     ability: 'overgrow', habitat: 'Route 2', height: 0.5, weight: 14,
   },
+  tidemast: {
+    id: 'tidemast', name: 'Tidemast', types: ['tide'], dexNumber: 61,
+    baseStats: { hp: 78, atk: 88, def: 68, spa: 62, spd: 70, spe: 72 },
+    moves: ['tidal_maul', 'brine_splash', 'tidal', 'splash'],
+    catchRate: 20, expYield: 155, color: 0x0369a1, shape: 'quadruped',
+    description: 'Alpha of coastal packs; bark summons crashing surf.',
+    ability: 'torrent', habitat: 'Route 3', height: 1.3, weight: 68,
+  },
+  thornqueen: {
+    id: 'thornqueen', name: 'Thornqueen', types: ['leaf'], dexNumber: 62,
+    baseStats: { hp: 75, atk: 82, def: 72, spa: 68, spd: 65, spe: 58 },
+    moves: ['rose_strike', 'thorn_lash', 'leafblade', 'sleep_powder'],
+    catchRate: 18, expYield: 158, color: 0x166534, shape: 'humanoid',
+    description: 'Crown of blooms conceals venomous thorn whips.',
+    ability: 'overgrow', habitat: 'Route 2', height: 1.4, weight: 38,
+  },
+  prismdon: {
+    id: 'prismdon', name: 'Prismdon', types: ['psychic', 'stone'], dexNumber: 63,
+    baseStats: { hp: 82, atk: 65, def: 95, spa: 105, spd: 92, spe: 52 },
+    moves: ['crystal_lance', 'prism_beam', 'mindblast', 'earthquake'],
+    catchRate: 12, expYield: 195, color: 0x9333ea, shape: 'crystalline',
+    description: 'Refracts psychic energy through a geode heart.',
+    ability: 'levitate', habitat: 'Crystal Cave', height: 1.8, weight: 145,
+  },
+  ashpuff: {
+    id: 'ashpuff', name: 'Ashpuff', types: ['flame'], dexNumber: 64,
+    baseStats: { hp: 44, atk: 50, def: 42, spa: 58, spd: 48, spe: 55 },
+    moves: ['cinder_swipe', 'ember', 'tackle', 'growl'],
+    catchRate: 36, expYield: 70, color: 0xf97316, shape: 'quadruped',
+    description: 'Ash puffs from its paws with every playful hop.',
+    ability: 'flash_fire', habitat: 'Volcanic Path', height: 0.45, weight: 9,
+  },
+  voltchick: {
+    id: 'voltchick', name: 'Voltchick', types: ['volt'], dexNumber: 65,
+    baseStats: { hp: 40, atk: 48, def: 40, spa: 55, spd: 45, spe: 70 },
+    moves: ['static_peck', 'spark', 'tackle', 'leer'],
+    catchRate: 38, expYield: 68, color: 0xfacc15, shape: 'avian',
+    description: 'Down crackles with static before its first flight.',
+    ability: 'static', habitat: 'Route 1', height: 0.35, weight: 5,
+  },
 };
 
 export const STARTERS = ['emberpup', 'aqualet', 'leafkit'] as const;
