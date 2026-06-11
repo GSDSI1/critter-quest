@@ -19,6 +19,7 @@ import { isOutdoorMap, nightTintAlpha, tileNightTint } from '../systems/dayNight
 import { MapRenderer } from './overworld/MapRenderer';
 import { NpcManager } from './overworld/NpcManager';
 import { buildSkyLayer } from './overworld/SkyLayer';
+import { buildCityAtmosphere } from './overworld/CityAtmosphere';
 import { buildHealInterior } from '../ui/sceneBackdrops';
 import { fadeInOnStart, wipeInOnStart } from '../ui/transitions';
 import { markTouchPreferred } from '../ui/touchMenuNav';
@@ -64,6 +65,7 @@ export class OverworldScene extends Phaser.Scene {
     pinToScreen(this.nightOverlay, 840);
 
     if (isOutdoorMap(this.map.id)) buildSkyLayer(this);
+    buildCityAtmosphere(this, this.map.id);
     if (this.map.id === 'heal_center') buildHealInterior(this);
 
     this.mapRenderer = new MapRenderer(this);

@@ -26,6 +26,7 @@ export const EVOLUTIONS: EvolutionDef[] = [
   { from: 'cerebrain', to: 'astralyn', level: 36 },
   { from: 'snowpuff', to: 'blizzhound', level: 18 },
   { from: 'dreamwisp', to: 'somnara', level: 28 },
+  { from: 'kelpling', to: 'reefguard', level: 22 },
 ];
 
 export function getEvolution(speciesId: string, level: number): string | null {

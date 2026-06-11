@@ -170,13 +170,34 @@ const NPCS = {
   leader: [245, 158, 11], prof: [99, 102, 241],
 };
 
-for (const [role, rgb] of Object.entries(NPCS)) {
-  const rgba = Buffer.alloc(32 * 32 * 4, 0);
+function drawNpc(rgba, role, rgb) {
   fillRect(rgba, 32, 32, 10, 12, 12, 14, [...rgb, 255]);
   fillCircle(rgba, 32, 32, 16, 10, 6, [252, 211, 77, 255]);
   fillRect(rgba, 32, 32, 12, 26, 4, 4, [30, 30, 50, 255]);
   fillRect(rgba, 32, 32, 18, 26, 4, 4, [30, 30, 50, 255]);
+  if (role === 'nurse') {
+    fillRect(rgba, 32, 32, 8, 14, 16, 12, [255, 255, 255, 230]);
+    fillRect(rgba, 32, 32, 14, 8, 4, 3, [239, 68, 68, 255]);
+  } else if (role === 'leader') {
+    fillRect(rgba, 32, 32, 6, 12, 20, 6, [245, 158, 11, 220]);
+    fillCircle(rgba, 32, 32, 16, 8, 3, [250, 204, 21, 255]);
+  } else if (role === 'rival') {
+    fillRect(rgba, 32, 32, 8, 9, 16, 4, [220, 38, 38, 255]);
+  } else if (role === 'prof') {
+    fillRect(rgba, 32, 32, 12, 10, 8, 3, [30, 30, 50, 200]);
+    setPx(rgba, 32, 13, 11, [200, 230, 255, 255]);
+    setPx(rgba, 32, 19, 11, [200, 230, 255, 255]);
+  } else if (role === 'clerk') {
+    fillRect(rgba, 32, 32, 9, 13, 14, 3, [255, 255, 255, 200]);
+  } else if (role === 'trainer_m' || role === 'trainer_f') {
+    fillRect(rgba, 32, 32, 14, 11, 4, 8, [...shade(rgb, 30), 255]);
+  }
   outlineShape(rgba, 32, 32);
+}
+
+for (const [role, rgb] of Object.entries(NPCS)) {
+  const rgba = Buffer.alloc(32 * 32 * 4, 0);
+  drawNpc(rgba, role, rgb);
   writePng(join(npcDir, `${role}.png`), 32, 32, rgba);
 }
 

@@ -47,6 +47,10 @@ export const MOVES: Record<string, MoveDef> = {
   growl: { id: 'growl', name: 'Growl', type: 'stone', power: 0, accuracy: 100, pp: 20, category: 'status', effect: 'boost-atk', effectValue: -1, effectTarget: 'foe' },
   leer: { id: 'leer', name: 'Leer', type: 'stone', power: 0, accuracy: 100, pp: 20, category: 'status', effect: 'boost-def', effectValue: -1, effectTarget: 'foe' },
   poison_sting: { id: 'poison_sting', name: 'Poison Sting', type: 'leaf', power: 35, accuracy: 100, pp: 20, category: 'physical', effect: 'poison', effectChance: 30 },
+  coalsurge: { id: 'coalsurge', name: 'Coal Surge', type: 'flame', power: 65, accuracy: 95, pp: 15, category: 'special', effect: 'burn', effectChance: 20 },
+  reef_surge: { id: 'reef_surge', name: 'Reef Surge', type: 'tide', power: 75, accuracy: 95, pp: 12, category: 'special' },
+  shadow_dust: { id: 'shadow_dust', name: 'Shadow Dust', type: 'shadow', power: 55, accuracy: 100, pp: 20, category: 'special', effect: 'sleep', effectChance: 15 },
+  volt_ram: { id: 'volt_ram', name: 'Volt Ram', type: 'volt', power: 75, accuracy: 90, pp: 12, category: 'physical', effect: 'paralyze', effectChance: 20 },
 };
 
 export function getMove(id: string): MoveDef {

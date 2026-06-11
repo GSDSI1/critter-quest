@@ -49,8 +49,15 @@ ok(`${critterPngs.length} critter PNGs on disk`);
 // ── Data catalog ──
 const creatures = read('src/data/creatures.ts');
 const speciesIds = [...creatures.matchAll(/^\s{2}[a-z]+: \{/gm)];
-if (speciesIds.length === 45) ok('45 species in creatures.ts');
-else fail(`Expected 45 species, found ${speciesIds.length}`);
+if (speciesIds.length === 50) ok('50 species in creatures.ts');
+else fail(`Expected 50 species, found ${speciesIds.length}`);
+
+const movesSrc = read('src/data/moves.ts');
+const moveCount = (movesSrc.match(/^\s{2}[a-z][a-z0-9_]*: \{ id:/gm) ?? []).length;
+if (moveCount >= 35) ok(`${moveCount} moves in moves.ts`);
+else fail(`Expected ≥35 moves, found ${moveCount}`);
+if (movesSrc.includes('coalsurge') && movesSrc.includes('volt_ram')) ok('New species moves');
+else fail('moves.ts missing coalsurge/volt_ram');
 
 function readMapsBundle() {
   const index = read('src/data/maps/index.ts');
@@ -306,6 +313,8 @@ else fail('transitions.ts missing wipe helpers');
 
 if (overworld.includes('buildHealInterior') && overworld.includes('buildSkyLayer')) ok('Heal interior + sky parallax');
 else fail('OverworldScene missing atmosphere layers');
+if (existsSync(join(root, 'src/scenes/overworld/CityAtmosphere.ts'))) ok('City atmosphere tints');
+else fail('CityAtmosphere.ts missing');
 
 if (existsSync(join(root, 'src/ui/touchMenuNav.ts'))) ok('Touch menu navigation');
 else fail('touchMenuNav.ts missing');

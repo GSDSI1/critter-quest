@@ -362,6 +362,46 @@ export const CREATURES: Record<string, CreatureDef> = {
     description: 'Meditates for centuries atop mountain monoliths.',
     ability: 'sturdy', habitat: 'Victory Road', height: 1.6, weight: 200,
   },
+  coalemb: {
+    id: 'coalemb', name: 'Coalemb', types: ['flame'], dexNumber: 46,
+    baseStats: { hp: 62, atk: 48, def: 58, spa: 75, spd: 65, spe: 42 },
+    moves: ['ember', 'coalsurge', 'growl', 'leer'],
+    catchRate: 28, expYield: 125, color: 0x44403c, shape: 'blob',
+    description: 'Smoldering coal lumps drift off its back near lava vents.',
+    ability: 'flash_fire', habitat: 'Volcanic Path', height: 0.6, weight: 28,
+  },
+  kelpling: {
+    id: 'kelpling', name: 'Kelpling', types: ['tide'], dexNumber: 47,
+    baseStats: { hp: 48, atk: 42, def: 48, spa: 55, spd: 52, spe: 58 },
+    moves: ['splash', 'tackle', 'growl'],
+    catchRate: 40, expYield: 68, color: 0x14b8a6, shape: 'blob',
+    description: 'Drifts in tidal pools clutching shiny pebbles.',
+    ability: 'torrent', habitat: 'Route 3', height: 0.4, weight: 8,
+  },
+  reefguard: {
+    id: 'reefguard', name: 'Reefguard', types: ['tide', 'leaf'], dexNumber: 48,
+    baseStats: { hp: 72, atk: 58, def: 78, spa: 82, spd: 88, spe: 52 },
+    moves: ['reef_surge', 'tidal', 'vine', 'splash'],
+    catchRate: 22, expYield: 158, color: 0x0d9488, shape: 'serpent',
+    description: 'Coral armor grows along its coils as it patrols reefs.',
+    ability: 'overgrow', habitat: 'Route 3', height: 1.2, weight: 38,
+  },
+  nightmoth: {
+    id: 'nightmoth', name: 'Nightmoth', types: ['shadow'], dexNumber: 49,
+    baseStats: { hp: 50, atk: 45, def: 42, spa: 78, spd: 62, spe: 92 },
+    moves: ['shadow_dust', 'shadowclaw', 'hypnosis', 'tackle'],
+    catchRate: 30, expYield: 140, color: 0x581c87, shape: 'avian',
+    description: 'Wing dust lulls prey into a deep slumber.',
+    ability: 'shadow_tag', habitat: 'Forest (night)', height: 0.9, weight: 12,
+  },
+  stormhorn: {
+    id: 'stormhorn', name: 'Stormhorn', types: ['volt'], dexNumber: 50,
+    baseStats: { hp: 78, atk: 92, def: 68, spa: 55, spd: 62, spe: 75 },
+    moves: ['volt_ram', 'spark', 'leer', 'tackle'],
+    catchRate: 20, expYield: 168, color: 0xfbbf24, shape: 'quadruped',
+    description: 'Horns channel lightning when it charges across plains.',
+    ability: 'static', habitat: 'Route 5', height: 1.5, weight: 88,
+  },
 };
 
 export const STARTERS = ['emberpup', 'aqualet', 'leafkit'] as const;

@@ -600,9 +600,69 @@
         "h": 32
       }
     },
-    "coralite_sm": {
+    "coalemb_sm": {
       "frame": {
         "x": 960,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 32
+      }
+    },
+    "coalemb_sm_back": {
+      "frame": {
+        "x": 992,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 32
+      }
+    },
+    "coalemb_sm_f2": {
+      "frame": {
+        "x": 1024,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 32
+      }
+    },
+    "coralite_sm": {
+      "frame": {
+        "x": 1056,
         "y": 0,
         "w": 32,
         "h": 32
@@ -622,7 +682,7 @@
     },
     "coralite_sm_back": {
       "frame": {
-        "x": 992,
+        "x": 1088,
         "y": 0,
         "w": 32,
         "h": 32
@@ -642,7 +702,7 @@
     },
     "coralite_sm_f2": {
       "frame": {
-        "x": 1024,
+        "x": 1120,
         "y": 0,
         "w": 32,
         "h": 32
@@ -662,7 +722,7 @@
     },
     "crystalynx_sm": {
       "frame": {
-        "x": 1056,
+        "x": 1152,
         "y": 0,
         "w": 32,
         "h": 32
@@ -682,7 +742,7 @@
     },
     "crystalynx_sm_back": {
       "frame": {
-        "x": 1088,
+        "x": 1184,
         "y": 0,
         "w": 32,
         "h": 32
@@ -702,7 +762,7 @@
     },
     "crystalynx_sm_f2": {
       "frame": {
-        "x": 1120,
+        "x": 1216,
         "y": 0,
         "w": 32,
         "h": 32
@@ -722,7 +782,7 @@
     },
     "dreamwisp_sm": {
       "frame": {
-        "x": 1152,
+        "x": 1248,
         "y": 0,
         "w": 32,
         "h": 32
@@ -742,7 +802,7 @@
     },
     "dreamwisp_sm_back": {
       "frame": {
-        "x": 1184,
+        "x": 1280,
         "y": 0,
         "w": 32,
         "h": 32
@@ -762,7 +822,7 @@
     },
     "dreamwisp_sm_f2": {
       "frame": {
-        "x": 1216,
+        "x": 1312,
         "y": 0,
         "w": 32,
         "h": 32
@@ -782,7 +842,7 @@
     },
     "emberlord_sm": {
       "frame": {
-        "x": 1248,
+        "x": 1344,
         "y": 0,
         "w": 32,
         "h": 32
@@ -802,7 +862,7 @@
     },
     "emberlord_sm_back": {
       "frame": {
-        "x": 1280,
+        "x": 1376,
         "y": 0,
         "w": 32,
         "h": 32
@@ -822,7 +882,7 @@
     },
     "emberlord_sm_f2": {
       "frame": {
-        "x": 1312,
+        "x": 1408,
         "y": 0,
         "w": 32,
         "h": 32
@@ -842,7 +902,7 @@
     },
     "emberpup_sm": {
       "frame": {
-        "x": 1344,
+        "x": 1440,
         "y": 0,
         "w": 32,
         "h": 32
@@ -862,7 +922,7 @@
     },
     "emberpup_sm_back": {
       "frame": {
-        "x": 1376,
+        "x": 1472,
         "y": 0,
         "w": 32,
         "h": 32
@@ -882,7 +942,7 @@
     },
     "emberpup_sm_f2": {
       "frame": {
-        "x": 1408,
+        "x": 1504,
         "y": 0,
         "w": 32,
         "h": 32
@@ -902,7 +962,7 @@
     },
     "flamewyrm_sm": {
       "frame": {
-        "x": 1440,
+        "x": 1536,
         "y": 0,
         "w": 32,
         "h": 32
@@ -922,7 +982,7 @@
     },
     "flamewyrm_sm_back": {
       "frame": {
-        "x": 1472,
+        "x": 1568,
         "y": 0,
         "w": 32,
         "h": 32
@@ -942,7 +1002,7 @@
     },
     "flamewyrm_sm_f2": {
       "frame": {
-        "x": 1504,
+        "x": 1600,
         "y": 0,
         "w": 32,
         "h": 32
@@ -962,7 +1022,7 @@
     },
     "frosthorn_sm": {
       "frame": {
-        "x": 1536,
+        "x": 1632,
         "y": 0,
         "w": 32,
         "h": 32
@@ -982,7 +1042,7 @@
     },
     "frosthorn_sm_back": {
       "frame": {
-        "x": 1568,
+        "x": 1664,
         "y": 0,
         "w": 32,
         "h": 32
@@ -1002,7 +1062,7 @@
     },
     "frosthorn_sm_f2": {
       "frame": {
-        "x": 1600,
+        "x": 1696,
         "y": 0,
         "w": 32,
         "h": 32
@@ -1022,7 +1082,7 @@
     },
     "frostkit_sm": {
       "frame": {
-        "x": 1632,
+        "x": 1728,
         "y": 0,
         "w": 32,
         "h": 32
@@ -1042,7 +1102,7 @@
     },
     "frostkit_sm_back": {
       "frame": {
-        "x": 1664,
+        "x": 1760,
         "y": 0,
         "w": 32,
         "h": 32
@@ -1062,7 +1122,7 @@
     },
     "frostkit_sm_f2": {
       "frame": {
-        "x": 1696,
+        "x": 1792,
         "y": 0,
         "w": 32,
         "h": 32
@@ -1082,7 +1142,7 @@
     },
     "frostmoss_sm": {
       "frame": {
-        "x": 1728,
+        "x": 1824,
         "y": 0,
         "w": 32,
         "h": 32
@@ -1102,7 +1162,7 @@
     },
     "frostmoss_sm_back": {
       "frame": {
-        "x": 1760,
+        "x": 1856,
         "y": 0,
         "w": 32,
         "h": 32
@@ -1122,7 +1182,7 @@
     },
     "frostmoss_sm_f2": {
       "frame": {
-        "x": 1792,
+        "x": 1888,
         "y": 0,
         "w": 32,
         "h": 32
@@ -1142,7 +1202,7 @@
     },
     "geodeon_sm": {
       "frame": {
-        "x": 1824,
+        "x": 1920,
         "y": 0,
         "w": 32,
         "h": 32
@@ -1162,7 +1222,7 @@
     },
     "geodeon_sm_back": {
       "frame": {
-        "x": 1856,
+        "x": 1952,
         "y": 0,
         "w": 32,
         "h": 32
@@ -1182,7 +1242,7 @@
     },
     "geodeon_sm_f2": {
       "frame": {
-        "x": 1888,
+        "x": 1984,
         "y": 0,
         "w": 32,
         "h": 32
@@ -1202,7 +1262,7 @@
     },
     "glacetail_sm": {
       "frame": {
-        "x": 1920,
+        "x": 2016,
         "y": 0,
         "w": 32,
         "h": 32
@@ -1222,8 +1282,8 @@
     },
     "glacetail_sm_back": {
       "frame": {
-        "x": 1952,
-        "y": 0,
+        "x": 0,
+        "y": 32,
         "w": 32,
         "h": 32
       },
@@ -1242,8 +1302,8 @@
     },
     "glacetail_sm_f2": {
       "frame": {
-        "x": 1984,
-        "y": 0,
+        "x": 32,
+        "y": 32,
         "w": 32,
         "h": 32
       },
@@ -1262,8 +1322,8 @@
     },
     "glaciorex_sm": {
       "frame": {
-        "x": 2016,
-        "y": 0,
+        "x": 64,
+        "y": 32,
         "w": 32,
         "h": 32
       },
@@ -1282,7 +1342,7 @@
     },
     "glaciorex_sm_back": {
       "frame": {
-        "x": 0,
+        "x": 96,
         "y": 32,
         "w": 32,
         "h": 32
@@ -1302,7 +1362,7 @@
     },
     "glaciorex_sm_f2": {
       "frame": {
-        "x": 32,
+        "x": 128,
         "y": 32,
         "w": 32,
         "h": 32
@@ -1322,7 +1382,7 @@
     },
     "grimlet_sm": {
       "frame": {
-        "x": 64,
+        "x": 160,
         "y": 32,
         "w": 32,
         "h": 32
@@ -1342,7 +1402,7 @@
     },
     "grimlet_sm_back": {
       "frame": {
-        "x": 96,
+        "x": 192,
         "y": 32,
         "w": 32,
         "h": 32
@@ -1362,7 +1422,7 @@
     },
     "grimlet_sm_f2": {
       "frame": {
-        "x": 128,
+        "x": 224,
         "y": 32,
         "w": 32,
         "h": 32
@@ -1382,7 +1442,7 @@
     },
     "infernox_sm": {
       "frame": {
-        "x": 160,
+        "x": 256,
         "y": 32,
         "w": 32,
         "h": 32
@@ -1402,7 +1462,7 @@
     },
     "infernox_sm_back": {
       "frame": {
-        "x": 192,
+        "x": 288,
         "y": 32,
         "w": 32,
         "h": 32
@@ -1422,66 +1482,6 @@
     },
     "infernox_sm_f2": {
       "frame": {
-        "x": 224,
-        "y": 32,
-        "w": 32,
-        "h": 32
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 32
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 32
-      }
-    },
-    "leafkit_sm": {
-      "frame": {
-        "x": 256,
-        "y": 32,
-        "w": 32,
-        "h": 32
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 32
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 32
-      }
-    },
-    "leafkit_sm_back": {
-      "frame": {
-        "x": 288,
-        "y": 32,
-        "w": 32,
-        "h": 32
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 32,
-        "h": 32
-      },
-      "sourceSize": {
-        "w": 32,
-        "h": 32
-      }
-    },
-    "leafkit_sm_f2": {
-      "frame": {
         "x": 320,
         "y": 32,
         "w": 32,
@@ -1500,7 +1500,7 @@
         "h": 32
       }
     },
-    "mindling_sm": {
+    "kelpling_sm": {
       "frame": {
         "x": 352,
         "y": 32,
@@ -1520,7 +1520,7 @@
         "h": 32
       }
     },
-    "mindling_sm_back": {
+    "kelpling_sm_back": {
       "frame": {
         "x": 384,
         "y": 32,
@@ -1540,7 +1540,7 @@
         "h": 32
       }
     },
-    "mindling_sm_f2": {
+    "kelpling_sm_f2": {
       "frame": {
         "x": 416,
         "y": 32,
@@ -1560,7 +1560,7 @@
         "h": 32
       }
     },
-    "mistral_sm": {
+    "leafkit_sm": {
       "frame": {
         "x": 448,
         "y": 32,
@@ -1580,7 +1580,7 @@
         "h": 32
       }
     },
-    "mistral_sm_back": {
+    "leafkit_sm_back": {
       "frame": {
         "x": 480,
         "y": 32,
@@ -1600,7 +1600,7 @@
         "h": 32
       }
     },
-    "mistral_sm_f2": {
+    "leafkit_sm_f2": {
       "frame": {
         "x": 512,
         "y": 32,
@@ -1620,7 +1620,7 @@
         "h": 32
       }
     },
-    "mossling_sm": {
+    "mindling_sm": {
       "frame": {
         "x": 544,
         "y": 32,
@@ -1640,7 +1640,7 @@
         "h": 32
       }
     },
-    "mossling_sm_back": {
+    "mindling_sm_back": {
       "frame": {
         "x": 576,
         "y": 32,
@@ -1660,7 +1660,7 @@
         "h": 32
       }
     },
-    "mossling_sm_f2": {
+    "mindling_sm_f2": {
       "frame": {
         "x": 608,
         "y": 32,
@@ -1680,7 +1680,7 @@
         "h": 32
       }
     },
-    "pebblite_sm": {
+    "mistral_sm": {
       "frame": {
         "x": 640,
         "y": 32,
@@ -1700,7 +1700,7 @@
         "h": 32
       }
     },
-    "pebblite_sm_back": {
+    "mistral_sm_back": {
       "frame": {
         "x": 672,
         "y": 32,
@@ -1720,7 +1720,7 @@
         "h": 32
       }
     },
-    "pebblite_sm_f2": {
+    "mistral_sm_f2": {
       "frame": {
         "x": 704,
         "y": 32,
@@ -1740,7 +1740,7 @@
         "h": 32
       }
     },
-    "psyknight_sm": {
+    "mossling_sm": {
       "frame": {
         "x": 736,
         "y": 32,
@@ -1760,7 +1760,7 @@
         "h": 32
       }
     },
-    "psyknight_sm_back": {
+    "mossling_sm_back": {
       "frame": {
         "x": 768,
         "y": 32,
@@ -1780,7 +1780,7 @@
         "h": 32
       }
     },
-    "psyknight_sm_f2": {
+    "mossling_sm_f2": {
       "frame": {
         "x": 800,
         "y": 32,
@@ -1800,7 +1800,7 @@
         "h": 32
       }
     },
-    "rockord_sm": {
+    "nightmoth_sm": {
       "frame": {
         "x": 832,
         "y": 32,
@@ -1820,7 +1820,7 @@
         "h": 32
       }
     },
-    "rockord_sm_back": {
+    "nightmoth_sm_back": {
       "frame": {
         "x": 864,
         "y": 32,
@@ -1840,7 +1840,7 @@
         "h": 32
       }
     },
-    "rockord_sm_f2": {
+    "nightmoth_sm_f2": {
       "frame": {
         "x": 896,
         "y": 32,
@@ -1860,7 +1860,7 @@
         "h": 32
       }
     },
-    "shadeling_sm": {
+    "pebblite_sm": {
       "frame": {
         "x": 928,
         "y": 32,
@@ -1880,7 +1880,7 @@
         "h": 32
       }
     },
-    "shadeling_sm_back": {
+    "pebblite_sm_back": {
       "frame": {
         "x": 960,
         "y": 32,
@@ -1900,7 +1900,7 @@
         "h": 32
       }
     },
-    "shadeling_sm_f2": {
+    "pebblite_sm_f2": {
       "frame": {
         "x": 992,
         "y": 32,
@@ -1920,7 +1920,7 @@
         "h": 32
       }
     },
-    "shadespecter_sm": {
+    "psyknight_sm": {
       "frame": {
         "x": 1024,
         "y": 32,
@@ -1940,7 +1940,7 @@
         "h": 32
       }
     },
-    "shadespecter_sm_back": {
+    "psyknight_sm_back": {
       "frame": {
         "x": 1056,
         "y": 32,
@@ -1960,7 +1960,7 @@
         "h": 32
       }
     },
-    "shadespecter_sm_f2": {
+    "psyknight_sm_f2": {
       "frame": {
         "x": 1088,
         "y": 32,
@@ -1980,7 +1980,7 @@
         "h": 32
       }
     },
-    "snowpuff_sm": {
+    "reefguard_sm": {
       "frame": {
         "x": 1120,
         "y": 32,
@@ -2000,7 +2000,7 @@
         "h": 32
       }
     },
-    "snowpuff_sm_back": {
+    "reefguard_sm_back": {
       "frame": {
         "x": 1152,
         "y": 32,
@@ -2020,7 +2020,7 @@
         "h": 32
       }
     },
-    "snowpuff_sm_f2": {
+    "reefguard_sm_f2": {
       "frame": {
         "x": 1184,
         "y": 32,
@@ -2040,7 +2040,7 @@
         "h": 32
       }
     },
-    "somnara_sm": {
+    "rockord_sm": {
       "frame": {
         "x": 1216,
         "y": 32,
@@ -2060,7 +2060,7 @@
         "h": 32
       }
     },
-    "somnara_sm_back": {
+    "rockord_sm_back": {
       "frame": {
         "x": 1248,
         "y": 32,
@@ -2080,7 +2080,7 @@
         "h": 32
       }
     },
-    "somnara_sm_f2": {
+    "rockord_sm_f2": {
       "frame": {
         "x": 1280,
         "y": 32,
@@ -2100,7 +2100,7 @@
         "h": 32
       }
     },
-    "sparkbit_sm": {
+    "shadeling_sm": {
       "frame": {
         "x": 1312,
         "y": 32,
@@ -2120,7 +2120,7 @@
         "h": 32
       }
     },
-    "sparkbit_sm_back": {
+    "shadeling_sm_back": {
       "frame": {
         "x": 1344,
         "y": 32,
@@ -2140,7 +2140,7 @@
         "h": 32
       }
     },
-    "sparkbit_sm_f2": {
+    "shadeling_sm_f2": {
       "frame": {
         "x": 1376,
         "y": 32,
@@ -2160,7 +2160,7 @@
         "h": 32
       }
     },
-    "thornbeast_sm": {
+    "shadespecter_sm": {
       "frame": {
         "x": 1408,
         "y": 32,
@@ -2180,7 +2180,7 @@
         "h": 32
       }
     },
-    "thornbeast_sm_back": {
+    "shadespecter_sm_back": {
       "frame": {
         "x": 1440,
         "y": 32,
@@ -2200,7 +2200,7 @@
         "h": 32
       }
     },
-    "thornbeast_sm_f2": {
+    "shadespecter_sm_f2": {
       "frame": {
         "x": 1472,
         "y": 32,
@@ -2220,7 +2220,7 @@
         "h": 32
       }
     },
-    "thornling_sm": {
+    "snowpuff_sm": {
       "frame": {
         "x": 1504,
         "y": 32,
@@ -2240,7 +2240,7 @@
         "h": 32
       }
     },
-    "thornling_sm_back": {
+    "snowpuff_sm_back": {
       "frame": {
         "x": 1536,
         "y": 32,
@@ -2260,7 +2260,7 @@
         "h": 32
       }
     },
-    "thornling_sm_f2": {
+    "snowpuff_sm_f2": {
       "frame": {
         "x": 1568,
         "y": 32,
@@ -2280,7 +2280,7 @@
         "h": 32
       }
     },
-    "tidefin_sm": {
+    "somnara_sm": {
       "frame": {
         "x": 1600,
         "y": 32,
@@ -2300,7 +2300,7 @@
         "h": 32
       }
     },
-    "tidefin_sm_back": {
+    "somnara_sm_back": {
       "frame": {
         "x": 1632,
         "y": 32,
@@ -2320,7 +2320,7 @@
         "h": 32
       }
     },
-    "tidefin_sm_f2": {
+    "somnara_sm_f2": {
       "frame": {
         "x": 1664,
         "y": 32,
@@ -2340,7 +2340,7 @@
         "h": 32
       }
     },
-    "tidewisp_sm": {
+    "sparkbit_sm": {
       "frame": {
         "x": 1696,
         "y": 32,
@@ -2360,7 +2360,7 @@
         "h": 32
       }
     },
-    "tidewisp_sm_back": {
+    "sparkbit_sm_back": {
       "frame": {
         "x": 1728,
         "y": 32,
@@ -2380,7 +2380,7 @@
         "h": 32
       }
     },
-    "tidewisp_sm_f2": {
+    "sparkbit_sm_f2": {
       "frame": {
         "x": 1760,
         "y": 32,
@@ -2400,7 +2400,7 @@
         "h": 32
       }
     },
-    "vineclaw_sm": {
+    "stormhorn_sm": {
       "frame": {
         "x": 1792,
         "y": 32,
@@ -2420,7 +2420,7 @@
         "h": 32
       }
     },
-    "vineclaw_sm_back": {
+    "stormhorn_sm_back": {
       "frame": {
         "x": 1824,
         "y": 32,
@@ -2440,7 +2440,7 @@
         "h": 32
       }
     },
-    "vineclaw_sm_f2": {
+    "stormhorn_sm_f2": {
       "frame": {
         "x": 1856,
         "y": 32,
@@ -2460,7 +2460,7 @@
         "h": 32
       }
     },
-    "voidseer_sm": {
+    "thornbeast_sm": {
       "frame": {
         "x": 1888,
         "y": 32,
@@ -2480,7 +2480,7 @@
         "h": 32
       }
     },
-    "voidseer_sm_back": {
+    "thornbeast_sm_back": {
       "frame": {
         "x": 1920,
         "y": 32,
@@ -2500,7 +2500,7 @@
         "h": 32
       }
     },
-    "voidseer_sm_f2": {
+    "thornbeast_sm_f2": {
       "frame": {
         "x": 1952,
         "y": 32,
@@ -2520,7 +2520,7 @@
         "h": 32
       }
     },
-    "voltite_sm": {
+    "thornling_sm": {
       "frame": {
         "x": 1984,
         "y": 32,
@@ -2540,7 +2540,7 @@
         "h": 32
       }
     },
-    "voltite_sm_back": {
+    "thornling_sm_back": {
       "frame": {
         "x": 2016,
         "y": 32,
@@ -2560,7 +2560,7 @@
         "h": 32
       }
     },
-    "voltite_sm_f2": {
+    "thornling_sm_f2": {
       "frame": {
         "x": 0,
         "y": 64,
@@ -2580,7 +2580,7 @@
         "h": 32
       }
     },
-    "voltwing_sm": {
+    "tidefin_sm": {
       "frame": {
         "x": 32,
         "y": 64,
@@ -2600,7 +2600,7 @@
         "h": 32
       }
     },
-    "voltwing_sm_back": {
+    "tidefin_sm_back": {
       "frame": {
         "x": 64,
         "y": 64,
@@ -2620,7 +2620,7 @@
         "h": 32
       }
     },
-    "voltwing_sm_f2": {
+    "tidefin_sm_f2": {
       "frame": {
         "x": 96,
         "y": 64,
@@ -2640,7 +2640,7 @@
         "h": 32
       }
     },
-    "zenolith_sm": {
+    "tidewisp_sm": {
       "frame": {
         "x": 128,
         "y": 64,
@@ -2660,7 +2660,7 @@
         "h": 32
       }
     },
-    "zenolith_sm_back": {
+    "tidewisp_sm_back": {
       "frame": {
         "x": 160,
         "y": 64,
@@ -2680,9 +2680,309 @@
         "h": 32
       }
     },
-    "zenolith_sm_f2": {
+    "tidewisp_sm_f2": {
       "frame": {
         "x": 192,
+        "y": 64,
+        "w": 32,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 32
+      }
+    },
+    "vineclaw_sm": {
+      "frame": {
+        "x": 224,
+        "y": 64,
+        "w": 32,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 32
+      }
+    },
+    "vineclaw_sm_back": {
+      "frame": {
+        "x": 256,
+        "y": 64,
+        "w": 32,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 32
+      }
+    },
+    "vineclaw_sm_f2": {
+      "frame": {
+        "x": 288,
+        "y": 64,
+        "w": 32,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 32
+      }
+    },
+    "voidseer_sm": {
+      "frame": {
+        "x": 320,
+        "y": 64,
+        "w": 32,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 32
+      }
+    },
+    "voidseer_sm_back": {
+      "frame": {
+        "x": 352,
+        "y": 64,
+        "w": 32,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 32
+      }
+    },
+    "voidseer_sm_f2": {
+      "frame": {
+        "x": 384,
+        "y": 64,
+        "w": 32,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 32
+      }
+    },
+    "voltite_sm": {
+      "frame": {
+        "x": 416,
+        "y": 64,
+        "w": 32,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 32
+      }
+    },
+    "voltite_sm_back": {
+      "frame": {
+        "x": 448,
+        "y": 64,
+        "w": 32,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 32
+      }
+    },
+    "voltite_sm_f2": {
+      "frame": {
+        "x": 480,
+        "y": 64,
+        "w": 32,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 32
+      }
+    },
+    "voltwing_sm": {
+      "frame": {
+        "x": 512,
+        "y": 64,
+        "w": 32,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 32
+      }
+    },
+    "voltwing_sm_back": {
+      "frame": {
+        "x": 544,
+        "y": 64,
+        "w": 32,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 32
+      }
+    },
+    "voltwing_sm_f2": {
+      "frame": {
+        "x": 576,
+        "y": 64,
+        "w": 32,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 32
+      }
+    },
+    "zenolith_sm": {
+      "frame": {
+        "x": 608,
+        "y": 64,
+        "w": 32,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 32
+      }
+    },
+    "zenolith_sm_back": {
+      "frame": {
+        "x": 640,
+        "y": 64,
+        "w": 32,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 32
+      }
+    },
+    "zenolith_sm_f2": {
+      "frame": {
+        "x": 672,
         "y": 64,
         "w": 32,
         "h": 32

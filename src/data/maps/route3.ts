@@ -12,6 +12,8 @@ export const route3: GameMap = {
   npcs: [
     { id: 'rival2', x: 12, y: 8, name: 'Kai', role: 'rival', lines: ['You again?! My team got stronger!', 'Prepare to lose!'],
       trainer: { party: [{ creatureId: '__RIVAL_EVO__', level: 12 }, { creatureId: 'sparkbit', level: 11 }], reward: 450 } },
+    { id: 'swimmer_mia', x: 4, y: 12, name: 'Mia', role: 'trainer_f', lines: ['Kelplings play in the tide pools here!', 'Want to swim with them?'],
+      trainer: { party: [{ creatureId: 'kelpling', level: 13 }, { creatureId: 'tidewisp', level: 14 }], reward: 420 } },
     { id: 'sign7', x: 12, y: 16, name: 'Sign', role: 'sign', lines: ['Route 3', '↑ Ember City  |  → Route 4  |  ↓ Mossgrove City'] },
   ],
   tiles: t([
@@ -23,6 +25,8 @@ export const route3: GameMap = {
     'T..=....####.....=.....T',
     'T..=.............=.....T',
     'T..=.............=.....T',
+    'T..=....~~~......=.....T',
+    'T..=....~~~......=.....T',
     'T..=.....*.......=.....T',
     'T..=.............=.....T',
     'T..=.............=.....T',
@@ -31,9 +35,6 @@ export const route3: GameMap = {
     'T..=.............=.....T',
     'T..=.............=.....T',
     'T..=.....S.......=.....T',
-    'T..=.............=.....T',
-    'T..=.............=.....T',
-    'T..=.............=.....T',
     'T..=.............=.....T',
     'T..=.............=.....T',
     'TTTTTTTTTTTTTTTTTTTTTTTT',

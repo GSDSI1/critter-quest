@@ -600,7 +600,7 @@
         "h": 64
       }
     },
-    "coralite": {
+    "coalemb": {
       "frame": {
         "x": 1920,
         "y": 0,
@@ -620,7 +620,7 @@
         "h": 64
       }
     },
-    "coralite_back": {
+    "coalemb_back": {
       "frame": {
         "x": 1984,
         "y": 0,
@@ -640,9 +640,69 @@
         "h": 64
       }
     },
-    "coralite_f2": {
+    "coalemb_f2": {
       "frame": {
         "x": 0,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "coralite": {
+      "frame": {
+        "x": 64,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "coralite_back": {
+      "frame": {
+        "x": 128,
+        "y": 64,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "coralite_f2": {
+      "frame": {
+        "x": 192,
         "y": 64,
         "w": 64,
         "h": 64
@@ -662,7 +722,7 @@
     },
     "crystalynx": {
       "frame": {
-        "x": 64,
+        "x": 256,
         "y": 64,
         "w": 64,
         "h": 64
@@ -682,7 +742,7 @@
     },
     "crystalynx_back": {
       "frame": {
-        "x": 128,
+        "x": 320,
         "y": 64,
         "w": 64,
         "h": 64
@@ -702,7 +762,7 @@
     },
     "crystalynx_f2": {
       "frame": {
-        "x": 192,
+        "x": 384,
         "y": 64,
         "w": 64,
         "h": 64
@@ -722,7 +782,7 @@
     },
     "dreamwisp": {
       "frame": {
-        "x": 256,
+        "x": 448,
         "y": 64,
         "w": 64,
         "h": 64
@@ -742,7 +802,7 @@
     },
     "dreamwisp_back": {
       "frame": {
-        "x": 320,
+        "x": 512,
         "y": 64,
         "w": 64,
         "h": 64
@@ -762,7 +822,7 @@
     },
     "dreamwisp_f2": {
       "frame": {
-        "x": 384,
+        "x": 576,
         "y": 64,
         "w": 64,
         "h": 64
@@ -782,7 +842,7 @@
     },
     "emberlord": {
       "frame": {
-        "x": 448,
+        "x": 640,
         "y": 64,
         "w": 64,
         "h": 64
@@ -802,7 +862,7 @@
     },
     "emberlord_back": {
       "frame": {
-        "x": 512,
+        "x": 704,
         "y": 64,
         "w": 64,
         "h": 64
@@ -822,7 +882,7 @@
     },
     "emberlord_f2": {
       "frame": {
-        "x": 576,
+        "x": 768,
         "y": 64,
         "w": 64,
         "h": 64
@@ -842,7 +902,7 @@
     },
     "emberpup": {
       "frame": {
-        "x": 640,
+        "x": 832,
         "y": 64,
         "w": 64,
         "h": 64
@@ -862,7 +922,7 @@
     },
     "emberpup_back": {
       "frame": {
-        "x": 704,
+        "x": 896,
         "y": 64,
         "w": 64,
         "h": 64
@@ -882,7 +942,7 @@
     },
     "emberpup_f2": {
       "frame": {
-        "x": 768,
+        "x": 960,
         "y": 64,
         "w": 64,
         "h": 64
@@ -902,7 +962,7 @@
     },
     "flamewyrm": {
       "frame": {
-        "x": 832,
+        "x": 1024,
         "y": 64,
         "w": 64,
         "h": 64
@@ -922,7 +982,7 @@
     },
     "flamewyrm_back": {
       "frame": {
-        "x": 896,
+        "x": 1088,
         "y": 64,
         "w": 64,
         "h": 64
@@ -942,7 +1002,7 @@
     },
     "flamewyrm_f2": {
       "frame": {
-        "x": 960,
+        "x": 1152,
         "y": 64,
         "w": 64,
         "h": 64
@@ -962,7 +1022,7 @@
     },
     "frosthorn": {
       "frame": {
-        "x": 1024,
+        "x": 1216,
         "y": 64,
         "w": 64,
         "h": 64
@@ -982,7 +1042,7 @@
     },
     "frosthorn_back": {
       "frame": {
-        "x": 1088,
+        "x": 1280,
         "y": 64,
         "w": 64,
         "h": 64
@@ -1002,7 +1062,7 @@
     },
     "frosthorn_f2": {
       "frame": {
-        "x": 1152,
+        "x": 1344,
         "y": 64,
         "w": 64,
         "h": 64
@@ -1022,7 +1082,7 @@
     },
     "frostkit": {
       "frame": {
-        "x": 1216,
+        "x": 1408,
         "y": 64,
         "w": 64,
         "h": 64
@@ -1042,7 +1102,7 @@
     },
     "frostkit_back": {
       "frame": {
-        "x": 1280,
+        "x": 1472,
         "y": 64,
         "w": 64,
         "h": 64
@@ -1062,7 +1122,7 @@
     },
     "frostkit_f2": {
       "frame": {
-        "x": 1344,
+        "x": 1536,
         "y": 64,
         "w": 64,
         "h": 64
@@ -1082,7 +1142,7 @@
     },
     "frostmoss": {
       "frame": {
-        "x": 1408,
+        "x": 1600,
         "y": 64,
         "w": 64,
         "h": 64
@@ -1102,7 +1162,7 @@
     },
     "frostmoss_back": {
       "frame": {
-        "x": 1472,
+        "x": 1664,
         "y": 64,
         "w": 64,
         "h": 64
@@ -1122,7 +1182,7 @@
     },
     "frostmoss_f2": {
       "frame": {
-        "x": 1536,
+        "x": 1728,
         "y": 64,
         "w": 64,
         "h": 64
@@ -1142,7 +1202,7 @@
     },
     "geodeon": {
       "frame": {
-        "x": 1600,
+        "x": 1792,
         "y": 64,
         "w": 64,
         "h": 64
@@ -1162,7 +1222,7 @@
     },
     "geodeon_back": {
       "frame": {
-        "x": 1664,
+        "x": 1856,
         "y": 64,
         "w": 64,
         "h": 64
@@ -1182,7 +1242,7 @@
     },
     "geodeon_f2": {
       "frame": {
-        "x": 1728,
+        "x": 1920,
         "y": 64,
         "w": 64,
         "h": 64
@@ -1202,7 +1262,7 @@
     },
     "glacetail": {
       "frame": {
-        "x": 1792,
+        "x": 1984,
         "y": 64,
         "w": 64,
         "h": 64
@@ -1222,8 +1282,8 @@
     },
     "glacetail_back": {
       "frame": {
-        "x": 1856,
-        "y": 64,
+        "x": 0,
+        "y": 128,
         "w": 64,
         "h": 64
       },
@@ -1242,8 +1302,8 @@
     },
     "glacetail_f2": {
       "frame": {
-        "x": 1920,
-        "y": 64,
+        "x": 64,
+        "y": 128,
         "w": 64,
         "h": 64
       },
@@ -1262,8 +1322,8 @@
     },
     "glaciorex": {
       "frame": {
-        "x": 1984,
-        "y": 64,
+        "x": 128,
+        "y": 128,
         "w": 64,
         "h": 64
       },
@@ -1282,7 +1342,7 @@
     },
     "glaciorex_back": {
       "frame": {
-        "x": 0,
+        "x": 192,
         "y": 128,
         "w": 64,
         "h": 64
@@ -1302,7 +1362,7 @@
     },
     "glaciorex_f2": {
       "frame": {
-        "x": 64,
+        "x": 256,
         "y": 128,
         "w": 64,
         "h": 64
@@ -1322,7 +1382,7 @@
     },
     "grimlet": {
       "frame": {
-        "x": 128,
+        "x": 320,
         "y": 128,
         "w": 64,
         "h": 64
@@ -1342,7 +1402,7 @@
     },
     "grimlet_back": {
       "frame": {
-        "x": 192,
+        "x": 384,
         "y": 128,
         "w": 64,
         "h": 64
@@ -1362,7 +1422,7 @@
     },
     "grimlet_f2": {
       "frame": {
-        "x": 256,
+        "x": 448,
         "y": 128,
         "w": 64,
         "h": 64
@@ -1382,7 +1442,7 @@
     },
     "infernox": {
       "frame": {
-        "x": 320,
+        "x": 512,
         "y": 128,
         "w": 64,
         "h": 64
@@ -1402,7 +1462,7 @@
     },
     "infernox_back": {
       "frame": {
-        "x": 384,
+        "x": 576,
         "y": 128,
         "w": 64,
         "h": 64
@@ -1422,7 +1482,67 @@
     },
     "infernox_f2": {
       "frame": {
-        "x": 448,
+        "x": 640,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "kelpling": {
+      "frame": {
+        "x": 704,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "kelpling_back": {
+      "frame": {
+        "x": 768,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "kelpling_f2": {
+      "frame": {
+        "x": 832,
         "y": 128,
         "w": 64,
         "h": 64
@@ -1442,7 +1562,7 @@
     },
     "leafkit": {
       "frame": {
-        "x": 512,
+        "x": 896,
         "y": 128,
         "w": 64,
         "h": 64
@@ -1462,7 +1582,7 @@
     },
     "leafkit_back": {
       "frame": {
-        "x": 576,
+        "x": 960,
         "y": 128,
         "w": 64,
         "h": 64
@@ -1482,7 +1602,7 @@
     },
     "leafkit_f2": {
       "frame": {
-        "x": 640,
+        "x": 1024,
         "y": 128,
         "w": 64,
         "h": 64
@@ -1502,7 +1622,7 @@
     },
     "mindling": {
       "frame": {
-        "x": 704,
+        "x": 1088,
         "y": 128,
         "w": 64,
         "h": 64
@@ -1522,7 +1642,7 @@
     },
     "mindling_back": {
       "frame": {
-        "x": 768,
+        "x": 1152,
         "y": 128,
         "w": 64,
         "h": 64
@@ -1542,7 +1662,7 @@
     },
     "mindling_f2": {
       "frame": {
-        "x": 832,
+        "x": 1216,
         "y": 128,
         "w": 64,
         "h": 64
@@ -1562,7 +1682,7 @@
     },
     "mistral": {
       "frame": {
-        "x": 896,
+        "x": 1280,
         "y": 128,
         "w": 64,
         "h": 64
@@ -1582,7 +1702,7 @@
     },
     "mistral_back": {
       "frame": {
-        "x": 960,
+        "x": 1344,
         "y": 128,
         "w": 64,
         "h": 64
@@ -1602,7 +1722,7 @@
     },
     "mistral_f2": {
       "frame": {
-        "x": 1024,
+        "x": 1408,
         "y": 128,
         "w": 64,
         "h": 64
@@ -1622,7 +1742,7 @@
     },
     "mossling": {
       "frame": {
-        "x": 1088,
+        "x": 1472,
         "y": 128,
         "w": 64,
         "h": 64
@@ -1642,7 +1762,7 @@
     },
     "mossling_back": {
       "frame": {
-        "x": 1152,
+        "x": 1536,
         "y": 128,
         "w": 64,
         "h": 64
@@ -1662,7 +1782,67 @@
     },
     "mossling_f2": {
       "frame": {
-        "x": 1216,
+        "x": 1600,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "nightmoth": {
+      "frame": {
+        "x": 1664,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "nightmoth_back": {
+      "frame": {
+        "x": 1728,
+        "y": 128,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "nightmoth_f2": {
+      "frame": {
+        "x": 1792,
         "y": 128,
         "w": 64,
         "h": 64
@@ -1682,7 +1862,7 @@
     },
     "pebblite": {
       "frame": {
-        "x": 1280,
+        "x": 1856,
         "y": 128,
         "w": 64,
         "h": 64
@@ -1702,7 +1882,7 @@
     },
     "pebblite_back": {
       "frame": {
-        "x": 1344,
+        "x": 1920,
         "y": 128,
         "w": 64,
         "h": 64
@@ -1722,7 +1902,7 @@
     },
     "pebblite_f2": {
       "frame": {
-        "x": 1408,
+        "x": 1984,
         "y": 128,
         "w": 64,
         "h": 64
@@ -1742,186 +1922,6 @@
     },
     "psyknight": {
       "frame": {
-        "x": 1472,
-        "y": 128,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "psyknight_back": {
-      "frame": {
-        "x": 1536,
-        "y": 128,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "psyknight_f2": {
-      "frame": {
-        "x": 1600,
-        "y": 128,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "rockord": {
-      "frame": {
-        "x": 1664,
-        "y": 128,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "rockord_back": {
-      "frame": {
-        "x": 1728,
-        "y": 128,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "rockord_f2": {
-      "frame": {
-        "x": 1792,
-        "y": 128,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "shadeling": {
-      "frame": {
-        "x": 1856,
-        "y": 128,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "shadeling_back": {
-      "frame": {
-        "x": 1920,
-        "y": 128,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "shadeling_f2": {
-      "frame": {
-        "x": 1984,
-        "y": 128,
-        "w": 64,
-        "h": 64
-      },
-      "rotated": false,
-      "trimmed": false,
-      "spriteSourceSize": {
-        "x": 0,
-        "y": 0,
-        "w": 64,
-        "h": 64
-      },
-      "sourceSize": {
-        "w": 64,
-        "h": 64
-      }
-    },
-    "shadespecter": {
-      "frame": {
         "x": 0,
         "y": 192,
         "w": 64,
@@ -1940,7 +1940,7 @@
         "h": 64
       }
     },
-    "shadespecter_back": {
+    "psyknight_back": {
       "frame": {
         "x": 64,
         "y": 192,
@@ -1960,7 +1960,7 @@
         "h": 64
       }
     },
-    "shadespecter_f2": {
+    "psyknight_f2": {
       "frame": {
         "x": 128,
         "y": 192,
@@ -1980,7 +1980,7 @@
         "h": 64
       }
     },
-    "snowpuff": {
+    "reefguard": {
       "frame": {
         "x": 192,
         "y": 192,
@@ -2000,7 +2000,7 @@
         "h": 64
       }
     },
-    "snowpuff_back": {
+    "reefguard_back": {
       "frame": {
         "x": 256,
         "y": 192,
@@ -2020,7 +2020,7 @@
         "h": 64
       }
     },
-    "snowpuff_f2": {
+    "reefguard_f2": {
       "frame": {
         "x": 320,
         "y": 192,
@@ -2040,7 +2040,7 @@
         "h": 64
       }
     },
-    "somnara": {
+    "rockord": {
       "frame": {
         "x": 384,
         "y": 192,
@@ -2060,7 +2060,7 @@
         "h": 64
       }
     },
-    "somnara_back": {
+    "rockord_back": {
       "frame": {
         "x": 448,
         "y": 192,
@@ -2080,7 +2080,7 @@
         "h": 64
       }
     },
-    "somnara_f2": {
+    "rockord_f2": {
       "frame": {
         "x": 512,
         "y": 192,
@@ -2100,7 +2100,7 @@
         "h": 64
       }
     },
-    "sparkbit": {
+    "shadeling": {
       "frame": {
         "x": 576,
         "y": 192,
@@ -2120,7 +2120,7 @@
         "h": 64
       }
     },
-    "sparkbit_back": {
+    "shadeling_back": {
       "frame": {
         "x": 640,
         "y": 192,
@@ -2140,7 +2140,7 @@
         "h": 64
       }
     },
-    "sparkbit_f2": {
+    "shadeling_f2": {
       "frame": {
         "x": 704,
         "y": 192,
@@ -2160,7 +2160,7 @@
         "h": 64
       }
     },
-    "thornbeast": {
+    "shadespecter": {
       "frame": {
         "x": 768,
         "y": 192,
@@ -2180,7 +2180,7 @@
         "h": 64
       }
     },
-    "thornbeast_back": {
+    "shadespecter_back": {
       "frame": {
         "x": 832,
         "y": 192,
@@ -2200,7 +2200,7 @@
         "h": 64
       }
     },
-    "thornbeast_f2": {
+    "shadespecter_f2": {
       "frame": {
         "x": 896,
         "y": 192,
@@ -2220,7 +2220,7 @@
         "h": 64
       }
     },
-    "thornling": {
+    "snowpuff": {
       "frame": {
         "x": 960,
         "y": 192,
@@ -2240,7 +2240,7 @@
         "h": 64
       }
     },
-    "thornling_back": {
+    "snowpuff_back": {
       "frame": {
         "x": 1024,
         "y": 192,
@@ -2260,7 +2260,7 @@
         "h": 64
       }
     },
-    "thornling_f2": {
+    "snowpuff_f2": {
       "frame": {
         "x": 1088,
         "y": 192,
@@ -2280,7 +2280,7 @@
         "h": 64
       }
     },
-    "tidefin": {
+    "somnara": {
       "frame": {
         "x": 1152,
         "y": 192,
@@ -2300,7 +2300,7 @@
         "h": 64
       }
     },
-    "tidefin_back": {
+    "somnara_back": {
       "frame": {
         "x": 1216,
         "y": 192,
@@ -2320,7 +2320,7 @@
         "h": 64
       }
     },
-    "tidefin_f2": {
+    "somnara_f2": {
       "frame": {
         "x": 1280,
         "y": 192,
@@ -2340,7 +2340,7 @@
         "h": 64
       }
     },
-    "tidewisp": {
+    "sparkbit": {
       "frame": {
         "x": 1344,
         "y": 192,
@@ -2360,7 +2360,7 @@
         "h": 64
       }
     },
-    "tidewisp_back": {
+    "sparkbit_back": {
       "frame": {
         "x": 1408,
         "y": 192,
@@ -2380,7 +2380,7 @@
         "h": 64
       }
     },
-    "tidewisp_f2": {
+    "sparkbit_f2": {
       "frame": {
         "x": 1472,
         "y": 192,
@@ -2400,7 +2400,7 @@
         "h": 64
       }
     },
-    "vineclaw": {
+    "stormhorn": {
       "frame": {
         "x": 1536,
         "y": 192,
@@ -2420,7 +2420,7 @@
         "h": 64
       }
     },
-    "vineclaw_back": {
+    "stormhorn_back": {
       "frame": {
         "x": 1600,
         "y": 192,
@@ -2440,7 +2440,7 @@
         "h": 64
       }
     },
-    "vineclaw_f2": {
+    "stormhorn_f2": {
       "frame": {
         "x": 1664,
         "y": 192,
@@ -2460,7 +2460,7 @@
         "h": 64
       }
     },
-    "voidseer": {
+    "thornbeast": {
       "frame": {
         "x": 1728,
         "y": 192,
@@ -2480,7 +2480,7 @@
         "h": 64
       }
     },
-    "voidseer_back": {
+    "thornbeast_back": {
       "frame": {
         "x": 1792,
         "y": 192,
@@ -2500,7 +2500,7 @@
         "h": 64
       }
     },
-    "voidseer_f2": {
+    "thornbeast_f2": {
       "frame": {
         "x": 1856,
         "y": 192,
@@ -2520,7 +2520,7 @@
         "h": 64
       }
     },
-    "voltite": {
+    "thornling": {
       "frame": {
         "x": 1920,
         "y": 192,
@@ -2540,7 +2540,7 @@
         "h": 64
       }
     },
-    "voltite_back": {
+    "thornling_back": {
       "frame": {
         "x": 1984,
         "y": 192,
@@ -2560,7 +2560,7 @@
         "h": 64
       }
     },
-    "voltite_f2": {
+    "thornling_f2": {
       "frame": {
         "x": 0,
         "y": 256,
@@ -2580,7 +2580,7 @@
         "h": 64
       }
     },
-    "voltwing": {
+    "tidefin": {
       "frame": {
         "x": 64,
         "y": 256,
@@ -2600,7 +2600,7 @@
         "h": 64
       }
     },
-    "voltwing_back": {
+    "tidefin_back": {
       "frame": {
         "x": 128,
         "y": 256,
@@ -2620,7 +2620,7 @@
         "h": 64
       }
     },
-    "voltwing_f2": {
+    "tidefin_f2": {
       "frame": {
         "x": 192,
         "y": 256,
@@ -2640,7 +2640,7 @@
         "h": 64
       }
     },
-    "zenolith": {
+    "tidewisp": {
       "frame": {
         "x": 256,
         "y": 256,
@@ -2660,7 +2660,7 @@
         "h": 64
       }
     },
-    "zenolith_back": {
+    "tidewisp_back": {
       "frame": {
         "x": 320,
         "y": 256,
@@ -2680,9 +2680,309 @@
         "h": 64
       }
     },
-    "zenolith_f2": {
+    "tidewisp_f2": {
       "frame": {
         "x": 384,
+        "y": 256,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "vineclaw": {
+      "frame": {
+        "x": 448,
+        "y": 256,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "vineclaw_back": {
+      "frame": {
+        "x": 512,
+        "y": 256,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "vineclaw_f2": {
+      "frame": {
+        "x": 576,
+        "y": 256,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "voidseer": {
+      "frame": {
+        "x": 640,
+        "y": 256,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "voidseer_back": {
+      "frame": {
+        "x": 704,
+        "y": 256,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "voidseer_f2": {
+      "frame": {
+        "x": 768,
+        "y": 256,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "voltite": {
+      "frame": {
+        "x": 832,
+        "y": 256,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "voltite_back": {
+      "frame": {
+        "x": 896,
+        "y": 256,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "voltite_f2": {
+      "frame": {
+        "x": 960,
+        "y": 256,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "voltwing": {
+      "frame": {
+        "x": 1024,
+        "y": 256,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "voltwing_back": {
+      "frame": {
+        "x": 1088,
+        "y": 256,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "voltwing_f2": {
+      "frame": {
+        "x": 1152,
+        "y": 256,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "zenolith": {
+      "frame": {
+        "x": 1216,
+        "y": 256,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "zenolith_back": {
+      "frame": {
+        "x": 1280,
+        "y": 256,
+        "w": 64,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 64
+      }
+    },
+    "zenolith_f2": {
+      "frame": {
+        "x": 1344,
         "y": 256,
         "w": 64,
         "h": 64

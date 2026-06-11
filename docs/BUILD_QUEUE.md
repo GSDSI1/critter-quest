@@ -28,6 +28,7 @@ Last updated: 2026-06-09 (graphics sprint). Source: `GAMEPLAN.md`.
 | **Opt** | Kenney import workflow (`npm run import-tileset`) | ✓ |
 | **Opt** | Touch menu nav + wipe transitions | ✓ |
 | **Opt** | Battle/shop/PC/fast-travel touch nav + fly wipe | ✓ |
+| **Opt** | 50 species + 4 moves + kelpling line + city atmosphere + NPC art v2 | ✓ |
 
 ## Optional polish (future)
 
