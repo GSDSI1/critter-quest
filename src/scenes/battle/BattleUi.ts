@@ -279,7 +279,11 @@ export class BattleUi {
       this.scene.add.image(x + 8, y + 15, `type_${move.type}`).setOrigin(0, 0.5).setScale(0.7);
       const label = this.scene.add.text(x + 28, y + 6, `${move.name}  ${m.pp}/${m.maxPp}`, {
         fontFamily: FONT, fontSize: '11px', color: i === this.host.moveIndex ? '#f5c542' : '#f0f0f0',
-      }).setInteractive({ useHandCursor: true });
+      }).setOrigin(0, 0).setInteractive({
+        useHandCursor: true,
+        hitArea: new Phaser.Geom.Rectangle(0, 0, 240, 28),
+        hitAreaCallback: Phaser.Geom.Rectangle.Contains,
+      });
       label.on('pointerdown', () => { this.host.moveIndex = i; this.host.useMove(i); });
       this.moveContainer.add([bg, label]);
     });
@@ -302,7 +306,11 @@ export class BattleUi {
       bg.fillRoundedRect(32, y, 300, 24, 4);
       const label = this.scene.add.text(40, y + 4, `${i === this.host.bagIndex ? '▶ ' : ''}${item.name} x${GameState.player.items[id]}`, {
         fontFamily: FONT, fontSize: '11px', color: i === this.host.bagIndex ? '#f5c542' : '#f0f0f0',
-      }).setInteractive({ useHandCursor: true });
+      }).setInteractive({
+        useHandCursor: true,
+        hitArea: new Phaser.Geom.Rectangle(0, 0, 280, 22),
+        hitAreaCallback: Phaser.Geom.Rectangle.Contains,
+      });
       label.on('pointerdown', () => { this.host.bagIndex = i; this.host.useBagItem(id); });
       this.bagContainer.add([bg, label]);
     });

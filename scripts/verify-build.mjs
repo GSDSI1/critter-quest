@@ -309,6 +309,8 @@ else fail('OverworldScene missing atmosphere layers');
 
 if (existsSync(join(root, 'src/ui/touchMenuNav.ts'))) ok('Touch menu navigation');
 else fail('touchMenuNav.ts missing');
+if (battleScene.includes('TouchMenuNav')) ok('Battle touch menu nav');
+else fail('BattleScene missing touch nav');
 
 if (existsSync(join(root, 'scripts/import-kenney-tileset.mjs'))) ok('Kenney tileset import script');
 else fail('import-kenney-tileset.mjs missing');

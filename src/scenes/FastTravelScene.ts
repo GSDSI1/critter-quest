@@ -7,11 +7,13 @@ import { buildScreenOverlay, buildMenuPanel } from '../ui/sceneBackdrops';
 import { Input } from '../systems/input';
 import { Sfx } from '../utils/audio';
 import { HEAL_RETURN_SPAWN, listFastTravelDestinations } from '../systems/healTravel';
-import { fadeToScene } from '../ui/transitions';
+import { wipeToScene } from '../ui/transitions';
+import { TouchMenuNav } from '../ui/touchMenuNav';
 
 export class FastTravelScene extends Phaser.Scene {
   private selected = 0;
   private destinations: { id: string; label: string }[] = [];
+  private touchNav?: TouchMenuNav;
 
   constructor() {
     super('FastTravel');
@@ -32,6 +34,18 @@ export class FastTravelScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     this.renderList();
+    this.touchNav = new TouchMenuNav(this, {
+      onUp: () => {
+        const max = this.destinations.length;
+        if (max) { this.selected = (this.selected - 1 + max) % max; this.renderList(); }
+      },
+      onDown: () => {
+        const max = this.destinations.length;
+        if (max) { this.selected = (this.selected + 1) % max; this.renderList(); }
+      },
+      onConfirm: () => this.travel(),
+      onCancel: () => this.close(),
+    });
   }
 
   update(): void {
@@ -85,7 +99,7 @@ export class FastTravelScene extends Phaser.Scene {
     trySave(this);
     this.scene.stop('PauseMenu');
     this.scene.stop();
-    fadeToScene(this, 'Overworld', undefined, 300);
+    wipeToScene(this, 'Overworld', { _wipeIn: true }, 'left', 320);
   }
 
   private close(): void {

@@ -7,11 +7,13 @@ import { trySave } from '../utils/saveFeedback';
 import { buildMartInterior, buildScreenOverlay, buildMenuPanel } from '../ui/sceneBackdrops';
 import { Input } from '../systems/input';
 import { Sfx } from '../utils/audio';
+import { TouchMenuNav } from '../ui/touchMenuNav';
 
 export class ShopScene extends Phaser.Scene {
   private selected = 0;
   private mode: 'buy' | 'sell' = 'buy';
   private returnMap = 'town';
+  private touchNav?: TouchMenuNav;
 
   constructor() {
     super('Shop');
@@ -43,6 +45,13 @@ export class ShopScene extends Phaser.Scene {
     this.input.keyboard?.on('keydown-DOWN', () => { this.selected = Math.min(SHOP_STOCK.length - 1, this.selected + 1); this.renderList(); });
     this.input.keyboard?.on('keydown-Z', () => this.buy());
     this.input.keyboard?.on('keydown-ESC', () => this.leave());
+
+    this.touchNav = new TouchMenuNav(this, {
+      onUp: () => { this.selected = Math.max(0, this.selected - 1); this.renderList(); },
+      onDown: () => { this.selected = Math.min(SHOP_STOCK.length - 1, this.selected + 1); this.renderList(); },
+      onConfirm: () => this.buy(),
+      onCancel: () => this.leave(),
+    });
   }
 
   update(): void {

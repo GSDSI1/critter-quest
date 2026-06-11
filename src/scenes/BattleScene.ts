@@ -12,7 +12,8 @@ import {
 import { addToParty } from '../systems/save';
 import { trySave } from '../utils/saveFeedback';
 import { preloadCreatureTextures } from '../utils/assetLoader';
-import { startWithFadeIn } from '../ui/transitions';
+import { fadeInOnStart, startWithFadeIn } from '../ui/transitions';
+import { TouchMenuNav } from '../ui/touchMenuNav';
 import { buildBattleArena } from '../ui/sceneBackdrops';
 import { Sfx } from '../utils/audio';
 import { startMusic, stopMusic } from '../utils/music';
@@ -51,6 +52,7 @@ export class BattleScene extends Phaser.Scene implements BattleUiHost, BattleFlo
   battleAnims!: BattleAnims;
   private flow!: BattleFlow;
   private messageAutoTimer?: Phaser.Time.TimerEvent;
+  private touchNav?: TouchMenuNav;
 
   constructor() {
     super('Battle');
@@ -65,7 +67,9 @@ export class BattleScene extends Phaser.Scene implements BattleUiHost, BattleFlo
     badge?: string;
     isRematch?: boolean;
     mapId?: string;
+    _fadeIn?: boolean;
   }): void {
+    fadeInOnStart(this, data, 320);
     void this.initBattle(data);
   }
 
@@ -115,6 +119,17 @@ export class BattleScene extends Phaser.Scene implements BattleUiHost, BattleFlo
     buildBattleArena(this, this.mapId);
     this.ui.build();
     Input.bind(this);
+    this.touchNav = new TouchMenuNav(this, {
+      onUp: () => this.ui.onNav(this.phase, -1, 0),
+      onDown: () => this.ui.onNav(this.phase, 1, 0),
+      onConfirm: () => this.onConfirm(),
+      onCancel: () => {
+        if (this.phase === 'moves' || this.phase === 'bag') {
+          this.phase = 'menu';
+          this.ui.returnToMenu();
+        }
+      },
+    });
     this.ui.syncEnemyUi(false);
     registerSeen(GameState.player.dexSeen, this.wild.speciesId);
 
@@ -145,6 +160,7 @@ export class BattleScene extends Phaser.Scene implements BattleUiHost, BattleFlo
   update(): void {
     Input.update();
     this.ui.setContinueVisible(this.phase);
+    this.touchNav?.setVisible(['menu', 'moves', 'bag'].includes(this.phase));
     if (Input.justPressed('up')) this.ui.onNav(this.phase, -1, 0);
     if (Input.justPressed('down')) this.ui.onNav(this.phase, 1, 0);
     if (Input.justPressed('left')) this.ui.onNav(this.phase, 0, -1);

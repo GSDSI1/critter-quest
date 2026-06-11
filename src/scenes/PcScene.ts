@@ -9,10 +9,12 @@ import { drawHpBar } from '../ui/HUD';
 import { addCreatureImage } from '../utils/assetLoader';
 import { buildScreenOverlay, buildMenuPanel } from '../ui/sceneBackdrops';
 import { Input } from '../systems/input';
+import { TouchMenuNav } from '../ui/touchMenuNav';
 
 export class PcScene extends Phaser.Scene {
   private mode: 'party' | 'storage' = 'party';
   private selected = 0;
+  private touchNav?: TouchMenuNav;
 
   constructor() {
     super('PC');
@@ -32,6 +34,12 @@ export class PcScene extends Phaser.Scene {
     });
 
     this.render();
+    this.touchNav = new TouchMenuNav(this, {
+      onUp: () => { this.selected = Math.max(0, this.selected - 1); this.render(); },
+      onDown: () => { this.selected = Math.min(Math.max(0, this.list().length - 1), this.selected + 1); this.render(); },
+      onConfirm: () => this.action(),
+      onCancel: () => { this.scene.stop(); this.scene.resume('Overworld'); },
+    });
   }
 
   update(): void {

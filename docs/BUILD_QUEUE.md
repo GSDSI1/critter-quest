@@ -27,6 +27,7 @@ Last updated: 2026-06-09 (graphics sprint). Source: `GAMEPLAN.md`.
 | **Opt** | Overworld sky parallax + heal interior + tile night tint | ✓ |
 | **Opt** | Kenney import workflow (`npm run import-tileset`) | ✓ |
 | **Opt** | Touch menu nav + wipe transitions | ✓ |
+| **Opt** | Battle/shop/PC/fast-travel touch nav + fly wipe | ✓ |
 
 ## Optional polish (future)
 

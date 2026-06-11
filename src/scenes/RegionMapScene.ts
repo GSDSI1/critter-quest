@@ -8,8 +8,11 @@ import { buildScreenOverlay, buildMenuPanel } from '../ui/sceneBackdrops';
 import { Input } from '../systems/input';
 import { Sfx } from '../utils/audio';
 import { REGION_NODES, REGION_LINKS } from '../data/regionMap';
+import { TouchMenuNav } from '../ui/touchMenuNav';
 
 export class RegionMapScene extends Phaser.Scene {
+  private touchNav?: TouchMenuNav;
+
   constructor() {
     super('RegionMap');
   }
@@ -61,6 +64,13 @@ export class RegionMapScene extends Phaser.Scene {
     this.add.text(GAME_WIDTH / 2, 420, 'Press B / ESC to close', {
       fontFamily: FONT, fontSize: '11px', color: '#8899aa',
     }).setOrigin(0.5);
+
+    this.touchNav = new TouchMenuNav(this, {
+      onUp: () => {},
+      onDown: () => {},
+      onConfirm: () => this.close(),
+      onCancel: () => this.close(),
+    });
   }
 
   update(): void {
