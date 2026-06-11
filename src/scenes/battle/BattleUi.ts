@@ -15,7 +15,7 @@ import {
 } from '../../systems/evolution';
 import { getBattleUsableItems, useItemOnCritter } from '../../systems/items';
 import {
-  GameState, type CritterInstance, displayName, expProgress, isFainted, addExp, registerCaught, registerSeen,
+  GameState, type CritterInstance, displayName, expProgress, isFainted, addExp, registerSeen,
 } from '../../systems/stats';
 import { trySave } from '../../utils/saveFeedback';
 import { addCreatureImage, applyCreatureTexture, startCritterIdle, type CritterIdleHandle } from '../../utils/assetLoader';

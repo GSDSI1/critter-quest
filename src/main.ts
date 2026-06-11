@@ -57,6 +57,7 @@ declare global {
       };
       teleport: (mapId: string, x: number, y: number, facing?: 'up' | 'down' | 'left' | 'right') => void;
       startNewGame: () => void;
+      skipToMenu: () => void;
       menuContinue: () => void;
       confirmCharacter: () => void;
       startStarterSelect: () => void;
@@ -108,6 +109,9 @@ if (import.meta.env.DEV) {
     startNewGame() {
       GameState.reset();
       game.scene.start('CharacterSelect');
+    },
+    skipToMenu() {
+      game.scene.start('Menu');
     },
     menuContinue() {
       game.scene.start('Overworld');

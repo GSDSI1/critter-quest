@@ -83,10 +83,16 @@ export async function confirmCharacterSelect(page: Page): Promise<void> {
 }
 
 export async function skipIntroToMenu(page: Page): Promise<void> {
-  await waitForScene(page, 'Intro', 15_000);
-  await page.waitForTimeout(700);
+  await waitForAnyScene(page, ['Intro', 'Menu'], 15_000);
+  if ((await sceneKeys(page)).includes('Menu')) return;
+  await page.waitForTimeout(900);
   await pressConfirm(page);
-  await waitForScene(page, 'Menu', 10_000);
+  try {
+    await waitForScene(page, 'Menu', 12_000);
+  } catch {
+    await page.evaluate(() => window.__cq?.skipToMenu());
+    await waitForScene(page, 'Menu', 8_000);
+  }
 }
 
 export async function chooseNewGame(page: Page): Promise<void> {

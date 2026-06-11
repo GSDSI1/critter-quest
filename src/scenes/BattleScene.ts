@@ -7,8 +7,9 @@ import { evolutionMessage } from '../systems/evolution';
 import { getBattleUsableItems } from '../systems/items';
 import {
   GameState, type CritterInstance, displayName, firstAlive,
-  isFainted, healParty, registerSeen, registerCaught, addExp,
+  isFainted, healParty, registerSeen, addExp,
 } from '../systems/stats';
+import { registerCaughtWithMilestone } from '../systems/dexNotify';
 import { addToParty } from '../systems/save';
 import { trySave } from '../utils/saveFeedback';
 import { preloadCreatureTextures } from '../utils/assetLoader';
@@ -290,7 +291,7 @@ export class BattleScene extends Phaser.Scene implements BattleUiHost, BattleFlo
     }
     if (outcome === 'catch') {
       if (this.isTrainer) return;
-      registerCaught(GameState.player.dexCaught, this.wild.speciesId, GameState.player.dexSeen);
+      registerCaughtWithMilestone(GameState.player, this.wild.speciesId, this);
       if (GameState.player.party.length < 6) addToParty(this.wild);
       else GameState.player.storage.push(this.wild);
       trySave(this);

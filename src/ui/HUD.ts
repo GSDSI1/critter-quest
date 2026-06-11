@@ -4,6 +4,7 @@ import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../data/types';
 import { getBadge } from '../data/badges';
 import { totalOrbs } from '../data/items';
 import { GameState } from '../systems/stats';
+import { isNight } from '../systems/dayNight';
 import { pinContainerChildren } from './screenUi';
 
 export class OverworldHUD {
@@ -14,6 +15,7 @@ export class OverworldHUD {
   private badgeText!: Phaser.GameObjects.Text;
   private hintsText!: Phaser.GameObjects.Text;
   private moveHintText!: Phaser.GameObjects.Text;
+  private timeText!: Phaser.GameObjects.Text;
 
   constructor(scene: Phaser.Scene) {
     this.container = scene.add.container(0, 0).setDepth(900);
@@ -21,9 +23,9 @@ export class OverworldHUD {
 
     const bg = scene.add.graphics();
     bg.fillStyle(0x000000, 0.55);
-    bg.fillRoundedRect(8, 8, 224, 72, 8);
+    bg.fillRoundedRect(8, 8, 224, 86, 8);
     bg.lineStyle(1, COLORS.gold, 0.6);
-    bg.strokeRoundedRect(8, 8, 224, 72, 8);
+    bg.strokeRoundedRect(8, 8, 224, 86, 8);
 
     this.mapText = scene.add.text(16, 12, '', {
       fontFamily: FONT, fontSize: '11px', color: '#f5c542',
@@ -41,6 +43,10 @@ export class OverworldHUD {
       fontFamily: FONT, fontSize: '10px', color: '#8899aa',
     });
 
+    this.timeText = scene.add.text(16, 70, '', {
+      fontFamily: FONT, fontSize: '10px', color: '#8899aa',
+    });
+
     this.hintsText = scene.add.text(GAME_WIDTH - 140, 12, '[P] Menu  [X] Party', {
       fontFamily: FONT, fontSize: '10px', color: '#8899aa',
     });
@@ -49,7 +55,7 @@ export class OverworldHUD {
       fontFamily: FONT, fontSize: '9px', color: '#667788',
     }).setOrigin(0.5);
 
-    this.container.add([bg, this.mapText, this.moneyText, this.orbText, this.badgeText, this.hintsText, this.moveHintText]);
+    this.container.add([bg, this.mapText, this.moneyText, this.orbText, this.badgeText, this.timeText, this.hintsText, this.moveHintText]);
     this.refresh('');
   }
 
@@ -60,6 +66,17 @@ export class OverworldHUD {
     this.orbText.setText(`Orbs: ${totalOrbs(p.items)}`);
     const badges = p.badges.map(b => getBadge(b).name.split(' ')[0][0]).join('');
     this.badgeText.setText(badges ? `Badges: ${badges}` : '');
+  }
+
+  updateTimeOfDay(playTimeSec: number, outdoor: boolean): void {
+    if (!outdoor) {
+      this.timeText.setVisible(false);
+      return;
+    }
+    this.timeText.setVisible(true);
+    const night = isNight(playTimeSec);
+    this.timeText.setText(night ? '☾ Night' : '☀ Day');
+    this.timeText.setColor(night ? '#a5b4fc' : '#fbbf24');
   }
 
   setTouchHints(touch: boolean): void {

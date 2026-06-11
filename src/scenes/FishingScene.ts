@@ -7,7 +7,8 @@ import { trySave } from '../utils/saveFeedback';
 import { Sfx } from '../utils/audio';
 import { buildMinigameShell } from '../ui/minigameShell';
 import { pickWildFromTable } from '../data/encounters';
-import { createCritter, registerSeen, registerCaught } from '../systems/stats';
+import { createCritter, registerSeen } from '../systems/stats';
+import { registerCaughtWithMilestone } from '../systems/dexNotify';
 import { addItem } from '../data/items';
 import { DialogBox } from '../ui/DialogBox';
 
@@ -117,7 +118,7 @@ export class FishingScene extends Phaser.Scene {
       if (GameState.player.party.length < 6) GameState.player.party.push(c);
       else GameState.player.storage.push(c);
       registerSeen(GameState.player.dexSeen, def.id);
-      registerCaught(GameState.player.dexCaught, def.id, GameState.player.dexSeen);
+      registerCaughtWithMilestone(GameState.player, def.id, this);
       lines.push(`Great catch! You reeled in ${def.name} (Lv.${level})!`);
     } else if (this.hits === 1) {
       addItem(GameState.player.items, 'potion', 1);

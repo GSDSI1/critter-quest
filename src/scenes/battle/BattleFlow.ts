@@ -13,8 +13,10 @@ import {
 } from '../../systems/evolution';
 import { useItemOnCritter } from '../../systems/items';
 import {
-  GameState, type CritterInstance, displayName, isFainted, addExp, registerCaught, registerSeen,
+  GameState, type CritterInstance, displayName, isFainted, addExp, registerSeen,
 } from '../../systems/stats';
+import { registerCaughtWithMilestone } from '../../systems/dexNotify';
+import type { BattleScene } from '../BattleScene';
 import { trySave } from '../../utils/saveFeedback';
 import { Sfx } from '../../utils/audio';
 import type { BattlePhase } from './BattleUi';
@@ -186,7 +188,7 @@ export class BattleFlow {
     this.host.phase = 'message';
     this.host.showNextMessage();
     this.host.battleAnims.playCapture(shakes, caught, () => {
-      registerCaught(GameState.player.dexCaught, this.host.wild.speciesId, GameState.player.dexSeen);
+      registerCaughtWithMilestone(GameState.player, this.host.wild.speciesId, this.host as BattleScene);
       this.host.promptNickname(this.host.wild);
     }, () => {
       this.host.time.delayedCall(400, () => { this.host.phase = 'menu'; this.host.ui.showMenu(); });
@@ -272,7 +274,7 @@ export class BattleFlow {
       this.host.ui.refreshPlayerSprite(to);
       this.host.ui.playerSprite.setAlpha(1);
       this.host.battleAnims.evolutionFlash(1);
-      registerCaught(GameState.player.dexCaught, to, GameState.player.dexSeen);
+      registerCaughtWithMilestone(GameState.player, to, this.host as BattleScene);
       const b = getCreature(to).baseStats;
       this.host.ui.queueMessage(`It evolved into ${getCreature(to).name}!`);
       this.host.ui.queueMessage(`Base stats — HP:${b.hp} ATK:${b.atk} DEF:${b.def} SPA:${b.spa} SPD:${b.spd} SPE:${b.spe}`);

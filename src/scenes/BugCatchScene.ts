@@ -5,7 +5,8 @@ import { trySave } from '../utils/saveFeedback';
 import { Sfx } from '../utils/audio';
 import { buildMinigameShell } from '../ui/minigameShell';
 import { addItem } from '../data/items';
-import { createCritter, registerSeen, registerCaught } from '../systems/stats';
+import { createCritter, registerSeen } from '../systems/stats';
+import { registerCaughtWithMilestone } from '../systems/dexNotify';
 import { DialogBox } from '../ui/DialogBox';
 import { GAME_WIDTH, GAME_HEIGHT } from '../data/types';
 
@@ -113,7 +114,7 @@ export class BugCatchScene extends Phaser.Scene {
       if (GameState.player.party.length < 6) GameState.player.party.push(c);
       else GameState.player.storage.push(c);
       registerSeen(GameState.player.dexSeen, 'nightmoth');
-      registerCaught(GameState.player.dexCaught, 'nightmoth', GameState.player.dexSeen);
+      registerCaughtWithMilestone(GameState.player, 'nightmoth', this);
       lines.push('Amazing! Great Orb + Nightmoth!');
     } else if (this.score >= 20) {
       addItem(GameState.player.items, 'oran_berry', 3);

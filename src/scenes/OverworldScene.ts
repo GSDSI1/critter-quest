@@ -53,6 +53,7 @@ export class OverworldScene extends Phaser.Scene {
   private walkBypassLock = false;
   private walkQueue: TileCoord[] = [];
   private walkTarget: TileCoord | null = null;
+  private introActive = false;
   private walkMarker?: Phaser.GameObjects.Graphics;
 
   constructor() {
@@ -137,22 +138,20 @@ export class OverworldScene extends Phaser.Scene {
     this.npcManager.spawnSigns(this.map);
 
     if (data.showIntro && !GameState.player.storyFlags.saw_controls) {
-      this.inputLocked = true;
-      GameState.player.storyFlags.saw_controls = true;
-      trySave(this);
-      this.syncTouchPadModal();
-      this.dialog.show([
+      this.startIntro([
         'Welcome to Verdant Town!',
-        'Tap anywhere or press Z to continue.',
-        'Tap the map or D-pad to move. Walk in tall grass for wild critters!',
-      ], () => { this.inputLocked = false; this.syncTouchPadModal(); });
+        'Tap the map or D-pad to walk. Tall grass has wild critters.',
+        'Press B / X to skip tips.',
+      ], () => {
+        GameState.player.storyFlags.saw_controls = true;
+        trySave(this);
+      });
     } else if (data.showIntro) {
-      this.inputLocked = true;
-      this.dialog.show([
-        'Welcome to Verdant Town!',
-        'Tap the map or D-pad to move. Tall grass hides wild critters.',
-        'Hold Shift or L1 to run after beating Kai.',
-      ], () => { this.inputLocked = false; this.syncTouchPadModal(); });
+      this.startIntro([
+        'Welcome back to Verdant Town!',
+        'Tap the map or D-pad to move. Hold Shift or L1 to run after beating Kai.',
+        'Press B / X to skip.',
+      ]);
     }
 
     if (data.blackout) {
@@ -296,6 +295,23 @@ export class OverworldScene extends Phaser.Scene {
     this.setWalkDestination(action.tx, action.ty);
   }
 
+  private startIntro(lines: string[], onFirstComplete?: () => void): void {
+    this.inputLocked = true;
+    this.introActive = true;
+    this.syncTouchPadModal();
+    this.dialog.show(lines, () => {
+      this.introActive = false;
+      this.inputLocked = false;
+      onFirstComplete?.();
+      this.syncTouchPadModal();
+    });
+  }
+
+  private skipIntro(): void {
+    this.introActive = false;
+    this.dialog.skip();
+  }
+
   private syncTouchPadModal(): void {
     const hidePad = this.controlsPanel.isShowing();
     this.touchPad?.setVisible(!hidePad && shouldShowOverworldTouchPad());
@@ -304,10 +320,11 @@ export class OverworldScene extends Phaser.Scene {
   private updateInputHint(): void {
     const show = this.inputLocked || this.dialog.isShowing() || this.controlsPanel.isShowing();
     if (show) {
+      const skip = this.introActive ? ' · B/X skip' : '';
       this.inputHint.setText(
         this.controlsPanel.isShowing()
-          ? 'Tap Next or press Z to continue'
-          : 'Tap Next or press Z to continue',
+          ? `Tap Next or press Z to continue${skip}`
+          : `Tap Next or press Z to continue${skip}`,
       );
       this.inputHint.setVisible(true);
     } else {
@@ -332,9 +349,15 @@ export class OverworldScene extends Phaser.Scene {
       return;
     }
 
+    if (this.walkBypassLock && this.walkQueue.length > 0 && !this.moving && !this.scene.isPaused()) {
+      this.processWalkQueue();
+    }
+
     if (this.dialog.isShowing()) {
       this.syncTouchPadModal();
-      if (Input.justPressed('confirm') || Input.justPressed('cancel')) {
+      if (this.introActive && Input.justPressed('cancel')) {
+        this.skipIntro();
+      } else if (Input.justPressed('confirm') || Input.justPressed('cancel')) {
         this.clearWalkPath();
         this.dialog.advance();
       }
@@ -361,6 +384,17 @@ export class OverworldScene extends Phaser.Scene {
 
     if (!blocked && this.walkQueue.length > 0 && !this.moving) {
       this.processWalkQueue();
+    }
+
+    if (!blocked && this.pointerHold === 'walk' && this.input.activePointer.isDown) {
+      this.pointerStepCooldown -= delta;
+      if (this.pointerStepCooldown <= 0) {
+        this.pointerStepCooldown = this.moveDuration;
+        if (this.walkQueue.length === 0) {
+          const action = resolveOverworldPointer(this, this.input.activePointer);
+          if (action?.type === 'walk') this.setWalkDestination(action.tx, action.ty);
+        }
+      }
     }
 
     if (blocked) return;
@@ -403,6 +437,7 @@ export class OverworldScene extends Phaser.Scene {
     if (outdoor) {
       this.mapRenderer.setDayNightTint(tileNightTint(GameState.player.playTime));
     }
+    this.hud.updateTimeOfDay(GameState.player.playTime, outdoor);
     this.forestFireflies?.update(GameState.player.playTime);
   }
 

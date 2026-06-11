@@ -1,6 +1,8 @@
 # Critter Quest — Improvement Gameplan (Cursor-Ready)
 
-Audit date: 2026-06-10 · Repo: github.com/GSDSI1/critter-quest · Phaser 3.88 + TS strict + Vite 6
+Audit date: 2026-06-11 · Repo: github.com/GSDSI1/critter-quest · Phaser 3.88 + TS strict + Vite 6
+
+**Current snapshot:** 87 species · 25 maps · 4 gyms + Victory Road · 3 minigames (fishing, bug catch, contest) · 49 unit tests · 10+ e2e specs · ~100 verify checks. See `docs/BUILD_QUEUE.md` for live counts.
 
 ---
 
@@ -8,24 +10,22 @@ Audit date: 2026-06-10 · Repo: github.com/GSDSI1/critter-quest · Phaser 3.88 +
 
 **What's solid (don't touch the architecture):**
 - Clean 3-layer split: `src/data/` (typed tables) → `src/systems/` (pure logic) → `src/scenes/` (render/input)
-- `tsc --noEmit` passes clean, zero `any` in 8,051 LOC
-- Save system has validation, whitelisting, versioned migration (v3 + 2 legacy keys)
-- Hybrid art pipeline already designed: PNG overrides with procedural fallback via `meta.json`
-- 93-check verify script + 5 Playwright e2e tests + `.cursor/rules` already in place
+- `tsc --noEmit` passes clean; save validation + versioned migration (v3)
+- `MapRenderer` tilemap layer (not per-tile Images); lazy scene registration + Phaser chunk split
+- BFS tap-to-walk (`walkPath.ts`), day/night cycle, region fog, dex milestones, visited maps
+- Hybrid art pipeline: PNG overrides with procedural fallback via `meta.json`
+- CI: lint, verify (~100 checks), Vitest (49), Playwright e2e, GitHub Pages deploy
 
-**Top problems found:**
+**Top problems remaining:**
 
 | # | Problem | Evidence | Impact |
 |---|---------|----------|--------|
-| 1 | All art is procedural shapes | `sprites.ts` draws circles/rects; PNGs on disk are 83–235 byte stubs; `meta.json` placeholder:true; no `tileset.png` | Game looks like a prototype |
-| 2 | Overworld renders 1 Image per tile | `OverworldScene.ts:240-247` loops W×H calling `add.image` (600+ GameObjects per map) | GC pressure, slow scene start |
-| 3 | 1.65 MB single JS bundle | `dist/assets/index-*.js`; Phaser not code-split, Vite warns at build | Slow first load |
-| 4 | Own rules violated: files >300 lines | sprites.ts 923, BattleScene 814, OverworldScene 614, maps.ts 558 | Hard to iterate in Cursor (context bloat) |
-| 5 | `Math.random` direct in systems (12 calls) | battle.ts, status.ts, encounters.ts, abilities.ts, natures.ts — rules file says use injectable Rng | Untestable battle logic |
-| 6 | Zero unit tests | Only e2e; battle math, stats, save migration untested | Refactors are risky |
-| 7 | Audio is raw oscillator beeps | `audio.ts` — no music, no volume control | Feels unfinished |
-| 8 | No animations on critters | Static texture + bob tween only | Battles feel flat |
-| 9 | Shallow content | 27 species, 6 types, 2 gyms, 14 maps, no endgame | ~1-2 hrs of gameplay |
+| 1 | Most art still procedural | Species 71–87 lack hand pixel art; Kenney tileset not integrated | Game looks like a prototype |
+| 2 | God files >300 LOC | `NpcManager.ts` ~655, `sprites.ts` ~923, `BattleScene` ~400+ | Hard to iterate in Cursor |
+| 3 | `Math.random` in battle systems | battle.ts, encounters.ts, etc. — rules say injectable `Rng` | Some battle paths untestable |
+| 4 | Audio mostly procedural | WebAudio beeps; BGM stubs optional | Feels unfinished |
+| 5 | Minigame discoverability | Region map `???` until visited; no quest pointers | Players miss pier/grove/contest |
+| 6 | Content headroom | 87/100 species target; some rares single-stage | Dex completionists want more |
 
 ---
 

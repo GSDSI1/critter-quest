@@ -7,6 +7,7 @@ test('auto-walk pathfinding moves the player', async ({ page }) => {
   await waitForScene(page, 'Overworld');
   await teleport(page, 'town', 12, 14, 'up');
   await page.waitForTimeout(600);
+  await page.evaluate(() => window.__cq?.completeTutorial());
 
   const before = await playerState(page);
   expect(before?.mapId).toBe('town');

@@ -133,6 +133,14 @@ export class DialogBox {
     }
   }
 
+  /** Close immediately and run the completion callback (e.g. skip tutorial). */
+  skip(): void {
+    if (!this.visible) return;
+    const done = this.onComplete;
+    this.hide();
+    done?.();
+  }
+
   private renderLine(): void {
     this.textObj.setText(this.lines[this.lineIndex] ?? '');
     const yOffset = this.speakerText.visible ? 26 : 14;

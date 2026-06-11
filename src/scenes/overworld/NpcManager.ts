@@ -354,14 +354,24 @@ export class NpcManager {
     }
 
     if (npc.lines.includes('BUGCATCH')) {
-      if (GameState.player.dexCaught.length < 5) {
-        this.dialog.show(['Catch at least 5 species first!', 'Then come back for the firefly challenge.'], () => {
+      const caught = GameState.player.dexCaught.length;
+      const night = isNight(GameState.player.playTime);
+      if (caught < 5) {
+        this.dialog.show([
+          'Firefly Challenge — locked.',
+          `Dex: ${caught}/5 species caught.`,
+          'Explore tall grass and catch more critters first!',
+        ], () => {
           this.callbacks.setInputLocked(false);
         });
         return;
       }
-      if (!isNight(GameState.player.playTime)) {
-        this.dialog.show(['Fireflies only come out at night!', 'Come back when the stars are out.'], () => {
+      if (!night) {
+        this.dialog.show([
+          `You're ready (${caught} species on the dex)!`,
+          'Fireflies only appear at night — watch for ☾ on the HUD.',
+          'Come back when the moon is out.',
+        ], () => {
           this.callbacks.setInputLocked(false);
         });
         return;
