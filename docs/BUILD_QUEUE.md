@@ -6,10 +6,10 @@ Last updated: 2026-06-11 (P1 UX sprint). Source: `GAMEPLAN.md` + post-sprint aud
 
 | Metric | Value |
 |--------|-------|
-| Species | 87 |
+| Species | 90 |
 | Maps | 25 |
 | Scenes (lazy) | 20+ incl. Fishing / BugCatch / CritterContest |
-| Unit tests | 49 (9 files) |
+| Unit tests | 54 (10 files) |
 | E2E specs | 10 |
 | Verify checks | ~100+, green |
 | Unpushed commits | 5+ on `main` (movement sprint → P1 UX) |

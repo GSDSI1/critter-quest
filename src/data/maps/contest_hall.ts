@@ -11,7 +11,11 @@ export const contest_hall: GameMap = {
       'Welcome to the Frostvale Critter Contest!',
       'Show off your partner\'s beauty and strength. CONTEST',
     ] },
-    { id: 'sign_contest', x: 2, y: 2, name: 'Sign', role: 'sign', lines: ['Critter Contest Hall', 'One entry per day — prizes await!'] },
+    { id: 'sign_contest', x: 2, y: 2, name: 'Sign', role: 'sign', lines: [
+      'Critter Contest Hall',
+      'One entry per in-game day.',
+      'Already won today? Come back tomorrow!',
+    ] },
   ],
   tiles: t([
     'WWWWWWWWWWWWWW',

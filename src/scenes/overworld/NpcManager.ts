@@ -21,11 +21,12 @@ import {
   startEliteGauntlet, findGauntletNpc, buildTrainerBattleData, rematchLevelBonus,
 } from '../../systems/eliteGauntlet';
 import { registerHealVisit } from '../../systems/healTravel';
-import { isNight } from '../../systems/dayNight';
 import { wipeRestartScene } from '../../ui/transitions';
 import { addItem } from '../../data/items';
 import { playDayIndex } from '../../ui/minigameShell';
 import { pendingDexMilestone, claimDexMilestone } from '../../systems/dexMilestones';
+import { warpGateAllowed } from '../../systems/warpGates';
+import { tryHandleMinigameNpc } from './MinigameNpcHandlers';
 
 type Critter = ReturnType<typeof createCritter>;
 
@@ -156,29 +157,9 @@ export class NpcManager {
 
         const warp = isWarpTile(map, nx, ny);
         if (warp) {
-          if (warp.requiresBadge && !hasBadge(GameState.player.badges, warp.requiresBadge)) {
+          if (!warpGateAllowed(warp, GameState.player.badges, GameState.player.storyFlags)) {
             this.callbacks.setInputLocked(true);
-            const badgeNames: Record<string, string> = {
-              verdant: 'Verdant',
-              ember: 'Ember',
-              frost: 'Frost',
-              psyche: 'Psyche',
-            };
-            const badgeName = badgeNames[warp.requiresBadge] ?? warp.requiresBadge;
-            const msg = `The path is blocked. Earn the ${badgeName} Badge first!`;
-            this.dialog.show(msg, () => {
-              if (dy < 0) GameState.player.y++;
-              else GameState.player.y--;
-              player.y = GameState.player.y * TILE_SIZE + TILE_SIZE / 2;
-              this.callbacks.setInputLocked(false);
-            });
-            return;
-          }
-          if (warp.requiresAllBadges?.length) {
-            const badgesOk = warp.requiresAllBadges.every(b => hasBadge(GameState.player.badges, b));
-            const allowed = GameState.player.storyFlags.champion || badgesOk;
-            if (!allowed) {
-              this.callbacks.setInputLocked(true);
+            if (warp.requiresAllBadges?.length) {
               this.dialog.show([
                 'The path is hidden behind ancient trees.',
                 'Earn Verdant and Ember badges — or become Champion.',
@@ -191,20 +172,29 @@ export class NpcManager {
                 player.y = GameState.player.y * TILE_SIZE + TILE_SIZE / 2;
                 this.callbacks.setInputLocked(false);
               });
-              return;
+            } else if (warp.requiresFlag) {
+              this.dialog.show(['The path is sealed.', 'Only the regional Champion may enter.'], () => {
+                if (dy < 0) GameState.player.y++;
+                else if (dy > 0) GameState.player.y--;
+                else if (dx < 0) GameState.player.x++;
+                else GameState.player.x--;
+                player.x = GameState.player.x * TILE_SIZE + TILE_SIZE / 2;
+                player.y = GameState.player.y * TILE_SIZE + TILE_SIZE / 2;
+                this.callbacks.setInputLocked(false);
+              });
+            } else {
+              const badgeNames: Record<string, string> = {
+                verdant: 'Verdant', ember: 'Ember', frost: 'Frost', psyche: 'Psyche',
+              };
+              const badgeName = badgeNames[warp.requiresBadge ?? ''] ?? warp.requiresBadge;
+              const msg = `The path is blocked. Earn the ${badgeName} Badge first!`;
+              this.dialog.show(msg, () => {
+                if (dy < 0) GameState.player.y++;
+                else GameState.player.y--;
+                player.y = GameState.player.y * TILE_SIZE + TILE_SIZE / 2;
+                this.callbacks.setInputLocked(false);
+              });
             }
-          }
-          if (warp.requiresFlag && !GameState.player.storyFlags[warp.requiresFlag]) {
-            this.callbacks.setInputLocked(true);
-            this.dialog.show(['The path is sealed.', 'Only the regional Champion may enter.'], () => {
-              if (dy < 0) GameState.player.y++;
-              else if (dy > 0) GameState.player.y--;
-              else if (dx < 0) GameState.player.x++;
-              else GameState.player.x--;
-              player.x = GameState.player.x * TILE_SIZE + TILE_SIZE / 2;
-              player.y = GameState.player.y * TILE_SIZE + TILE_SIZE / 2;
-              this.callbacks.setInputLocked(false);
-            });
             return;
           }
           this.changeMap(warp.toMap, warp.toX, warp.toY);
@@ -343,91 +333,12 @@ export class NpcManager {
       return;
     }
 
-    if (npc.lines.includes('FISH')) {
-      const intro = npc.lines.filter(l => l !== 'FISH');
-      this.dialog.show(intro, () => {
-        this.callbacks.setInputLocked(false);
-        this.scene.scene.launch('Fishing', { returnMap: this.getMap().id });
-        this.scene.scene.pause();
-      });
-      return;
-    }
-
-    if (npc.lines.includes('BUGCATCH')) {
-      const caught = GameState.player.dexCaught.length;
-      const night = isNight(GameState.player.playTime);
-      if (caught < 5) {
-        this.dialog.show([
-          'Firefly Challenge — locked.',
-          `Dex: ${caught}/5 species caught.`,
-          'Explore tall grass and catch more critters first!',
-        ], () => {
-          this.callbacks.setInputLocked(false);
-        });
-        return;
-      }
-      if (!night) {
-        this.dialog.show([
-          `You're ready (${caught} species on the dex)!`,
-          'Fireflies only appear at night — watch for ☾ on the HUD.',
-          'Come back when the moon is out.',
-        ], () => {
-          this.callbacks.setInputLocked(false);
-        });
-        return;
-      }
-      const intro = npc.lines.filter(l => l !== 'BUGCATCH');
-      this.dialog.show(intro, () => {
-        this.callbacks.setInputLocked(false);
-        this.scene.scene.launch('BugCatch');
-        this.scene.scene.pause();
-      });
-      return;
-    }
-
-    if (npc.lines.includes('CONTEST')) {
-      const intro = npc.lines.filter(l => l !== 'CONTEST');
-      this.dialog.show(intro, () => {
-        this.callbacks.setInputLocked(false);
-        this.scene.scene.launch('CritterContest');
-        this.scene.scene.pause();
-      });
-      return;
-    }
-
-    if (npc.lines.includes('CHEST')) {
-      const chestIdx = npc.lines.indexOf('CHEST');
-      const chestId = chestIdx >= 0 && npc.lines[chestIdx + 1] ? npc.lines[chestIdx + 1] : npc.id;
-      if (GameState.player.storyFlags[chestId]) {
-        this.dialog.show(['The chest is empty.'], () => { this.callbacks.setInputLocked(false); });
-        return;
-      }
-      GameState.player.storyFlags[chestId] = true;
-      const reward = this.chestReward(chestId);
-      trySave(this.scene);
-      this.dialog.show(reward.lines, () => { this.callbacks.setInputLocked(false); });
-      return;
-    }
-
-    if (npc.lines.includes('COIN')) {
-      if (GameState.player.money < 100) {
-        this.dialog.show(['You need $100 to play.', 'Come back when you have more!'], () => {
-          this.callbacks.setInputLocked(false);
-        });
-        return;
-      }
-      GameState.player.money -= 100;
-      const win = Math.random() < 0.35;
-      if (win) {
-        GameState.player.money += 300;
-        trySave(this.scene);
-        this.dialog.show(['Jackpot! You won $300!'], () => { this.callbacks.setInputLocked(false); });
-      } else {
-        trySave(this.scene);
-        this.dialog.show(['No luck this time...'], () => { this.callbacks.setInputLocked(false); });
-      }
-      return;
-    }
+    if (tryHandleMinigameNpc(npc, {
+      scene: this.scene,
+      dialog: this.dialog,
+      getMap: () => this.getMap(),
+      unlockInput: () => { this.callbacks.setInputLocked(false); },
+    })) return;
 
     if (npc.lines.includes('HEAL')) {
       const welcome = npc.lines.filter(l => l !== 'HEAL');
@@ -555,45 +466,6 @@ export class NpcManager {
       return ['You beat Kai!', 'Explore Route 1 and the forest.', 'Visit the Mart for supplies!'];
     }
     return ['Be careful out there!', 'Visit the Mart for supplies, and the Healing Center to rest.'];
-  }
-
-  private chestReward(chestId: string): { lines: string[] } {
-    const table: Record<string, () => string[]> = {
-      chest_town: () => {
-        GameState.player.money += 100;
-        addItem(GameState.player.items, 'potion', 1);
-        return ['You found $100 and a Potion!'];
-      },
-      chest_route1: () => {
-        GameState.player.money += 150;
-        addItem(GameState.player.items, 'oran_berry', 2);
-        return ['You found $150 and 2 Oran Berries!'];
-      },
-      chest_moss: () => {
-        addItem(GameState.player.items, 'great_orb', 1);
-        return ['You found a Great Orb!'];
-      },
-      chest_cave: () => {
-        GameState.player.money += 300;
-        addItem(GameState.player.items, 'super_potion', 2);
-        return ['You found $300 and 2 Super Potions!'];
-      },
-      grove_chest: () => {
-        GameState.player.money += 500;
-        if (!GameState.player.storyFlags.contest_winner) {
-          addItem(GameState.player.items, 'hyper_potion', 2);
-          return ['You found $500 and 2 Hyper Potions!'];
-        }
-        addItem(GameState.player.items, 'ultra_orb', 1);
-        return ['You found $500 and an Ultra Orb!'];
-      },
-    };
-    const fn = table[chestId] ?? (() => {
-      GameState.player.money += 200;
-      addItem(GameState.player.items, 'potion', 2);
-      return ['You found $200 and 2 Potions!'];
-    });
-    return { lines: fn() };
   }
 
   private gateOpen(npc: MapNpc): boolean {

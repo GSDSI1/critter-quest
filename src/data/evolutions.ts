@@ -43,6 +43,8 @@ export const EVOLUTIONS: EvolutionDef[] = [
   { from: 'shroomcap', to: 'fungloom', level: 18 },
   { from: 'sandcrab', to: 'bouldercrust', level: 24 },
   { from: 'frostwisp', to: 'glaciwhisp', level: 20 },
+  { from: 'tidepod', to: 'tidewrack', level: 22 },
+  { from: 'embermite', to: 'embercoil', level: 20 },
 ];
 
 export function getEvolution(speciesId: string, level: number): string | null {

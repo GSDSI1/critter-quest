@@ -698,6 +698,30 @@ export const CREATURES: Record<string, CreatureDef> = {
     description: 'Freezes moisture from thought alone.',
     ability: 'snow_cloak', habitat: 'Glacier Pass', height: 0.7, weight: 3,
   },
+  tidewrack: {
+    id: 'tidewrack', name: 'Tidewrack', types: ['tide'], dexNumber: 88,
+    baseStats: { hp: 72, atk: 68, def: 62, spa: 78, spd: 70, spe: 72 },
+    moves: ['brine_splash', 'tidal', 'tidal_maul', 'splash'],
+    catchRate: 20, expYield: 142, color: 0x0284c7, shape: 'quadruped',
+    description: 'Drags kelp armor as it patrols rocky shores.',
+    ability: 'torrent', habitat: 'Route 3', height: 0.9, weight: 32,
+  },
+  embercoil: {
+    id: 'embercoil', name: 'Embercoil', types: ['flame'], dexNumber: 89,
+    baseStats: { hp: 58, atk: 62, def: 52, spa: 88, spd: 68, spe: 82 },
+    moves: ['coalsurge', 'scorch_claw', 'blaze', 'ember'],
+    catchRate: 18, expYield: 155, color: 0xea580c, shape: 'blob',
+    description: 'Coils around warm vents on volcanic paths.',
+    ability: 'flash_fire', habitat: 'Volcanic Path', height: 0.6, weight: 12,
+  },
+  prizefawn: {
+    id: 'prizefawn', name: 'Prizefawn', types: ['psychic'], dexNumber: 90,
+    baseStats: { hp: 62, atk: 55, def: 58, spa: 85, spd: 80, spe: 88 },
+    moves: ['calm_mind', 'psybeam', 'mindblast', 'hypnosis'],
+    catchRate: 12, expYield: 190, color: 0xf472b6, shape: 'quadruped',
+    description: 'Contest crowds adore its graceful psychic displays.',
+    ability: 'synchronize', habitat: 'Frostvale', height: 0.8, weight: 18,
+  },
 };
 
 export const STARTERS = ['emberpup', 'aqualet', 'leafkit'] as const;

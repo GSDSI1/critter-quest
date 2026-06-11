@@ -335,6 +335,18 @@ export const LEARNSETS: Record<string, LearnEntry[]> = {
     { level: 1, move: 'icebeam' }, { level: 1, move: 'mindblast' },
     { level: 22, move: 'frostbite' }, { level: 26, move: 'calm_mind' },
   ],
+  tidewrack: [
+    { level: 1, move: 'brine_splash' }, { level: 1, move: 'tidal' },
+    { level: 24, move: 'tidal_maul' }, { level: 28, move: 'splash' },
+  ],
+  embercoil: [
+    { level: 1, move: 'coalsurge' }, { level: 1, move: 'scorch_claw' },
+    { level: 22, move: 'blaze' }, { level: 26, move: 'ember' },
+  ],
+  prizefawn: [
+    { level: 1, move: 'calm_mind' }, { level: 1, move: 'psybeam' },
+    { level: 18, move: 'mindblast' }, { level: 22, move: 'hypnosis' },
+  ],
 };
 
 export function movesKnownAtLevel(speciesId: string, level: number): string[] {

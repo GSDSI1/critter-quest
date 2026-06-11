@@ -57,6 +57,8 @@ export const ENCOUNTER_TABLES: Record<string, EncounterEntry[]> = {
     { id: 'reefguard', minLevel: 15, maxLevel: 19, weight: 5 },
     { id: 'flamewyrm', minLevel: 14, maxLevel: 18, weight: 8 },
     { id: 'geodeon', minLevel: 14, maxLevel: 18, weight: 5 },
+    { id: 'tidepod', minLevel: 10, maxLevel: 14, weight: 10 },
+    { id: 'tidewrack', minLevel: 18, maxLevel: 22, weight: 3 },
   ],
   crystal_cave: [
     { id: 'pebblite', minLevel: 12, maxLevel: 16, weight: 14 },
@@ -81,6 +83,7 @@ export const ENCOUNTER_TABLES: Record<string, EncounterEntry[]> = {
     { id: 'infernox', minLevel: 20, maxLevel: 26, weight: 3 },
     { id: 'rockord', minLevel: 16, maxLevel: 20, weight: 10 },
     { id: 'embermite', minLevel: 15, maxLevel: 19, weight: 10 },
+    { id: 'embercoil', minLevel: 20, maxLevel: 24, weight: 4 },
   ],
   route4: [
     { id: 'frostkit', minLevel: 18, maxLevel: 22, weight: 20 },
@@ -114,6 +117,7 @@ export const ENCOUNTER_TABLES: Record<string, EncounterEntry[]> = {
     { id: 'psyknight', minLevel: 28, maxLevel: 32, weight: 6 },
     { id: 'somnara', minLevel: 30, maxLevel: 34, weight: 4 },
     { id: 'psychoglow', minLevel: 27, maxLevel: 31, weight: 10 },
+    { id: 'prizefawn', minLevel: 28, maxLevel: 32, weight: 5 },
   ],
   route1_night: [
     { id: 'shadeling', minLevel: 3, maxLevel: 6, weight: 20 },

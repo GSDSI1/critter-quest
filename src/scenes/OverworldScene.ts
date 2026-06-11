@@ -27,7 +27,7 @@ import { fadeInOnStart, wipeInOnStart } from '../ui/transitions';
 import { markTouchPreferred, shouldShowOverworldTouchPad } from '../ui/touchMenuNav';
 import { focusGameCanvas } from '../utils/focusCanvas';
 import { resolveOverworldPointer } from '../ui/overworldPointer';
-import { findPath, npcBlockedTiles, type TileCoord } from '../systems/walkPath';
+import { WalkController } from './overworld/WalkController';
 
 export class OverworldScene extends Phaser.Scene {
   private player!: Phaser.GameObjects.Sprite;
@@ -50,11 +50,8 @@ export class OverworldScene extends Phaser.Scene {
   private pointerStepCooldown = 0;
   private pointerHold: 'move' | 'walk' | null = null;
   private pointerHoldDir = { dx: 0, dy: 0 };
-  private walkBypassLock = false;
-  private walkQueue: TileCoord[] = [];
-  private walkTarget: TileCoord | null = null;
   private introActive = false;
-  private walkMarker?: Phaser.GameObjects.Graphics;
+  private walk!: WalkController;
 
   constructor() {
     super('Overworld');
@@ -102,6 +99,16 @@ export class OverworldScene extends Phaser.Scene {
       getPlayerShadow: () => this.playerShadow,
     });
 
+    this.walk = new WalkController({
+      scene: this,
+      getMap: () => this.map,
+      step: (dx, dy) => this.onPlayerMove(dx, dy),
+      isMoving: () => this.moving,
+      isInputLocked: () => this.inputLocked,
+      isDialogShowing: () => this.dialog.isShowing(),
+      isPaused: () => this.scene.isPaused(),
+    });
+
     this.touchPad = new OverworldTouchPad(this);
     this.touchPad.setVisible(shouldShowOverworldTouchPad());
     this.hud.setTouchHints(true);
@@ -127,7 +134,7 @@ export class OverworldScene extends Phaser.Scene {
       if (this.pointerHold !== 'walk' || !pointer.isDown) return;
       if (this.dialog.isShowing() || this.inputLocked || this.scene.isPaused()) return;
       const action = resolveOverworldPointer(this, pointer);
-      if (action?.type === 'walk') this.setWalkDestination(action.tx, action.ty);
+      if (action?.type === 'walk') this.walk.setDestination(action.tx, action.ty);
     });
     this.events.on('wake', () => focusGameCanvas());
     this.time.delayedCall(100, () => focusGameCanvas());
@@ -194,75 +201,13 @@ export class OverworldScene extends Phaser.Scene {
       this.hasMoved = true;
       this.hud.clearMoveHint();
     }
-    if (!moved) this.clearWalkPath();
+    if (!moved) this.walk.clear();
     return moved;
   }
 
   /** Dev/test bridge: queue auto-walk to a map tile (same path as map tap). */
   requestWalkTo(tx: number, ty: number, opts?: { force?: boolean }): void {
-    if (opts?.force) this.walkBypassLock = true;
-    else if (this.inputLocked || this.dialog.isShowing()) return;
-    this.setWalkDestination(tx, ty);
-  }
-
-  private clearWalkPath(): void {
-    this.walkQueue = [];
-    this.walkTarget = null;
-    this.walkBypassLock = false;
-    this.walkMarker?.destroy();
-    this.walkMarker = undefined;
-  }
-
-  private showWalkMarker(tx: number, ty: number): void {
-    this.walkMarker?.destroy();
-    const g = this.add.graphics().setDepth(12);
-    const cx = tx * TILE_SIZE + TILE_SIZE / 2;
-    const cy = ty * TILE_SIZE + TILE_SIZE / 2;
-    g.lineStyle(2, 0xf5c542, 0.9);
-    g.strokeCircle(cx, cy, 6);
-    g.fillStyle(0xf5c542, 0.25);
-    g.fillCircle(cx, cy, 4);
-    this.walkMarker = g;
-    this.tweens.add({
-      targets: g,
-      alpha: 0.35,
-      duration: 500,
-      yoyo: true,
-      repeat: -1,
-    });
-  }
-
-  private setWalkDestination(tx: number, ty: number): void {
-    const px = GameState.player.x;
-    const py = GameState.player.y;
-    if (tx === px && ty === py) {
-      this.clearWalkPath();
-      return;
-    }
-    const path = findPath(this.map, px, py, tx, ty, npcBlockedTiles(this.map));
-    if (!path || path.length === 0) return;
-    this.walkQueue = path;
-    this.walkTarget = { x: tx, y: ty };
-    this.showWalkMarker(tx, ty);
-    this.processWalkQueue();
-  }
-
-  private processWalkQueue(): void {
-    if (this.moving || this.walkQueue.length === 0) return;
-    if (!this.walkBypassLock && (this.inputLocked || this.dialog.isShowing() || this.scene.isPaused())) return;
-    const next = this.walkQueue[0];
-    const px = GameState.player.x;
-    const py = GameState.player.y;
-    const dx = next.x - px;
-    const dy = next.y - py;
-    if (Math.abs(dx) + Math.abs(dy) !== 1) {
-      this.clearWalkPath();
-      return;
-    }
-    if (this.onPlayerMove(dx, dy)) {
-      this.walkQueue.shift();
-      if (this.walkQueue.length === 0) this.clearWalkPath();
-    }
+    this.walk.requestTo(tx, ty, opts);
   }
 
   private handlePointerDown(pointer: Phaser.Input.Pointer): void {
@@ -273,18 +218,18 @@ export class OverworldScene extends Phaser.Scene {
     if (!action) return;
 
     if (action.type === 'talk') {
-      this.clearWalkPath();
+      this.walk.clear();
       this.npcManager.tryInteract();
       return;
     }
     if (action.type === 'menu') {
-      this.clearWalkPath();
+      this.walk.clear();
       this.scene.launch('PauseMenu');
       this.scene.pause();
       return;
     }
     if (action.type === 'move') {
-      this.clearWalkPath();
+      this.walk.clear();
       this.pointerHold = 'move';
       this.pointerHoldDir = { dx: action.dx, dy: action.dy };
       this.pointerStepCooldown = 0;
@@ -292,7 +237,7 @@ export class OverworldScene extends Phaser.Scene {
       return;
     }
     this.pointerHold = 'walk';
-    this.setWalkDestination(action.tx, action.ty);
+    this.walk.setDestination(action.tx, action.ty);
   }
 
   private startIntro(lines: string[], onFirstComplete?: () => void): void {
@@ -349,8 +294,8 @@ export class OverworldScene extends Phaser.Scene {
       return;
     }
 
-    if (this.walkBypassLock && this.walkQueue.length > 0 && !this.moving && !this.scene.isPaused()) {
-      this.processWalkQueue();
+    if (this.walk.bypassLock && this.walk.hasQueue && !this.moving && !this.scene.isPaused()) {
+      this.walk.processQueue();
     }
 
     if (this.dialog.isShowing()) {
@@ -358,7 +303,7 @@ export class OverworldScene extends Phaser.Scene {
       if (this.introActive && Input.justPressed('cancel')) {
         this.skipIntro();
       } else if (Input.justPressed('confirm') || Input.justPressed('cancel')) {
-        this.clearWalkPath();
+        this.walk.clear();
         this.dialog.advance();
       }
       this.updateInputHint();
@@ -368,7 +313,7 @@ export class OverworldScene extends Phaser.Scene {
     this.updateInputHint();
 
     this.syncTouchPadModal();
-    const blocked = (this.inputLocked && !this.walkBypassLock) || this.moving || this.scene.isPaused();
+    const blocked = (this.inputLocked && !this.walk.bypassLock) || this.moving || this.scene.isPaused();
     this.touchPad?.setEnabled(!blocked);
 
     this.mapRenderer.update(delta);
@@ -382,17 +327,17 @@ export class OverworldScene extends Phaser.Scene {
       }
     }
 
-    if (!blocked && this.walkQueue.length > 0 && !this.moving) {
-      this.processWalkQueue();
+    if (!blocked && this.walk.hasQueue && !this.moving) {
+      this.walk.processQueue();
     }
 
     if (!blocked && this.pointerHold === 'walk' && this.input.activePointer.isDown) {
       this.pointerStepCooldown -= delta;
       if (this.pointerStepCooldown <= 0) {
         this.pointerStepCooldown = this.moveDuration;
-        if (this.walkQueue.length === 0) {
+        if (!this.walk.hasQueue) {
           const action = resolveOverworldPointer(this, this.input.activePointer);
-          if (action?.type === 'walk') this.setWalkDestination(action.tx, action.ty);
+          if (action?.type === 'walk') this.walk.setDestination(action.tx, action.ty);
         }
       }
     }
@@ -401,13 +346,13 @@ export class OverworldScene extends Phaser.Scene {
     GameState.player.playTime += delta / 1000;
 
     if (Input.justPressed('party')) {
-      this.clearWalkPath();
+      this.walk.clear();
       this.scene.launch('Party');
       this.scene.pause();
       return;
     }
     if (Input.justPressed('pause')) {
-      this.clearWalkPath();
+      this.walk.clear();
       this.scene.launch('PauseMenu');
       this.scene.pause();
       return;
