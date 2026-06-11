@@ -2,7 +2,7 @@ import { FONT } from '../ui/theme';
 import Phaser from 'phaser';
 import { TILE_SIZE, GAME_WIDTH, GAME_HEIGHT } from '../data/types';
 import { getMap, type GameMap } from '../data/maps';
-import { GameState } from '../systems/stats';
+import { GameState, registerMapVisit } from '../systems/stats';
 import { trySave } from '../utils/saveFeedback';
 import { DialogBox } from '../ui/DialogBox';
 import { ControlsPanel } from '../ui/ControlsPanel';
@@ -48,8 +48,9 @@ export class OverworldScene extends Phaser.Scene {
   private forestFireflies?: { update: (playTime: number) => void };
   private hasMoved = false;
   private pointerStepCooldown = 0;
-  private pointerHold: 'move' | null = null;
+  private pointerHold: 'move' | 'walk' | null = null;
   private pointerHoldDir = { dx: 0, dy: 0 };
+  private walkBypassLock = false;
   private walkQueue: TileCoord[] = [];
   private walkTarget: TileCoord | null = null;
   private walkMarker?: Phaser.GameObjects.Graphics;
@@ -121,6 +122,12 @@ export class OverworldScene extends Phaser.Scene {
       this.pointerHold = null;
       this.pointerStepCooldown = 0;
     });
+    this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+      if (this.pointerHold !== 'walk' || !pointer.isDown) return;
+      if (this.dialog.isShowing() || this.inputLocked || this.scene.isPaused()) return;
+      const action = resolveOverworldPointer(this, pointer);
+      if (action?.type === 'walk') this.setWalkDestination(action.tx, action.ty);
+    });
     this.events.on('wake', () => focusGameCanvas());
     this.time.delayedCall(100, () => focusGameCanvas());
 
@@ -169,6 +176,7 @@ export class OverworldScene extends Phaser.Scene {
     }
 
     if (data.fromBattle) trySave(this);
+    registerMapVisit(GameState.player.visitedMaps, this.map.id);
   }
 
   private addVignette(): void {
@@ -193,13 +201,15 @@ export class OverworldScene extends Phaser.Scene {
 
   /** Dev/test bridge: queue auto-walk to a map tile (same path as map tap). */
   requestWalkTo(tx: number, ty: number, opts?: { force?: boolean }): void {
-    if (!opts?.force && (this.inputLocked || this.dialog.isShowing())) return;
+    if (opts?.force) this.walkBypassLock = true;
+    else if (this.inputLocked || this.dialog.isShowing()) return;
     this.setWalkDestination(tx, ty);
   }
 
   private clearWalkPath(): void {
     this.walkQueue = [];
     this.walkTarget = null;
+    this.walkBypassLock = false;
     this.walkMarker?.destroy();
     this.walkMarker = undefined;
   }
@@ -240,7 +250,7 @@ export class OverworldScene extends Phaser.Scene {
 
   private processWalkQueue(): void {
     if (this.moving || this.walkQueue.length === 0) return;
-    if (this.inputLocked || this.dialog.isShowing() || this.scene.isPaused()) return;
+    if (!this.walkBypassLock && (this.inputLocked || this.dialog.isShowing() || this.scene.isPaused())) return;
     const next = this.walkQueue[0];
     const px = GameState.player.x;
     const py = GameState.player.y;
@@ -282,6 +292,7 @@ export class OverworldScene extends Phaser.Scene {
       this.onPlayerMove(action.dx, action.dy);
       return;
     }
+    this.pointerHold = 'walk';
     this.setWalkDestination(action.tx, action.ty);
   }
 
@@ -334,7 +345,7 @@ export class OverworldScene extends Phaser.Scene {
     this.updateInputHint();
 
     this.syncTouchPadModal();
-    const blocked = this.inputLocked || this.moving || this.scene.isPaused();
+    const blocked = (this.inputLocked && !this.walkBypassLock) || this.moving || this.scene.isPaused();
     this.touchPad?.setEnabled(!blocked);
 
     this.mapRenderer.update(delta);

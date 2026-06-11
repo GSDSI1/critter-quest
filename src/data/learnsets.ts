@@ -267,6 +267,26 @@ export const LEARNSETS: Record<string, LearnEntry[]> = {
     { level: 1, move: 'splash' }, { level: 1, move: 'psybeam' },
     { level: 12, move: 'gleam_pulse' }, { level: 16, move: 'tidal' },
   ],
+  piercrab: [
+    { level: 1, move: 'splash' }, { level: 1, move: 'boulder' },
+    { level: 10, move: 'brine_splash' }, { level: 14, move: 'tidal' },
+  ],
+  moonmoth: [
+    { level: 1, move: 'psybeam' }, { level: 1, move: 'sleep_powder' },
+    { level: 12, move: 'leafblade' }, { level: 16, move: 'mindblast' },
+  ],
+  brinecrown: [
+    { level: 1, move: 'tidal' }, { level: 1, move: 'brine_splash' },
+    { level: 18, move: 'boulder' }, { level: 22, move: 'tidal_maul' },
+  ],
+  grovespirit: [
+    { level: 1, move: 'vine' }, { level: 1, move: 'psybeam' },
+    { level: 20, move: 'rose_strike' }, { level: 24, move: 'mindblast' },
+  ],
+  miragen: [
+    { level: 1, move: 'psybeam' }, { level: 1, move: 'shadowclaw' },
+    { level: 22, move: 'darkpulse' }, { level: 26, move: 'mindblast' },
+  ],
 };
 
 export function movesKnownAtLevel(speciesId: string, level: number): string[] {

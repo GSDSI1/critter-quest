@@ -38,21 +38,25 @@ export class RegionMapScene extends Phaser.Scene {
     for (const node of REGION_NODES) {
       const isHere = here === node.id || here.startsWith(node.id);
       const visitedHub = node.hub && GameState.player.visitedHealCenters.includes(node.id);
+      const discovered = isHere || visitedHub || GameState.player.visitedMaps.includes(node.id);
       const hasBadge = node.badge && GameState.player.badges.includes(node.badge);
-      const color = isHere ? COLORS.gold
-        : hasBadge ? 0x22c55e
-          : visitedHub ? 0x60a5fa
-            : node.kind === 'gym' ? 0xf97316
-              : 0x64748b;
+      const color = !discovered ? 0x1e293b
+        : isHere ? COLORS.gold
+          : hasBadge ? 0x22c55e
+            : visitedHub ? 0x60a5fa
+              : node.kind === 'gym' ? 0xf97316
+                : 0x64748b;
+      const nodeAlpha = discovered ? (isHere ? 1 : 0.85) : 0.4;
 
-      this.add.circle(node.x, node.y, isHere ? 10 : 7, color, isHere ? 1 : 0.85).setDepth(2);
+      this.add.circle(node.x, node.y, isHere ? 10 : 7, color, nodeAlpha).setDepth(2);
       if (hasBadge) {
         const badge = getBadge(node.badge!);
         this.add.circle(node.x + 8, node.y - 8, 4, badge.color).setDepth(3);
       }
-      this.add.text(node.x, node.y + 14, node.label, {
+      const label = discovered ? node.label : '???';
+      this.add.text(node.x, node.y + 14, label, {
         fontFamily: FONT, fontSize: '8px',
-        color: isHere ? '#f5c542' : '#8899aa',
+        color: isHere ? '#f5c542' : discovered ? '#8899aa' : '#334155',
       }).setOrigin(0.5).setDepth(2);
     }
 

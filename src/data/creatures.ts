@@ -562,6 +562,46 @@ export const CREATURES: Record<string, CreatureDef> = {
     description: 'Bioluminescent fins hypnotize prey in moonlit shallows.',
     ability: 'levitate', habitat: 'Route 3', height: 0.6, weight: 16,
   },
+  piercrab: {
+    id: 'piercrab', name: 'Piercrab', types: ['tide', 'stone'], dexNumber: 71,
+    baseStats: { hp: 55, atk: 72, def: 78, spa: 42, spd: 48, spe: 38 },
+    moves: ['splash', 'boulder', 'brine_splash', 'tidal'],
+    catchRate: 35, expYield: 88, color: 0x0891b2, shape: 'quadruped',
+    description: 'Scuttles along tide pools snapping at bobbers.',
+    ability: 'sturdy', habitat: 'Fishing Pier', height: 0.5, weight: 12,
+  },
+  moonmoth: {
+    id: 'moonmoth', name: 'Moonmoth', types: ['psychic', 'leaf'], dexNumber: 72,
+    baseStats: { hp: 58, atk: 45, def: 52, spa: 82, spd: 70, spe: 85 },
+    moves: ['psybeam', 'sleep_powder', 'mindblast', 'leafblade'],
+    catchRate: 24, expYield: 130, color: 0xc084fc, shape: 'avian',
+    description: 'Its wing dust puts critters into a gentle trance.',
+    ability: 'levitate', habitat: 'Forest (night)', height: 0.7, weight: 8,
+  },
+  brinecrown: {
+    id: 'brinecrown', name: 'Brinecrown', types: ['tide'], dexNumber: 73,
+    baseStats: { hp: 78, atk: 85, def: 72, spa: 70, spd: 68, spe: 62 },
+    moves: ['tidal', 'brine_splash', 'boulder', 'tidal_maul'],
+    catchRate: 18, expYield: 168, color: 0x0284c7, shape: 'quadruped',
+    description: 'Coral antlers channel ocean pressure into crushing blows.',
+    ability: 'torrent', habitat: 'Route 3', height: 1.2, weight: 45,
+  },
+  grovespirit: {
+    id: 'grovespirit', name: 'Grovespirit', types: ['leaf', 'psychic'], dexNumber: 74,
+    baseStats: { hp: 68, atk: 55, def: 62, spa: 92, spd: 88, spe: 72 },
+    moves: ['mindblast', 'rose_strike', 'calm_mind', 'photosynthesis'],
+    catchRate: 12, expYield: 195, color: 0x4ade80, shape: 'humanoid',
+    description: 'A guardian wisp that drifts between ancient trees.',
+    ability: 'synchronize', habitat: 'Secret Grove', height: 1.0, weight: 0.1,
+  },
+  miragen: {
+    id: 'miragen', name: 'Miragen', types: ['psychic', 'shadow'], dexNumber: 75,
+    baseStats: { hp: 65, atk: 58, def: 60, spa: 95, spd: 82, spe: 90 },
+    moves: ['darkpulse', 'psybeam', 'shadowclaw', 'mindblast'],
+    catchRate: 8, expYield: 210, color: 0x6366f1, shape: 'humanoid',
+    description: 'Projects illusions of itself to confuse predators.',
+    ability: 'shadow_tag', habitat: 'Secret Grove', height: 0.9, weight: 14,
+  },
 };
 
 export const STARTERS = ['emberpup', 'aqualet', 'leafkit'] as const;

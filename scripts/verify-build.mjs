@@ -49,8 +49,8 @@ ok(`${critterPngs.length} critter PNGs on disk`);
 // ── Data catalog ──
 const creatures = read('src/data/creatures.ts');
 const speciesIds = [...creatures.matchAll(/^\s{2}[a-z]+: \{/gm)];
-if (speciesIds.length === 70) ok('70 species in creatures.ts');
-else fail(`Expected 70 species, found ${speciesIds.length}`);
+if (speciesIds.length === 75) ok('75 species in creatures.ts');
+else fail(`Expected 75 species, found ${speciesIds.length}`);
 
 const movesSrc = read('src/data/moves.ts');
 const moveCount = (movesSrc.match(/^\s{2}[a-z][a-z0-9_]*: \{ id:/gm) ?? []).length;
@@ -430,6 +430,8 @@ if (existsSync(join(root, 'e2e/lab-intro.spec.ts'))) ok('E2E lab intro spec');
 else fail('e2e/lab-intro.spec.ts missing');
 if (existsSync(join(root, 'e2e/movement.spec.ts'))) ok('E2E movement spec');
 else fail('e2e/movement.spec.ts missing');
+if (existsSync(join(root, 'e2e/minigames.spec.ts'))) ok('E2E minigames spec');
+else fail('e2e/minigames.spec.ts missing');
 
 if (!battleScene.includes('setupInput')) ok('BattleScene no duplicate setupInput');
 else fail('BattleScene still calls setupInput()');

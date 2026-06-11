@@ -73,6 +73,7 @@ declare global {
       addPartyMember: (speciesId: string, level?: number) => void;
       giveBadge: (id: string) => void;
       requestWalk: (tx: number, ty: number) => void;
+      openFishing: () => void;
     };
   }
 }
@@ -212,6 +213,12 @@ if (import.meta.env.DEV) {
     requestWalk(tx, ty) {
       const ow = game.scene.getScene('Overworld') as OverworldScene | null;
       ow?.requestWalkTo(tx, ty, { force: true });
+    },
+    openFishing() {
+      const ow = game.scene.getScene('Overworld');
+      if (!ow) return;
+      ow.scene.launch('Fishing', { returnMap: GameState.player.mapId });
+      ow.scene.pause();
     },
   };
 }

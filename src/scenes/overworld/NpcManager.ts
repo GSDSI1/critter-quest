@@ -7,7 +7,7 @@ import {
 import { pickWildFromTable, resolveEncounterTable } from '../../data/encounters';
 import { hasBadge } from '../../data/badges';
 import {
-  GameState, healParty, firstAlive, createCritter, registerSeen,
+  GameState, healParty, firstAlive, createCritter, registerSeen, registerMapVisit,
 } from '../../systems/stats';
 import { trySave } from '../../utils/saveFeedback';
 import { DialogBox } from '../../ui/DialogBox';
@@ -171,6 +171,26 @@ export class NpcManager {
               this.callbacks.setInputLocked(false);
             });
             return;
+          }
+          if (warp.requiresAllBadges?.length) {
+            const badgesOk = warp.requiresAllBadges.every(b => hasBadge(GameState.player.badges, b));
+            const allowed = GameState.player.storyFlags.champion || badgesOk;
+            if (!allowed) {
+              this.callbacks.setInputLocked(true);
+              this.dialog.show([
+                'The path is hidden behind ancient trees.',
+                'Earn Verdant and Ember badges — or become Champion.',
+              ], () => {
+                if (dy < 0) GameState.player.y++;
+                else if (dy > 0) GameState.player.y--;
+                else if (dx < 0) GameState.player.x++;
+                else GameState.player.x--;
+                player.x = GameState.player.x * TILE_SIZE + TILE_SIZE / 2;
+                player.y = GameState.player.y * TILE_SIZE + TILE_SIZE / 2;
+                this.callbacks.setInputLocked(false);
+              });
+              return;
+            }
           }
           if (warp.requiresFlag && !GameState.player.storyFlags[warp.requiresFlag]) {
             this.callbacks.setInputLocked(true);
@@ -423,8 +443,11 @@ export class NpcManager {
       const lines = [...this.getMomLines()];
       if (GameState.player.lastMomGiftDay !== day) {
         GameState.player.lastMomGiftDay = day;
-        addItem(GameState.player.items, 'potion', 1);
-        lines.unshift('I packed a fresh Potion for you today!');
+        const gift = Math.random() < 0.5 ? 'potion' : 'oran_berry';
+        addItem(GameState.player.items, gift, 1);
+        lines.unshift(gift === 'potion'
+          ? 'I packed a fresh Potion for you today!'
+          : 'I picked an Oran Berry from the garden for you!');
         trySave(this.scene);
       }
       this.dialog.show(lines, () => { this.callbacks.setInputLocked(false); });
@@ -456,9 +479,11 @@ export class NpcManager {
 
   private changeMap(mapId: string, x: number, y: number): void {
     if (mapId === 'heal_center') registerHealVisit(this.getMap().id);
+    registerMapVisit(GameState.player.visitedMaps, this.getMap().id);
     GameState.player.mapId = mapId;
     GameState.player.x = x;
     GameState.player.y = y;
+    registerMapVisit(GameState.player.visitedMaps, mapId);
     trySave(this.scene);
     wipeRestartScene(this.scene, { fromBattle: false });
   }

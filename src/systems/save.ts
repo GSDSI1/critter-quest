@@ -67,6 +67,7 @@ export function migrateSaveData(data: Record<string, unknown>): PlayerState {
     defeatedTrainers: isStringArray(data.defeatedTrainers) ? data.defeatedTrainers : [],
     defeatedRematch: isStringArray(data.defeatedRematch) ? data.defeatedRematch : [],
     visitedHealCenters: isStringArray(data.visitedHealCenters) ? data.visitedHealCenters : [],
+    visitedMaps: isStringArray(data.visitedMaps) ? data.visitedMaps : [],
     completionTime: typeof data.completionTime === 'number' ? data.completionTime : undefined,
     signsRead: typeof data.signsRead === 'number' ? data.signsRead : 0,
     lastMomGiftDay: typeof data.lastMomGiftDay === 'number' ? data.lastMomGiftDay : -1,

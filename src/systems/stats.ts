@@ -56,6 +56,7 @@ export interface PlayerState {
   defeatedTrainers: string[];
   defeatedRematch: string[];
   visitedHealCenters: string[];
+  visitedMaps: string[];
   completionTime?: number;
   playTime: number;
   signsRead: number;
@@ -204,6 +205,10 @@ export function registerCaught(dexCaught: string[], speciesId: string, dexSeen?:
   if (!dexCaught.includes(speciesId)) dexCaught.push(speciesId);
 }
 
+export function registerMapVisit(visitedMaps: string[], mapId: string): void {
+  if (!visitedMaps.includes(mapId)) visitedMaps.push(mapId);
+}
+
 export function defaultPlayer(): PlayerState {
   const items = emptyBag();
   addItem(items, 'potion', 3);
@@ -226,6 +231,7 @@ export function defaultPlayer(): PlayerState {
     defeatedTrainers: [],
     defeatedRematch: [],
     visitedHealCenters: [],
+    visitedMaps: [],
     playTime: 0,
     signsRead: 0,
     lastMomGiftDay: -1,

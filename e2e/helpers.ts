@@ -125,12 +125,9 @@ export async function startNewGameToOverworld(page: Page): Promise<void> {
     await page.evaluate(() => window.__cq?.pickStarter());
   }
   await waitForScene(page, 'Overworld', 25_000);
-  await pressCancel(page);
+  await advanceDialogs(page, 4);
   await page.waitForTimeout(300);
-  if ((await sceneKeys(page)).includes('Overworld')) {
-    await page.evaluate(() => window.__cq?.completeTutorial());
-  }
-  await advanceDialogs(page, 3);
+  await pressCancel(page);
 }
 
 export async function playerState(page: Page) {

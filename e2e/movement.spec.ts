@@ -1,13 +1,10 @@
 import { expect, test } from '@playwright/test';
-import {
-  gotoFresh, playerState, startNewGameToOverworld, teleport, waitForScene,
-} from './helpers';
+import { gotoFresh, playerState, startNewGameToOverworld, teleport, waitForScene } from './helpers';
 
 test('auto-walk pathfinding moves the player', async ({ page }) => {
   await gotoFresh(page);
   await startNewGameToOverworld(page);
   await waitForScene(page, 'Overworld');
-  // Restart overworld without intro dialog lock (same pattern as heal-center e2e)
   await teleport(page, 'town', 12, 14, 'up');
   await page.waitForTimeout(600);
 

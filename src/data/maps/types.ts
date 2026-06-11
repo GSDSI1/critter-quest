@@ -30,7 +30,7 @@ export interface GameMap {
   height: number;
   tiles: number[];
   spawn: { x: number; y: number };
-  warps: { x: number; y: number; toMap: string; toX: number; toY: number; requiresBadge?: string; requiresFlag?: string }[];
+  warps: { x: number; y: number; toMap: string; toX: number; toY: number; requiresBadge?: string; requiresFlag?: string; requiresAllBadges?: string[] }[];
   npcs: MapNpc[];
   encounterRate: number;
   encounterTable?: string;

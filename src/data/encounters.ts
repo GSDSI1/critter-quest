@@ -111,7 +111,8 @@ export const ENCOUNTER_TABLES: Record<string, EncounterEntry[]> = {
   ],
   route1_night: [
     { id: 'shadeling', minLevel: 3, maxLevel: 6, weight: 20 },
-    { id: 'nightmoth', minLevel: 4, maxLevel: 7, weight: 18 },
+    { id: 'nightmoth', minLevel: 4, maxLevel: 7, weight: 16 },
+    { id: 'moonmoth', minLevel: 6, maxLevel: 9, weight: 6 },
     { id: 'dreamwisp', minLevel: 4, maxLevel: 7, weight: 16 },
     { id: 'mossling', minLevel: 2, maxLevel: 5, weight: 14 },
     { id: 'pebblite', minLevel: 3, maxLevel: 6, weight: 12 },
@@ -145,6 +146,8 @@ export const ENCOUNTER_TABLES: Record<string, EncounterEntry[]> = {
     { id: 'vineclaw', minLevel: 15, maxLevel: 21, weight: 14 },
     { id: 'murkfox', minLevel: 14, maxLevel: 20, weight: 12 },
     { id: 'astralyn', minLevel: 22, maxLevel: 28, weight: 4 },
+    { id: 'grovespirit', minLevel: 20, maxLevel: 26, weight: 6 },
+    { id: 'miragen', minLevel: 24, maxLevel: 30, weight: 3 },
   ],
   fishing_catch: [
     { id: 'kelpling', minLevel: 8, maxLevel: 14, weight: 28 },
@@ -152,6 +155,8 @@ export const ENCOUNTER_TABLES: Record<string, EncounterEntry[]> = {
     { id: 'brinepup', minLevel: 9, maxLevel: 15, weight: 20 },
     { id: 'tidewisp', minLevel: 11, maxLevel: 17, weight: 14 },
     { id: 'tidefin', minLevel: 12, maxLevel: 18, weight: 10 },
+    { id: 'piercrab', minLevel: 10, maxLevel: 14, weight: 8 },
+    { id: 'brinecrown', minLevel: 14, maxLevel: 18, weight: 4 },
   ],
   /** Night variants — ghost/psychic skew (see dayNight.isNight). */
   forest_night: [
