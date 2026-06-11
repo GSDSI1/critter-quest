@@ -235,6 +235,8 @@ if (existsSync(join(root, 'scripts/critter-art/starters.mjs'))) ok('Starter pixe
 else fail('critter-art/starters.mjs missing');
 if (existsSync(join(root, 'scripts/critter-art/batch5.mjs'))) ok('Batch-5 pixel art overrides');
 else fail('critter-art/batch5.mjs missing');
+if (existsSync(join(root, 'scripts/critter-art/batch6.mjs'))) ok('Batch-6 pixel art overrides');
+else fail('critter-art/batch6.mjs missing');
 if (existsSync(join(root, 'src/scenes/overworld/CaveSparkles.ts'))) ok('Cave sparkle overlay');
 else fail('CaveSparkles.ts missing');
 if (existsSync(join(root, 'src/scenes/overworld/ForestFireflies.ts'))) ok('Forest firefly overlay');
@@ -246,6 +248,11 @@ if (owBundle.includes('playerTextureKey') && overworld.includes('applyOverworldC
 } else fail('OverworldScene incomplete');
 if (existsSync(join(root, 'src/scenes/overworld/MapRenderer.ts'))) ok('MapRenderer extracted');
 else fail('MapRenderer.ts missing');
+if (existsSync(join(root, 'src/scenes/overworld/OverworldInputHandler.ts'))) ok('OverworldInputHandler extracted');
+else fail('OverworldInputHandler.ts missing');
+const owLines = overworld.split('\n').length;
+if (owLines <= 350) ok(`OverworldScene ${owLines} LOC (target ≤350)`);
+else fail(`OverworldScene ${owLines} LOC exceeds 350`);
 
 const trainerIntro = read('src/scenes/TrainerIntroScene.ts');
 if (trainerIntro.includes('playerBackTextureKey') && trainerIntro.includes('GameState.player.name')) {
@@ -260,7 +267,10 @@ const inputScenes = [
 ];
 for (const s of inputScenes) {
   const src = read(`src/scenes/${s}.ts`);
-  if (src.includes("from '../systems/input'") && src.includes('Input.bind')) ok(`${s} Input`);
+  const inputHandler = s === 'OverworldScene' && existsSync(join(root, 'src/scenes/overworld/OverworldInputHandler.ts'))
+    ? read('src/scenes/overworld/OverworldInputHandler.ts') : '';
+  const bundle = src + inputHandler;
+  if (bundle.includes('Input.bind') || bundle.includes('Input.update')) ok(`${s} Input`);
   else fail(`${s} missing Input integration`);
 }
 

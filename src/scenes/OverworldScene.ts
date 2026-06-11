@@ -12,9 +12,7 @@ import { OverworldTouchPad } from '../ui/touchButtons';
 import { pinToScreen } from '../ui/screenUi';
 import { applyOverworldCamera } from '../utils/camera';
 import { resumeAudio } from '../utils/audio';
-import { setMusicThemeForMap, startMusic, stopMusic } from '../utils/music';
-import { Input } from '../systems/input';
-import { canAlwaysRun } from '../systems/options';
+import { setMusicThemeForMap } from '../utils/music';
 import { isOutdoorMap, nightTintAlpha, tileNightTint } from '../systems/dayNight';
 import { MapRenderer } from './overworld/MapRenderer';
 import { NpcManager } from './overworld/NpcManager';
@@ -24,10 +22,9 @@ import { buildCaveSparkles } from './overworld/CaveSparkles';
 import { buildForestFireflies } from './overworld/ForestFireflies';
 import { buildHealInterior } from '../ui/sceneBackdrops';
 import { fadeInOnStart, wipeInOnStart } from '../ui/transitions';
-import { markTouchPreferred, shouldShowOverworldTouchPad } from '../ui/touchMenuNav';
-import { focusGameCanvas } from '../utils/focusCanvas';
-import { resolveOverworldPointer } from '../ui/overworldPointer';
+import { shouldShowOverworldTouchPad } from '../ui/touchMenuNav';
 import { WalkController } from './overworld/WalkController';
+import { OverworldInputHandler, type OverworldInputContext } from './overworld/OverworldInputHandler';
 
 export class OverworldScene extends Phaser.Scene {
   private player!: Phaser.GameObjects.Sprite;
@@ -47,22 +44,19 @@ export class OverworldScene extends Phaser.Scene {
   private nightOverlay?: Phaser.GameObjects.Graphics;
   private forestFireflies?: { update: (playTime: number) => void };
   private hasMoved = false;
-  private pointerStepCooldown = 0;
-  private pointerHold: 'move' | 'walk' | null = null;
-  private pointerHoldDir = { dx: 0, dy: 0 };
   private introActive = false;
   private walk!: WalkController;
+  private inputHandler = new OverworldInputHandler();
 
   constructor() {
     super('Overworld');
   }
 
-  create(data: { showIntro?: boolean; fromBattle?: boolean; blackout?: boolean; _fadeIn?: boolean; _wipeIn?: boolean }): void {
+  create(data: { showIntro?: boolean; fromBattle?: boolean; blackout?: boolean; _fadeIn?: boolean; _wipeIn?: boolean; walkTarget?: { x: number; y: number } }): void {
     fadeInOnStart(this, data, 400);
     wipeInOnStart(this, data, 300);
     resumeAudio();
     setMusicThemeForMap(GameState.player.mapId);
-    Input.bind(this);
     this.map = getMap(GameState.player.mapId);
     this.dialog = new DialogBox(this);
     this.controlsPanel = new ControlsPanel(this);
@@ -79,10 +73,7 @@ export class OverworldScene extends Phaser.Scene {
     if (isOutdoorMap(this.map.id)) buildSkyLayer(this, this.map.id);
     buildCityAtmosphere(this, this.map.id);
     if (this.map.id === 'crystal_cave') buildCaveSparkles(this);
-    if (this.map.id === 'forest') {
-      this.forestFireflies = buildForestFireflies(this);
-    }
-    if (this.map.id === 'secret_grove') {
+    if (this.map.id === 'forest' || this.map.id === 'secret_grove') {
       this.forestFireflies = buildForestFireflies(this);
     }
     if (this.map.id === 'route3' || this.map.id === 'fishing_pier') {
@@ -113,36 +104,7 @@ export class OverworldScene extends Phaser.Scene {
     this.touchPad.setVisible(shouldShowOverworldTouchPad());
     this.hud.setTouchHints(true);
     this.hud.showMoveHint(true);
-    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      markTouchPreferred();
-      focusGameCanvas();
-      if (this.dialog.isShowing()) {
-        this.dialog.advance();
-        return;
-      }
-      if (this.controlsPanel.isShowing()) {
-        this.controlsPanel.advance();
-        return;
-      }
-      this.handlePointerDown(pointer);
-    });
-    this.input.on('pointerup', () => {
-      this.pointerHold = null;
-      this.pointerStepCooldown = 0;
-    });
-    this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
-      if (this.pointerHold !== 'walk' || !pointer.isDown) return;
-      if (this.dialog.isShowing() || this.inputLocked || this.scene.isPaused()) return;
-      const action = resolveOverworldPointer(this, pointer);
-      if (action?.type === 'walk') this.walk.setDestination(action.tx, action.ty);
-    });
-    this.events.on('wake', () => focusGameCanvas());
-    this.time.delayedCall(100, () => focusGameCanvas());
-
-    this.mapRenderer.render(this.map);
-    ({ player: this.player, shadow: this.playerShadow } = this.npcManager.spawnPlayer());
-    this.npcManager.spawnNpcs(this.map);
-    this.npcManager.spawnSigns(this.map);
+    this.inputHandler.bind(this.inputCtx());
 
     if (data.showIntro && !GameState.player.storyFlags.saw_controls) {
       this.startIntro([
@@ -174,6 +136,11 @@ export class OverworldScene extends Phaser.Scene {
       GameState.player.storyFlags.running = true;
     }
 
+    this.mapRenderer.render(this.map);
+    ({ player: this.player, shadow: this.playerShadow } = this.npcManager.spawnPlayer());
+    this.npcManager.spawnNpcs(this.map);
+    this.npcManager.spawnSigns(this.map);
+
     this.cameras.main.setBounds(0, 0, this.map.width * TILE_SIZE, this.map.height * TILE_SIZE);
     applyOverworldCamera(this.cameras.main, this.map, this.player);
 
@@ -183,6 +150,35 @@ export class OverworldScene extends Phaser.Scene {
 
     if (data.fromBattle) trySave(this);
     registerMapVisit(GameState.player.visitedMaps, this.map.id);
+
+    if (data.walkTarget) {
+      this.time.delayedCall(400, () => {
+        this.requestWalkTo(data.walkTarget!.x, data.walkTarget!.y, { force: true });
+      });
+    }
+  }
+
+  private inputCtx(): OverworldInputContext {
+    return {
+      scene: this,
+      dialog: this.dialog,
+      controlsPanel: this.controlsPanel,
+      hud: this.hud,
+      walk: this.walk,
+      npcManager: this.npcManager,
+      touchPad: this.touchPad,
+      isMoving: () => this.moving,
+      isInputLocked: () => this.inputLocked,
+      getMoveDuration: () => this.moveDuration,
+      setMoveDuration: (ms) => { this.moveDuration = ms; },
+      onPlayerMove: (dx, dy) => this.onPlayerMove(dx, dy),
+      isIntroActive: () => this.introActive,
+      skipIntro: () => this.skipIntro(),
+      syncTouchPad: () => this.syncTouchPadModal(),
+      updateInputHint: () => this.updateInputHint(),
+      showPadToast: (msg) => this.showPadToast(msg),
+      isPaused: () => this.scene.isPaused(),
+    };
   }
 
   private addVignette(): void {
@@ -210,36 +206,6 @@ export class OverworldScene extends Phaser.Scene {
     this.walk.requestTo(tx, ty, opts);
   }
 
-  private handlePointerDown(pointer: Phaser.Input.Pointer): void {
-    if (this.dialog.isShowing() || this.controlsPanel.isShowing()) return;
-    if (this.inputLocked || this.scene.isPaused()) return;
-
-    const action = resolveOverworldPointer(this, pointer);
-    if (!action) return;
-
-    if (action.type === 'talk') {
-      this.walk.clear();
-      this.npcManager.tryInteract();
-      return;
-    }
-    if (action.type === 'menu') {
-      this.walk.clear();
-      this.scene.launch('PauseMenu');
-      this.scene.pause();
-      return;
-    }
-    if (action.type === 'move') {
-      this.walk.clear();
-      this.pointerHold = 'move';
-      this.pointerHoldDir = { dx: action.dx, dy: action.dy };
-      this.pointerStepCooldown = 0;
-      this.onPlayerMove(action.dx, action.dy);
-      return;
-    }
-    this.pointerHold = 'walk';
-    this.walk.setDestination(action.tx, action.ty);
-  }
-
   private startIntro(lines: string[], onFirstComplete?: () => void): void {
     this.inputLocked = true;
     this.introActive = true;
@@ -258,19 +224,14 @@ export class OverworldScene extends Phaser.Scene {
   }
 
   private syncTouchPadModal(): void {
-    const hidePad = this.controlsPanel.isShowing();
-    this.touchPad?.setVisible(!hidePad && shouldShowOverworldTouchPad());
+    OverworldInputHandler.syncTouchPadVisible(this.touchPad, this.controlsPanel.isShowing());
   }
 
   private updateInputHint(): void {
     const show = this.inputLocked || this.dialog.isShowing() || this.controlsPanel.isShowing();
     if (show) {
       const skip = this.introActive ? ' · B/X skip' : '';
-      this.inputHint.setText(
-        this.controlsPanel.isShowing()
-          ? `Tap Next or press Z to continue${skip}`
-          : `Tap Next or press Z to continue${skip}`,
-      );
+      this.inputHint.setText(`Tap Next or press Z to continue${skip}`);
       this.inputHint.setVisible(true);
     } else {
       this.inputHint.setVisible(false);
@@ -278,96 +239,10 @@ export class OverworldScene extends Phaser.Scene {
   }
 
   update(_time: number, delta: number): void {
-    Input.update();
-
-    if (Input.gamepadJustConnected()) {
-      this.showPadToast('Controller connected');
-    }
-
-    if (this.controlsPanel.isShowing()) {
-      this.syncTouchPadModal();
-      if (Input.justPressed('left')) this.controlsPanel.prevPage();
-      if (Input.justPressed('right')) this.controlsPanel.nextPage();
-      if (Input.justPressed('confirm')) this.controlsPanel.advance();
-      if (Input.justPressed('cancel')) this.controlsPanel.skip();
-      this.updateInputHint();
-      return;
-    }
-
-    if (this.walk.bypassLock && this.walk.hasQueue && !this.moving && !this.scene.isPaused()) {
-      this.walk.processQueue();
-    }
-
-    if (this.dialog.isShowing()) {
-      this.syncTouchPadModal();
-      if (this.introActive && Input.justPressed('cancel')) {
-        this.skipIntro();
-      } else if (Input.justPressed('confirm') || Input.justPressed('cancel')) {
-        this.walk.clear();
-        this.dialog.advance();
-      }
-      this.updateInputHint();
-      return;
-    }
-
-    this.updateInputHint();
-
-    this.syncTouchPadModal();
-    const blocked = (this.inputLocked && !this.walk.bypassLock) || this.moving || this.scene.isPaused();
-    this.touchPad?.setEnabled(!blocked);
-
+    const skipMovement = this.inputHandler.update(this.inputCtx(), delta);
     this.mapRenderer.update(delta);
     this.updateDayNightTint();
-
-    if (!blocked && this.pointerHold === 'move' && this.input.activePointer.isDown) {
-      this.pointerStepCooldown -= delta;
-      if (this.pointerStepCooldown <= 0) {
-        this.onPlayerMove(this.pointerHoldDir.dx, this.pointerHoldDir.dy);
-        this.pointerStepCooldown = this.moveDuration;
-      }
-    }
-
-    if (!blocked && this.walk.hasQueue && !this.moving) {
-      this.walk.processQueue();
-    }
-
-    if (!blocked && this.pointerHold === 'walk' && this.input.activePointer.isDown) {
-      this.pointerStepCooldown -= delta;
-      if (this.pointerStepCooldown <= 0) {
-        this.pointerStepCooldown = this.moveDuration;
-        if (!this.walk.hasQueue) {
-          const action = resolveOverworldPointer(this, this.input.activePointer);
-          if (action?.type === 'walk') this.walk.setDestination(action.tx, action.ty);
-        }
-      }
-    }
-
-    if (blocked) return;
-    GameState.player.playTime += delta / 1000;
-
-    if (Input.justPressed('party')) {
-      this.walk.clear();
-      this.scene.launch('Party');
-      this.scene.pause();
-      return;
-    }
-    if (Input.justPressed('pause')) {
-      this.walk.clear();
-      this.scene.launch('PauseMenu');
-      this.scene.pause();
-      return;
-    }
-    if (Input.justPressed('confirm')) {
-      this.npcManager.tryInteract();
-      return;
-    }
-
-    const canRun = GameState.player.storyFlags.running || canAlwaysRun();
-    const running = canRun && Input.isHeld('run');
-    this.moveDuration = running ? 100 : 200;
-
-    const { dx, dy } = Input.getMovement();
-    if (dx !== 0 || dy !== 0) this.onPlayerMove(dx, dy);
+    if (skipMovement) return;
   }
 
   private updateDayNightTint(): void {

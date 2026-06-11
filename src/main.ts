@@ -92,6 +92,8 @@ declare global {
       resolveContest: () => void;
       fillDex: (count: number) => void;
       claimPendingDexMilestone: () => number;
+      walkToWarp: (mapId: string, warpX: number, warpY: number) => void;
+      teleportAndWalk: (mapId: string, x: number, y: number, destX: number, destY: number) => void;
     };
   }
 }
@@ -249,7 +251,8 @@ if (import.meta.env.DEV) {
     },
     requestWalk(tx, ty) {
       const ow = game.scene.getScene('Overworld') as OverworldScene | null;
-      ow?.requestWalkTo(tx, ty, { force: true });
+      if (!ow?.scene.isActive()) return;
+      ow.time.delayedCall(100, () => ow.requestWalkTo(tx, ty, { force: true }));
     },
     openFishing() {
       const ow = game.scene.getScene('Overworld');
@@ -293,6 +296,20 @@ if (import.meta.env.DEV) {
       if (m) claimDexMilestone(GameState.player, m);
       saveGame();
       return m?.count ?? 0;
+    },
+    walkToWarp(mapId, warpX, warpY) {
+      GameState.player.mapId = mapId;
+      GameState.player.x = warpX;
+      GameState.player.y = warpY + 1;
+      GameState.player.facing = 'up';
+      game.scene.start('Overworld', { walkTarget: { x: warpX, y: warpY } });
+    },
+    teleportAndWalk(mapId, x, y, destX, destY) {
+      GameState.player.mapId = mapId;
+      GameState.player.x = x;
+      GameState.player.y = y;
+      GameState.player.facing = 'up';
+      game.scene.start('Overworld', { walkTarget: { x: destX, y: destY } });
     },
   };
 }

@@ -1,6 +1,6 @@
 # Critter Quest — Build Queue
 
-Last updated: 2026-06-09 (P8 complete — 100 species + P2 trainer extract + P6 e2e). **Source of truth for forward work.**
+Last updated: 2026-06-09 (P2 input extract + P3 batch6 art + grove walk e2e). **Source of truth for forward work.**
 
 ## Snapshot
 
@@ -8,10 +8,11 @@ Last updated: 2026-06-09 (P8 complete — 100 species + P2 trainer extract + P6 
 |--------|-------|
 | Species | **100** |
 | Maps | 25 |
-| Unit tests | 60+ (12 files) |
+| Unit tests | 59 (12 files) |
 | E2E specs | 15 |
 | Dex milestones | 20 / 40 / 60 / 80 / 90 / **100** |
-| Verify | ~100 checks, green |
+| OverworldScene | **267 LOC** (≤350 target) |
+| Verify | ~102 checks, green |
 
 ---
 
@@ -21,12 +22,13 @@ Last updated: 2026-06-09 (P8 complete — 100 species + P2 trainer extract + P6 
 |------|----------------|
 | Movement sprint | BFS walk, 25 maps, 3 minigames, fun layer, species 71–87 |
 | P1 UX | Night HUD, dex toasts, intro skip, map hold-walk |
-| P2 | ChestRewards, MinigameHandlers, WalkController, warpGates, **TrainerBattleHandler**, **WarpBlockDialog** |
+| P2 | ChestRewards, MinigameHandlers, WalkController, warpGates, TrainerBattleHandler, WarpBlockDialog, **OverworldInputHandler** |
 | P3 | Species 88–90, evo lines, contest sign |
 | P4 | Minigame bests, fishing/bug/contest e2e, 3 chests |
 | P7 | `regionDiscovery.ts`, region map hints (★ nodes), Mom/Prof lines, fast travel to minigames |
 | P8 | Species 91–100, psychoglow→psychomyst, abysswisp→voidreaper, dex milestones 90+100 |
-| **P6 partial** | Gym 1–4 badge smoke, shop sell, chest loot e2e |
+| **P6 partial** | Gym 1–4 badge smoke, shop sell, chest loot, **grove walk e2e** |
+| **P3 partial** | batch6 hand art (10 species: pier/grove/legendaries) |
 
 ---
 
@@ -34,9 +36,8 @@ Last updated: 2026-06-09 (P8 complete — 100 species + P2 trainer extract + P6 
 
 | # | Issue | Next |
 |---|-------|------|
-| 1 | Procedural art 71–100 | batch6 hand art |
-| 2 | Grove walk e2e flaky | Optional: `stepOntoWarp` test bridge |
-| 3 | OverworldScene still large | Pointer/input helper extract |
+| 1 | Procedural art 71–100 | batch6 covers 10; extend to full roster |
+| 2 | Kenney tileset | manual import |
 
 ---
 
@@ -55,13 +56,13 @@ Last updated: 2026-06-09 (P8 complete — 100 species + P2 trainer extract + P6 
 |----|------|--------|
 | p2-trainer-extract | `TrainerBattleHandler.ts` from NpcManager | **done** |
 | p2-warp-dialog | `WarpBlockDialog.ts` for bounce-back copy | **done** |
-| p2-overworld-trim | Pointer/input helper; OverworldScene < 350 LOC | queued |
+| p2-overworld-trim | Pointer/input helper; OverworldScene < 350 LOC | **done** |
 
 ### P3 — Art
 
 | ID | Task |
 |----|------|
-| p3-batch6-art | Hand pixels for pier/grove/legendary species 71–100 |
+| p3-batch6-art | Hand pixels for pier/grove/legendary species | **partial** (10 species) |
 | p3-kenney | Kenney tileset import |
 
 ### P4 — Minigames (remaining)
@@ -81,7 +82,7 @@ Last updated: 2026-06-09 (P8 complete — 100 species + P2 trainer extract + P6 
 | p6-shop-sell | Shop sell roundtrip | **done** |
 | p6-gym2-4 | Gyms 2–4 badge smoke | **done** |
 | p6-chest-loot | Chest interact e2e | **done** |
-| p6-grove-walk | Walk onto forest warp tile | queued |
+| p6-grove-walk | Walk onto forest warp tile | **done** |
 
 ### P7 — Discoverability
 
@@ -111,9 +112,9 @@ Last updated: 2026-06-09 (P8 complete — 100 species + P2 trainer extract + P6 
 
 ## Suggested next sprint
 
-1. **P3 batch6 art** — hand pixels for late-game species
-2. **P2 OverworldScene trim** — input/pointer helper
-3. **P0 full e2e** — release confidence pass
+1. **P0 full e2e** — release confidence pass
+2. **P3 batch6 art** — extend hand pixels to remaining late-game species
+3. **P5 CC0 BGM** — licensed music + CREDITS.md
 
 ---
 

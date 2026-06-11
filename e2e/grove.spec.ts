@@ -14,3 +14,21 @@ test('secret grove accessible with verdant and ember badges', async ({ page }) =
   const p = await playerState(page);
   expect(p?.mapId).toBe('secret_grove');
 });
+
+test('forest walk reaches secret grove warp', async ({ page }) => {
+  await gotoFresh(page);
+  await startNewGameToOverworld(page);
+  await waitForScene(page, 'Overworld');
+  await page.evaluate(() => {
+    window.__cq?.giveBadge('verdant');
+    window.__cq?.giveBadge('ember');
+    window.__cq?.completeTutorial();
+  });
+  await page.evaluate(() => window.__cq?.walkToWarp('forest', 18, 8));
+  await page.waitForFunction(
+    () => window.__cq?.player()?.mapId === 'secret_grove',
+    { timeout: 25_000 },
+  );
+  const p = await playerState(page);
+  expect(p?.mapId).toBe('secret_grove');
+});
