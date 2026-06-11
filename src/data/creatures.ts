@@ -762,6 +762,46 @@ export const CREATURES: Record<string, CreatureDef> = {
     description: 'A rare specter that only appears on Victory Road.',
     ability: 'shadow_tag', habitat: 'Victory Road', height: 1.2, weight: 0.1,
   },
+  solarchion: {
+    id: 'solarchion', name: 'Solarchion', types: ['flame', 'psychic'], dexNumber: 96,
+    baseStats: { hp: 85, atk: 90, def: 80, spa: 115, spd: 95, spe: 100 },
+    moves: ['inferno', 'mindblast', 'blaze', 'gleam_pulse'],
+    catchRate: 3, expYield: 280, color: 0xfbbf24, shape: 'quadruped',
+    description: 'A sun-forged legend said to guard the Secret Grove.',
+    ability: 'flash_fire', habitat: 'Secret Grove', height: 1.4, weight: 52,
+  },
+  lunawisp: {
+    id: 'lunawisp', name: 'Lunawisp', types: ['shadow', 'psychic'], dexNumber: 97,
+    baseStats: { hp: 78, atk: 62, def: 72, spa: 118, spd: 105, spe: 98 },
+    moves: ['darkpulse', 'mindblast', 'shadow_dust', 'hypnosis'],
+    catchRate: 3, expYield: 285, color: 0x6366f1, shape: 'humanoid',
+    description: 'Drifts through moonlit groves, bending dreams to its will.',
+    ability: 'shadow_tag', habitat: 'Secret Grove', height: 1.0, weight: 0.2,
+  },
+  terradrake: {
+    id: 'terradrake', name: 'Terradrake', types: ['stone', 'flame'], dexNumber: 98,
+    baseStats: { hp: 92, atk: 110, def: 95, spa: 85, spd: 75, spe: 68 },
+    moves: ['earthquake', 'inferno', 'boulder', 'scorch_claw'],
+    catchRate: 3, expYield: 290, color: 0x78716c, shape: 'serpent',
+    description: 'An ancient wyrm that burrows beneath Victory Road.',
+    ability: 'sturdy', habitat: 'Victory Road', height: 2.1, weight: 180,
+  },
+  stormcrown: {
+    id: 'stormcrown', name: 'Stormcrown', types: ['volt', 'psychic'], dexNumber: 99,
+    baseStats: { hp: 80, atk: 95, def: 78, spa: 112, spd: 88, spe: 105 },
+    moves: ['thunder_dive', 'storm_beak', 'mindblast', 'thunderbolt'],
+    catchRate: 3, expYield: 295, color: 0xeab308, shape: 'avian',
+    description: 'Crowned in lightning, it roosts atop the final ascent.',
+    ability: 'static', habitat: 'Victory Road', height: 1.6, weight: 38,
+  },
+  primordix: {
+    id: 'primordix', name: 'Primordix', types: ['psychic', 'shadow'], dexNumber: 100,
+    baseStats: { hp: 90, atk: 75, def: 85, spa: 130, spd: 115, spe: 95 },
+    moves: ['mindblast', 'darkpulse', 'crystal_lance', 'gleam_pulse'],
+    catchRate: 2, expYield: 320, color: 0xc084fc, shape: 'crystalline',
+    description: 'The primordial critter — one per generation on Victory Road.',
+    ability: 'synchronize', habitat: 'Victory Road', height: 1.5, weight: 45,
+  },
 };
 
 export const STARTERS = ['emberpup', 'aqualet', 'leafkit'] as const;

@@ -162,6 +162,8 @@ export const ENCOUNTER_TABLES: Record<string, EncounterEntry[]> = {
     { id: 'grovespirit', minLevel: 20, maxLevel: 26, weight: 6 },
     { id: 'miragen', minLevel: 24, maxLevel: 30, weight: 3 },
     { id: 'glowfern', minLevel: 16, maxLevel: 22, weight: 8 },
+    { id: 'solarchion', minLevel: 28, maxLevel: 34, weight: 2 },
+    { id: 'lunawisp', minLevel: 30, maxLevel: 36, weight: 2 },
   ],
   fishing_catch: [
     { id: 'kelpling', minLevel: 8, maxLevel: 14, weight: 28 },
@@ -217,6 +219,9 @@ export const ENCOUNTER_TABLES: Record<string, EncounterEntry[]> = {
     { id: 'wraithling', minLevel: 36, maxLevel: 42, weight: 6 },
     { id: 'abysswisp', minLevel: 38, maxLevel: 42, weight: 3 },
     { id: 'voidreaper', minLevel: 40, maxLevel: 45, weight: 2 },
+    { id: 'terradrake', minLevel: 42, maxLevel: 48, weight: 3 },
+    { id: 'stormcrown', minLevel: 44, maxLevel: 50, weight: 2 },
+    { id: 'primordix', minLevel: 48, maxLevel: 55, weight: 1 },
   ],
 };
 

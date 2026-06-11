@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { TILE_SIZE } from '../../data/types';
 import {
   getTile, isWalkable, isEncounterTile, isWarpTile,
-  resolveTrainerParty, type MapNpc, type GameMap,
+  type MapNpc, type GameMap,
 } from '../../data/maps';
 import { pickWildFromTable, resolveEncounterTable } from '../../data/encounters';
 import { hasBadge } from '../../data/badges';
@@ -18,7 +18,7 @@ import { showExclamationBubble } from '../TrainerIntroScene';
 import { Sfx } from '../../utils/audio';
 import { resolveRematch } from '../../data/rematches';
 import {
-  startEliteGauntlet, findGauntletNpc, buildTrainerBattleData, rematchLevelBonus,
+  startEliteGauntlet, findGauntletNpc,
 } from '../../systems/eliteGauntlet';
 import { registerHealVisit } from '../../systems/healTravel';
 import { wipeRestartScene } from '../../ui/transitions';
@@ -28,8 +28,8 @@ import { pendingDexMilestone, claimDexMilestone } from '../../systems/dexMilesto
 import { warpGateAllowed } from '../../systems/warpGates';
 import { tryHandleMinigameNpc } from './MinigameNpcHandlers';
 import { momDiscoverabilityLine, profDiscoverabilityLine } from '../../systems/regionDiscovery';
-
-type Critter = ReturnType<typeof createCritter>;
+import { TrainerBattleHandler } from './TrainerBattleHandler';
+import { showWarpBlocked } from './WarpBlockDialog';
 
 export interface NpcManagerCallbacks {
   setInputLocked: (locked: boolean) => void;
@@ -41,13 +41,20 @@ export interface NpcManagerCallbacks {
 
 export class NpcManager {
   private npcSprites: Phaser.GameObjects.Sprite[] = [];
+  private trainerBattles: TrainerBattleHandler;
 
   constructor(
     private scene: Phaser.Scene,
     private getMap: () => GameMap,
     private dialog: DialogBox,
     private callbacks: NpcManagerCallbacks,
-  ) {}
+  ) {
+    this.trainerBattles = new TrainerBattleHandler(
+      scene,
+      () => this.getMap(),
+      (locked) => this.callbacks.setInputLocked(locked),
+    );
+  }
 
   spawnPlayer(): { player: Phaser.GameObjects.Sprite; shadow: Phaser.GameObjects.Ellipse } {
     const shadow = this.scene.add.ellipse(
@@ -159,43 +166,12 @@ export class NpcManager {
         const warp = isWarpTile(map, nx, ny);
         if (warp) {
           if (!warpGateAllowed(warp, GameState.player.badges, GameState.player.storyFlags)) {
-            this.callbacks.setInputLocked(true);
-            if (warp.requiresAllBadges?.length) {
-              this.dialog.show([
-                'The path is hidden behind ancient trees.',
-                'Earn Verdant and Ember badges — or become Champion.',
-              ], () => {
-                if (dy < 0) GameState.player.y++;
-                else if (dy > 0) GameState.player.y--;
-                else if (dx < 0) GameState.player.x++;
-                else GameState.player.x--;
-                player.x = GameState.player.x * TILE_SIZE + TILE_SIZE / 2;
-                player.y = GameState.player.y * TILE_SIZE + TILE_SIZE / 2;
-                this.callbacks.setInputLocked(false);
-              });
-            } else if (warp.requiresFlag) {
-              this.dialog.show(['The path is sealed.', 'Only the regional Champion may enter.'], () => {
-                if (dy < 0) GameState.player.y++;
-                else if (dy > 0) GameState.player.y--;
-                else if (dx < 0) GameState.player.x++;
-                else GameState.player.x--;
-                player.x = GameState.player.x * TILE_SIZE + TILE_SIZE / 2;
-                player.y = GameState.player.y * TILE_SIZE + TILE_SIZE / 2;
-                this.callbacks.setInputLocked(false);
-              });
-            } else {
-              const badgeNames: Record<string, string> = {
-                verdant: 'Verdant', ember: 'Ember', frost: 'Frost', psyche: 'Psyche',
-              };
-              const badgeName = badgeNames[warp.requiresBadge ?? ''] ?? warp.requiresBadge;
-              const msg = `The path is blocked. Earn the ${badgeName} Badge first!`;
-              this.dialog.show(msg, () => {
-                if (dy < 0) GameState.player.y++;
-                else GameState.player.y--;
-                player.y = GameState.player.y * TILE_SIZE + TILE_SIZE / 2;
-                this.callbacks.setInputLocked(false);
-              });
-            }
+            showWarpBlocked({
+              dialog: this.dialog,
+              getPlayer: () => this.callbacks.getPlayer(),
+              getPlayerShadow: () => this.callbacks.getPlayerShadow(),
+              setInputLocked: (locked) => this.callbacks.setInputLocked(locked),
+            }, warp, dx, dy);
             return;
           }
           this.changeMap(warp.toMap, warp.toX, warp.toY);
@@ -292,7 +268,7 @@ export class NpcManager {
         const first = findGauntletNpc('elite_trainer1');
         if (first) {
           showExclamationBubble(this.scene, first.x * TILE_SIZE + 8, first.y * TILE_SIZE, () => {
-            this.launchGauntletBattle(first);
+            this.trainerBattles.launchGauntletBattle(first);
           });
         } else {
           this.callbacks.setInputLocked(false);
@@ -308,7 +284,7 @@ export class NpcManager {
 
     if (champion && rematchDef && defeated && !rematched && npc.trainer) {
       this.dialog.show(['Want a rematch? I\'ve gotten stronger!'], () => {
-        this.startTrainerBattle(npc, true);
+        this.trainerBattles.startTrainerBattle(npc, true);
       });
       return;
     }
@@ -316,9 +292,7 @@ export class NpcManager {
     if (npc.trainer && !defeated) {
       this.dialog.show(npc.lines, () => {
         if (npc.trainer) {
-          showExclamationBubble(this.scene, npc.x * TILE_SIZE + 8, npc.y * TILE_SIZE, () => {
-            this.startTrainerBattle(npc, false);
-          });
+          this.trainerBattles.promptTrainerBattle(npc);
         } else {
           this.callbacks.setInputLocked(false);
         }
@@ -458,7 +432,7 @@ export class NpcManager {
     const { def, level } = pickWildFromTable(tableId);
     registerSeen(GameState.player.dexSeen, def.id);
     const wild = createCritter(def.id, level);
-    this.launchBattle([wild], false, '', '', 0, '');
+    this.trainerBattles.launchBattle([wild], false, '', '', 0, '');
   }
 
   private getMomLines(): string[] {
@@ -483,65 +457,5 @@ export class NpcManager {
     if (g.requiresBadge && !hasBadge(GameState.player.badges, g.requiresBadge)) return false;
     if (g.requiresFlag && !GameState.player.storyFlags[g.requiresFlag]) return false;
     return true;
-  }
-
-  private startTrainerBattle(npc: MapNpc, isRematch: boolean): void {
-    if (!npc.trainer) { this.callbacks.setInputLocked(false); return; }
-    const rematchDef = isRematch ? resolveRematch(npc.id, npc.rematch) : undefined;
-    const partySpec = rematchDef?.party ?? npc.trainer.party;
-    const reward = rematchDef?.reward ?? npc.trainer.reward;
-    const resolved = resolveTrainerParty(partySpec, GameState.player.starterId);
-    const bonus = isRematch ? rematchLevelBonus() : 0;
-    const party = resolved.map(m => {
-      registerSeen(GameState.player.dexSeen, m.creatureId);
-      return createCritter(m.creatureId, m.level + bonus);
-    });
-    this.launchBattle(party, true, npc.id, npc.name, reward, npc.trainer.badge ?? '', isRematch);
-  }
-
-  private launchGauntletBattle(npc: MapNpc): void {
-    const battleData = buildTrainerBattleData(npc);
-    if (!battleData) { this.callbacks.setInputLocked(false); return; }
-    this.callbacks.setInputLocked(true);
-    this.scene.cameras.main.flash(200, 255, 255, 255);
-    this.scene.time.delayedCall(300, () => {
-      this.scene.scene.start('TrainerIntro', {
-        trainerName: npc.name,
-        isTrainer: true,
-        battleData,
-      });
-    });
-  }
-
-  private launchBattle(
-    enemyParty: Critter[],
-    isTrainer: boolean,
-    trainerId: string,
-    trainerName: string,
-    reward: number,
-    badge: string,
-    isRematch = false,
-  ): void {
-    this.callbacks.setInputLocked(true);
-    this.scene.cameras.main.flash(200, 255, 255, 255);
-
-    const battleData = {
-      enemyParty,
-      isTrainer,
-      trainerId,
-      trainerName,
-      reward,
-      badge,
-      isRematch,
-      mapId: this.getMap().id,
-    };
-
-    this.scene.time.delayedCall(300, () => {
-      this.scene.scene.start('TrainerIntro', {
-        trainerName: isTrainer ? trainerName : 'Wild',
-        isTrainer,
-        battleData,
-      });
-    });
   }
 }

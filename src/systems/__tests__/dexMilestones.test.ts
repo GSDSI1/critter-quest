@@ -27,7 +27,7 @@ describe('dexMilestones', () => {
     expect(pendingDexMilestone(p)).toBeNull();
   });
 
-  it('has four tiers defined', () => {
-    expect(DEX_MILESTONES.length).toBe(5);
+  it('has six tiers defined', () => {
+    expect(DEX_MILESTONES.length).toBe(6);
   });
 });

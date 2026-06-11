@@ -367,6 +367,26 @@ export const LEARNSETS: Record<string, LearnEntry[]> = {
     { level: 1, move: 'darkpulse' }, { level: 1, move: 'mindblast' },
     { level: 38, move: 'shadow_dust' }, { level: 42, move: 'hypnosis' },
   ],
+  solarchion: [
+    { level: 1, move: 'inferno' }, { level: 1, move: 'mindblast' },
+    { level: 40, move: 'blaze' }, { level: 45, move: 'gleam_pulse' },
+  ],
+  lunawisp: [
+    { level: 1, move: 'darkpulse' }, { level: 1, move: 'mindblast' },
+    { level: 40, move: 'shadow_dust' }, { level: 45, move: 'hypnosis' },
+  ],
+  terradrake: [
+    { level: 1, move: 'earthquake' }, { level: 1, move: 'inferno' },
+    { level: 42, move: 'boulder' }, { level: 48, move: 'scorch_claw' },
+  ],
+  stormcrown: [
+    { level: 1, move: 'thunder_dive' }, { level: 1, move: 'storm_beak' },
+    { level: 44, move: 'mindblast' }, { level: 50, move: 'thunderbolt' },
+  ],
+  primordix: [
+    { level: 1, move: 'mindblast' }, { level: 1, move: 'darkpulse' },
+    { level: 50, move: 'crystal_lance' }, { level: 55, move: 'gleam_pulse' },
+  ],
 };
 
 export function movesKnownAtLevel(speciesId: string, level: number): string[] {

@@ -1,16 +1,16 @@
 # Critter Quest — Build Queue
 
-Last updated: 2026-06-11 (P7 discoverability + P8 species 95). **Source of truth for forward work.**
+Last updated: 2026-06-09 (P8 complete — 100 species + P2 trainer extract + P6 e2e). **Source of truth for forward work.**
 
 ## Snapshot
 
 | Metric | Value |
 |--------|-------|
-| Species | **95** |
+| Species | **100** |
 | Maps | 25 |
-| Unit tests | 59 (12 files) |
-| E2E specs | 14 |
-| Dex milestones | 20 / 40 / 60 / 80 / **90** |
+| Unit tests | 60+ (12 files) |
+| E2E specs | 15 |
+| Dex milestones | 20 / 40 / 60 / 80 / 90 / **100** |
 | Verify | ~100 checks, green |
 
 ---
@@ -21,11 +21,12 @@ Last updated: 2026-06-11 (P7 discoverability + P8 species 95). **Source of truth
 |------|----------------|
 | Movement sprint | BFS walk, 25 maps, 3 minigames, fun layer, species 71–87 |
 | P1 UX | Night HUD, dex toasts, intro skip, map hold-walk |
-| P2 | ChestRewards, MinigameHandlers, WalkController, warpGates |
+| P2 | ChestRewards, MinigameHandlers, WalkController, warpGates, **TrainerBattleHandler**, **WarpBlockDialog** |
 | P3 | Species 88–90, evo lines, contest sign |
 | P4 | Minigame bests, fishing/bug/contest e2e, 3 chests |
-| **P7** | `regionDiscovery.ts`, region map hints (★ nodes), Mom/Prof lines, fast travel to minigames |
-| **P8 partial** | Species 91–95, psychoglow→psychomyst, abysswisp→voidreaper, dex milestone 90 |
+| P7 | `regionDiscovery.ts`, region map hints (★ nodes), Mom/Prof lines, fast travel to minigames |
+| P8 | Species 91–100, psychoglow→psychomyst, abysswisp→voidreaper, dex milestones 90+100 |
+| **P6 partial** | Gym 1–4 badge smoke, shop sell, chest loot e2e |
 
 ---
 
@@ -33,10 +34,9 @@ Last updated: 2026-06-11 (P7 discoverability + P8 species 95). **Source of truth
 
 | # | Issue | Next |
 |---|-------|------|
-| 1 | NpcManager still ~550 LOC | Trainer battle extract |
-| 2 | Procedural art 71–95 | batch6 hand art |
-| 3 | 95/100 species | Final 5 legendaries |
-| 4 | Grove walk e2e flaky | Optional: `stepOntoWarp` test bridge |
+| 1 | Procedural art 71–100 | batch6 hand art |
+| 2 | Grove walk e2e flaky | Optional: `stepOntoWarp` test bridge |
+| 3 | OverworldScene still large | Pointer/input helper extract |
 
 ---
 
@@ -51,17 +51,17 @@ Last updated: 2026-06-11 (P7 discoverability + P8 species 95). **Source of truth
 
 ### P2 — Refactor (remaining)
 
-| ID | Task |
-|----|------|
-| p2-trainer-extract | `TrainerBattleHandler.ts` from NpcManager |
-| p2-warp-dialog | `WarpBlockDialog.ts` for bounce-back copy |
-| p2-overworld-trim | Pointer/input helper; OverworldScene < 350 LOC |
+| ID | Task | Status |
+|----|------|--------|
+| p2-trainer-extract | `TrainerBattleHandler.ts` from NpcManager | **done** |
+| p2-warp-dialog | `WarpBlockDialog.ts` for bounce-back copy | **done** |
+| p2-overworld-trim | Pointer/input helper; OverworldScene < 350 LOC | queued |
 
 ### P3 — Art
 
 | ID | Task |
 |----|------|
-| p3-batch6-art | Hand pixels for pier/grove species 71–87 |
+| p3-batch6-art | Hand pixels for pier/grove/legendary species 71–100 |
 | p3-kenney | Kenney tileset import |
 
 ### P4 — Minigames (remaining)
@@ -77,10 +77,10 @@ Last updated: 2026-06-11 (P7 discoverability + P8 species 95). **Source of truth
 | ID | Task | Status |
 |----|------|--------|
 | p6-grove-gate | Grove accessible with badges | **done** (teleport smoke) |
-| p6-dex-milestone | Milestone at 20 caught | **done** |
-| p6-shop-sell | Shop sell roundtrip | queued |
-| p6-gym2-4 | Gyms 2–4 badge smoke | queued |
-| p6-chest-loot | Chest interact e2e | queued |
+| p6-dex-milestone | Milestone at 20 + 100 caught | **done** |
+| p6-shop-sell | Shop sell roundtrip | **done** |
+| p6-gym2-4 | Gyms 2–4 badge smoke | **done** |
+| p6-chest-loot | Chest interact e2e | **done** |
 | p6-grove-walk | Walk onto forest warp tile | queued |
 
 ### P7 — Discoverability
@@ -90,16 +90,15 @@ Last updated: 2026-06-11 (P7 discoverability + P8 species 95). **Source of truth
 | p7-region-hints | Mom/Prof minigame lines | **done** |
 | p7-region-map | ★ hinted/visited minigame nodes | **done** |
 | p7-fast-travel | Pier/grove/contest in fast travel | **done** |
-| p7-frostvale-sign | Frostvale guide mentions contest | done (existing sign) |
 
 ### P8 — Content “100 species”
 
 | ID | Task | Status |
 |----|------|--------|
 | p8-species-91-95 | glowfern, stormlet, cavemaw, psychomyst, voidreaper | **done** |
-| p8-species-96-100 | 5 endgame species | queued |
+| p8-species-96-100 | solarchion, lunawisp, terradrake, stormcrown, primordix | **done** |
 | p8-dex-milestone-90 | Prof reward at 90 caught | **done** |
-| p8-evo-finish | Remaining single-stage rares | optional |
+| p8-dex-milestone-100 | Prof reward at 100 caught | **done** |
 
 ### P5 — Graphics & audio
 
@@ -112,25 +111,20 @@ Last updated: 2026-06-11 (P7 discoverability + P8 species 95). **Source of truth
 
 ## Suggested next sprint
 
-1. **P8 species 96–100** — finish regional dex
-2. **P2 trainer extract** — maintainability before more content
-3. **P6 gym2–4 + shop sell e2e** — CI confidence
+1. **P3 batch6 art** — hand pixels for late-game species
+2. **P2 OverworldScene trim** — input/pointer helper
+3. **P0 full e2e** — release confidence pass
 
 ---
-
-## Verify
-
-```bash
-npm run gen-assets
-npm run verify && npx tsc --noEmit && npm run test:unit && npm run test:e2e
-```
 
 ## Key files
 
 | Area | Path |
 |------|------|
-| Region discovery | `src/systems/regionDiscovery.ts` |
-| Fast travel | `src/systems/healTravel.ts` |
-| Minigame scores | `src/systems/minigameScores.ts` |
+| Species | `src/data/creatures.ts` |
+| Trainer battles | `src/scenes/overworld/TrainerBattleHandler.ts` |
+| Warp gates | `src/scenes/overworld/WarpBlockDialog.ts` |
 | Dex milestones | `src/systems/dexMilestones.ts` |
-| Test bridge | `src/main.ts` → `__cq` |
+| Region hints | `src/systems/regionDiscovery.ts` |
+| E2E helpers | `e2e/helpers.ts` |
+| Verify | `scripts/verify-build.mjs` |

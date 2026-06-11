@@ -55,7 +55,7 @@ Verdant Town through Victory Road — 22 core zones plus **Fishing Pier**, **Sec
 
 ### Critters & battle
 
-- **95 species** with evolution chains, abilities, natures, and IVs
+- **100 species** with evolution chains, abilities, natures, and IVs
 - **55+ moves** with type effectiveness chart
 - **Status effects** — burn, paralyze, poison, sleep, freeze, confusion
 - **Learn-move UI** when leveling up with a full moveset

@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT } from './data/types';
 import { getMap } from './data/maps';
 import { resolveTrainerParty } from './data/maps/helpers';
-import { getItem, addItem } from './data/items';
+import { getItem, addItem, removeItem } from './data/items';
 import { DEX_ORDER } from './data/creatures';
 import { pendingDexMilestone, claimDexMilestone } from './systems/dexMilestones';
 import { saveGame, depositToStorage, withdrawFromStorage } from './systems/save';
@@ -14,6 +14,7 @@ import { installLazySceneLoader } from './scenes/registerScenes';
 import { installCanvasFocusOnBoot } from './utils/focusCanvas';
 import type { BattleScene } from './scenes/BattleScene';
 import type { OverworldScene } from './scenes/OverworldScene';
+import { applyChestReward } from './scenes/overworld/ChestRewards';
 import type { FishingScene } from './scenes/FishingScene';
 import type { BugCatchScene } from './scenes/BugCatchScene';
 import type { CritterContestScene } from './scenes/CritterContestScene';
@@ -74,6 +75,8 @@ declare global {
       resolveBattle: (outcome: 'win' | 'lose' | 'catch') => void;
       openShop: () => void;
       buyShopItem: (itemId?: string) => boolean;
+      sellShopItem: (itemId?: string) => boolean;
+      claimChest: (chestId: string) => boolean;
       openPc: () => void;
       depositPartySlot: (index: number) => boolean;
       withdrawStorageSlot: (index: number) => boolean;
@@ -197,6 +200,21 @@ if (import.meta.env.DEV) {
       if (GameState.player.money < item.price) return false;
       GameState.player.money -= item.price;
       addItem(GameState.player.items, itemId);
+      saveGame();
+      return true;
+    },
+    sellShopItem(itemId = 'potion') {
+      if ((GameState.player.items[itemId] ?? 0) <= 0) return false;
+      const sellPrice = Math.max(1, Math.floor(getItem(itemId).price / 2));
+      removeItem(GameState.player.items, itemId);
+      GameState.player.money += sellPrice;
+      saveGame();
+      return true;
+    },
+    claimChest(chestId) {
+      if (GameState.player.storyFlags[chestId]) return false;
+      GameState.player.storyFlags[chestId] = true;
+      applyChestReward(chestId);
       saveGame();
       return true;
     },
