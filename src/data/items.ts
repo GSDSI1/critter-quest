@@ -105,6 +105,22 @@ export const ITEMS: Record<string, ItemDef> = {
     id: 'lum_berry', name: 'Lum Berry', description: 'Held: cures any status condition once.',
     price: 1200, category: 'battle', usableInBattle: false, usableOverworld: false,
   },
+  sitrus_berry: {
+    id: 'sitrus_berry', name: 'Sitrus Berry', description: 'Held: restores 25% HP when low.',
+    price: 800, category: 'battle', usableInBattle: false, usableOverworld: false,
+  },
+  hard_stone: {
+    id: 'hard_stone', name: 'Hard Stone', description: 'Held: boosts Stone moves 20%.',
+    price: 9800, category: 'battle', usableInBattle: false, usableOverworld: false,
+  },
+  magnet: {
+    id: 'magnet', name: 'Magnet', description: 'Held: boosts Volt moves 20%.',
+    price: 9800, category: 'battle', usableInBattle: false, usableOverworld: false,
+  },
+  shadow_cloth: {
+    id: 'shadow_cloth', name: 'Shadow Cloth', description: 'Held: boosts Shadow moves 20%.',
+    price: 9800, category: 'battle', usableInBattle: false, usableOverworld: false,
+  },
 };
 
 export const SHOP_STOCK = [
@@ -112,7 +128,8 @@ export const SHOP_STOCK = [
   'potion', 'super_potion', 'hyper_potion', 'full_restore',
   'revive', 'ether',
   'antidote', 'paralyze_heal', 'burn_heal', 'awakening', 'full_heal',
-  'oran_berry', 'lum_berry', 'charcoal', 'mystic_water', 'silk_scarf', 'never_melt_ice', 'twisted_spoon', 'scope_lens',
+  'oran_berry', 'lum_berry', 'sitrus_berry', 'charcoal', 'mystic_water', 'silk_scarf',
+  'never_melt_ice', 'twisted_spoon', 'hard_stone', 'magnet', 'shadow_cloth', 'scope_lens',
 ];
 
 export function getItem(id: string): ItemDef {
@@ -140,11 +157,15 @@ export function emptyBag(): ItemBag {
     ether: 0,
     oran_berry: 0,
     lum_berry: 0,
+    sitrus_berry: 0,
     charcoal: 0,
     mystic_water: 0,
     silk_scarf: 0,
     never_melt_ice: 0,
     twisted_spoon: 0,
+    hard_stone: 0,
+    magnet: 0,
+    shadow_cloth: 0,
     scope_lens: 0,
   };
 }

@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../data/types';
+import { COLORS, GAME_WIDTH } from '../data/types';
 import { getBadge } from '../data/badges';
 import { GameState } from '../systems/stats';
 import { trySave } from '../utils/saveFeedback';
@@ -22,10 +22,7 @@ export class PauseMenuScene extends Phaser.Scene {
   create(): void {
     Input.bind(this);
     this.muted = loadAudioSettings().muted;
-    this.options = ['Critterdex', 'Party', 'Options'];
-    this.options.push(this.muted ? 'Unmute' : 'Mute');
-    if (canFastTravel()) this.options.push('Fly');
-    this.options.push('Save Game', 'Close');
+    this.options = this.buildOptions();
     this.selected = Math.min(this.selected, this.options.length - 1);
     buildScreenOverlay(this, 0.65);
     buildMenuPanel(this, 170, 70, 300, 360, 5);
@@ -56,6 +53,13 @@ export class PauseMenuScene extends Phaser.Scene {
     this.renderOptions();
   }
 
+  private buildOptions(): string[] {
+    const opts = ['Critterdex', 'Party', 'Region Map', 'Options', this.muted ? 'Unmute' : 'Mute'];
+    if (canFastTravel()) opts.push('Fly');
+    opts.push('Save Game', 'Close');
+    return opts;
+  }
+
   update(): void {
     Input.update();
     if (Input.justPressed('up')) {
@@ -76,8 +80,8 @@ export class PauseMenuScene extends Phaser.Scene {
     this.optionTexts.forEach(t => t.destroy());
     this.optionTexts = [];
     this.options.forEach((opt, i) => {
-      const t = this.add.text(GAME_WIDTH / 2, 200 + i * 40, (i === this.selected ? '▶ ' : '  ') + opt, {
-        fontFamily: '"Courier New", monospace', fontSize: '16px',
+      const t = this.add.text(GAME_WIDTH / 2, 200 + i * 36, (i === this.selected ? '▶ ' : '  ') + opt, {
+        fontFamily: '"Courier New", monospace', fontSize: '15px',
         color: i === this.selected ? '#f5c542' : '#c0c0c0',
       }).setOrigin(0.5);
       this.optionTexts.push(t);
@@ -93,6 +97,9 @@ export class PauseMenuScene extends Phaser.Scene {
     } else if (opt === 'Party') {
       this.scene.launch('Party', { fromPause: true });
       this.scene.pause();
+    } else if (opt === 'Region Map') {
+      this.scene.launch('RegionMap');
+      this.scene.pause();
     } else if (opt === 'Options') {
       this.scene.launch('Options');
       this.scene.pause();
@@ -102,10 +109,8 @@ export class PauseMenuScene extends Phaser.Scene {
       saveAudioSettings(settings);
       refreshMusicVolume();
       this.muted = settings.muted;
-      this.options = ['Critterdex', 'Party', 'Options', this.muted ? 'Unmute' : 'Mute'];
-      if (canFastTravel()) this.options.push('Fly');
-      this.options.push('Save Game', 'Close');
-      this.selected = 3;
+      this.options = this.buildOptions();
+      this.selected = 4;
       this.renderOptions();
     } else if (opt === 'Fly') {
       this.scene.launch('FastTravel', { fromPause: true });

@@ -95,9 +95,13 @@ export class BattleFlow {
     }
     if (result.damage && result.damage > 0) {
       const moveType = getMove(this.host.playerMon.moves[index].id).type;
-      this.host.battleAnims.playHitOnEnemy(this.host.ui.enemySprite, moveType);
+      this.host.battleAnims.animateAttackLunge(this.host.ui.playerSprite, true, () => {
+        this.host.battleAnims.playHitOnEnemy(this.host.ui.enemySprite, moveType);
+        this.host.ui.animateEnemyHp();
+        this.host.battleAnims.applyEffectivenessTint(this.host.ui.enemySprite, result.effectiveness);
+      });
+    } else if (result.statChange) {
       this.host.ui.animateEnemyHp();
-      this.host.battleAnims.applyEffectivenessTint(this.host.ui.enemySprite, result.effectiveness);
     }
     if (result.fainted) {
       this.host.phase = 'message';
@@ -135,8 +139,10 @@ export class BattleFlow {
     this.host.ui.queueMessage(result.message);
     if (result.damage && result.damage > 0) {
       const moveType = getMove(this.host.wild.moves[aiMove].id).type;
-      this.host.battleAnims.playHitOnPlayer(this.host.ui.playerSprite, moveType);
-      this.host.ui.refreshPlayerUi();
+      this.host.battleAnims.animateAttackLunge(this.host.ui.enemySprite, false, () => {
+        this.host.battleAnims.playHitOnPlayer(this.host.ui.playerSprite, moveType);
+        this.host.ui.refreshPlayerUi();
+      });
     }
     const enemyStatus = endOfTurnStatus(this.host.wild);
     if (enemyStatus) {

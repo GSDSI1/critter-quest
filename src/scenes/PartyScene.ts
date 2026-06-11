@@ -13,7 +13,9 @@ import { buildScreenOverlay, buildMenuPanel } from '../ui/sceneBackdrops';
 import { Input } from '../systems/input';
 
 const HELD_ITEMS = [
-  'oran_berry', 'charcoal', 'mystic_water', 'silk_scarf', 'never_melt_ice', 'twisted_spoon', 'scope_lens',
+  'oran_berry', 'sitrus_berry', 'lum_berry',
+  'charcoal', 'mystic_water', 'silk_scarf', 'never_melt_ice', 'twisted_spoon',
+  'hard_stone', 'magnet', 'shadow_cloth', 'scope_lens',
 ];
 
 export class PartyScene extends Phaser.Scene {

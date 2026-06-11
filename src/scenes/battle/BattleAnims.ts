@@ -100,6 +100,16 @@ export class BattleAnims {
     if (moveType) this.playMoveVfx(moveType, enemySprite.x, enemySprite.y);
   }
 
+  /** Quick lunge toward the opponent before impact. */
+  animateAttackLunge(sprite: Phaser.GameObjects.Image, towardEnemy: boolean, onDone?: () => void): void {
+    const baseX = sprite.x;
+    const delta = towardEnemy ? 28 : -28;
+    this.scene.tweens.add({
+      targets: sprite, x: baseX + delta, duration: 110, yoyo: true, ease: 'Quad.easeOut',
+      onComplete: () => { sprite.x = baseX; onDone?.(); },
+    });
+  }
+
   playHitOnPlayer(playerSprite: Phaser.GameObjects.Image, moveType?: string): void {
     Sfx.hit();
     this.scene.cameras.main.shake(120, 0.004);

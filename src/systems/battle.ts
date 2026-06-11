@@ -304,6 +304,12 @@ export function moneyLossOnBlackout(money: number): number {
 }
 
 export function tryHeldBerry(c: CritterInstance): string | null {
+  if (c.heldItem === 'sitrus_berry' && c.currentHp > 0 && c.currentHp <= Math.floor(c.maxHp / 4)) {
+    const heal = Math.max(1, Math.floor(c.maxHp / 4));
+    c.currentHp = Math.min(c.maxHp, c.currentHp + heal);
+    c.heldItem = undefined;
+    return `${displayName(c)} ate its Sitrus Berry!`;
+  }
   if (c.heldItem !== 'oran_berry' || c.currentHp <= 0) return null;
   if (c.currentHp <= c.maxHp / 2) {
     c.currentHp = Math.min(c.maxHp, c.currentHp + 10);

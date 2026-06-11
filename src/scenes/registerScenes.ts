@@ -18,6 +18,7 @@ const LAZY_SCENES: { key: string; load: () => Promise<Record<string, SceneCtor>>
   { key: 'PauseMenu', load: () => import('./PauseMenuScene').then(m => ({ PauseMenuScene: m.PauseMenuScene })) },
   { key: 'Options', load: () => import('./OptionsScene').then(m => ({ OptionsScene: m.OptionsScene })) },
   { key: 'FastTravel', load: () => import('./FastTravelScene').then(m => ({ FastTravelScene: m.FastTravelScene })) },
+  { key: 'RegionMap', load: () => import('./RegionMapScene').then(m => ({ RegionMapScene: m.RegionMapScene })) },
   { key: 'HallOfFame', load: () => import('./HallOfFameScene').then(m => ({ HallOfFameScene: m.HallOfFameScene })) },
   { key: 'LearnMove', load: () => import('./LearnMoveScene').then(m => ({ LearnMoveScene: m.LearnMoveScene })) },
   { key: 'Nickname', load: () => import('./LearnMoveScene').then(m => ({ NicknameScene: m.NicknameScene })) },

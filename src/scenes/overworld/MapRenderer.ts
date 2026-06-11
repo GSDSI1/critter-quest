@@ -57,8 +57,11 @@ export class MapRenderer {
       this.tileLayer = tm.createLayer(0, tileset, 0, 0)?.setDepth(0);
     }
 
+    if (this.tileLayer && (map.mapTheme ?? 'outdoor') === 'outdoor') {
+      applyMapAutotiles(map, this.tileLayer);
+    }
     this.buildAnimatedOverlays(map, false);
-    this.renderEdgeOverlays(false);
+    this.renderEdgeOverlays((map.mapTheme ?? 'outdoor') === 'outdoor');
     this.decorLayer = this.scene.add.container(0, 0).setDepth(6);
     this.renderDecorations();
   }

@@ -249,26 +249,71 @@ function drawTile(
 }
 
 const TILE_COUNT = 19;
+export const OUTDOOR_PROC_TILE_COUNT = 51;
+
+function drawGrassPathAutotile(
+  g: Phaser.GameObjects.Graphics, row: number, ts: number, mask: number, theme: MapTheme,
+): void {
+  drawTile(g, 0, 0, row, ts, theme, 0);
+  const py = row * ts;
+  const edge = 5;
+  g.fillStyle(COLORS.path, 1);
+  if (mask & 1) g.fillRect(0, py, ts, edge);
+  if (mask & 2) g.fillRect(ts - edge, py, edge, ts);
+  if (mask & 4) g.fillRect(0, py + ts - edge, ts, edge);
+  if (mask & 8) g.fillRect(0, py, edge, ts);
+  if ((mask & 3) === 3) g.fillRect(ts - edge, py, edge, edge);
+  if ((mask & 6) === 6) g.fillRect(ts - edge, py + ts - edge, edge, edge);
+  if ((mask & 9) === 9) g.fillRect(0, py, edge, edge);
+  if ((mask & 12) === 12) g.fillRect(0, py + ts - edge, edge, edge);
+}
+
+function drawWaterShoreAutotile(
+  g: Phaser.GameObjects.Graphics, row: number, ts: number, mask: number, theme: MapTheme,
+): void {
+  drawTile(g, 0, 0, row, ts, theme, 0);
+  const py = row * ts;
+  const edge = 5;
+  g.fillStyle(COLORS.water, 1);
+  g.fillStyle(lighten(COLORS.water, 20), 1);
+  if (mask & 1) g.fillRect(0, py, ts, edge);
+  if (mask & 2) g.fillRect(ts - edge, py, edge, ts);
+  if (mask & 4) g.fillRect(0, py + ts - edge, ts, edge);
+  if (mask & 8) g.fillRect(0, py, edge, ts);
+  if ((mask & 3) === 3) g.fillRect(ts - edge, py, edge, edge);
+  if ((mask & 6) === 6) g.fillRect(ts - edge, py + ts - edge, edge, edge);
+  if ((mask & 9) === 9) g.fillRect(0, py, edge, edge);
+  if ((mask & 12) === 12) g.fillRect(0, py + ts - edge, edge, edge);
+}
 
 export function proceduralTilesetKey(theme: MapTheme = 'outdoor'): string {
   return theme === 'outdoor' ? 'proc_tileset' : `proc_tileset_${theme}`;
 }
 
-/** Bake 19 procedural tiles into a single spritesheet for tilemap rendering. */
+/** Bake procedural tiles into a spritesheet for tilemap rendering (outdoor includes autotile frames). */
 export function bakeProceduralTileset(scene: Phaser.Scene, theme: MapTheme = 'outdoor'): void {
   const key = proceduralTilesetKey(theme);
   if (scene.textures.exists(key)) return;
 
   const ts = 16;
+  const count = theme === 'outdoor' ? OUTDOOR_PROC_TILE_COUNT : TILE_COUNT;
   const g = scene.make.graphics({ x: 0, y: 0 });
-  for (let i = 0; i < TILE_COUNT; i++) {
-    drawTile(g, i, 0, i, ts, theme, 0);
+  for (let i = 0; i < count; i++) {
+    if (theme === 'outdoor') {
+      if (i === 19) drawTile(g, 2, 0, i, ts, theme, 1);
+      else if (i === 20) drawTile(g, 3, 0, i, ts, theme, 1);
+      else if (i >= 36) drawWaterShoreAutotile(g, i, ts, i - 35, theme);
+      else if (i >= 21) drawGrassPathAutotile(g, i, ts, i - 20, theme);
+      else drawTile(g, i, 0, i, ts, theme, 0);
+    } else {
+      drawTile(g, i, 0, i, ts, theme, 0);
+    }
   }
-  g.generateTexture(key, ts, ts * TILE_COUNT);
+  g.generateTexture(key, ts, ts * count);
   g.destroy();
 
   const tex = scene.textures.get(key);
-  for (let i = 0; i < TILE_COUNT; i++) {
+  for (let i = 0; i < count; i++) {
     const frame = String(i);
     if (!tex.has(frame)) tex.add(frame, 0, 0, i * ts, ts, ts);
   }

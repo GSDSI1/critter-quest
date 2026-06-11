@@ -91,7 +91,7 @@ const registerScenes = existsSync(join(root, 'src/scenes/registerScenes.ts'))
 const EAGER_SCENES = ['BootScene', 'IntroScene', 'MenuScene'];
 const LAZY_SCENE_KEYS = [
   'CharacterSelect', 'LabIntro', 'StarterSelect', 'Overworld', 'TrainerIntro', 'Battle',
-  'Party', 'Shop', 'PC', 'Critterdex', 'PauseMenu', 'Options', 'FastTravel', 'HallOfFame', 'LearnMove', 'Nickname', 'Victory',
+  'Party', 'Shop', 'PC', 'Critterdex', 'PauseMenu', 'Options', 'FastTravel', 'RegionMap', 'HallOfFame', 'LearnMove', 'Nickname', 'Victory',
 ];
 for (const scene of EAGER_SCENES) {
   if (main.includes(scene)) ok(`${scene} registered (eager)`);
@@ -265,9 +265,22 @@ const battleSrc = read('src/systems/battle.ts');
 if (battleSrc.includes('lum_berry') || read('src/data/items.ts').includes('lum_berry')) ok('Lum Berry held item');
 else fail('Lum Berry missing');
 
+if (battleSrc.includes('sitrus_berry') && read('src/data/items.ts').includes('sitrus_berry')) ok('Sitrus Berry held item');
+else fail('Sitrus Berry missing');
+
+if (read('src/data/items.ts').includes('hard_stone') && read('src/data/items.ts').includes('shadow_cloth')) {
+  ok('Type-boost held items in catalog');
+} else fail('items.ts missing type-boost held items');
+
 const pauseMenu = read('src/scenes/PauseMenuScene.ts');
 if (pauseMenu.includes('Mute') && pauseMenu.includes('loadAudioSettings')) ok('Pause menu mute toggle');
 else fail('PauseMenuScene missing mute toggle');
+if (pauseMenu.includes('Region Map')) ok('Pause menu region map entry');
+else fail('PauseMenuScene missing Region Map');
+
+if (existsSync(join(root, 'src/scenes/RegionMapScene.ts')) && existsSync(join(root, 'src/data/regionMap.ts'))) {
+  ok('Region map scene + data');
+} else fail('RegionMapScene or regionMap.ts missing');
 
 const battleScene = read('src/scenes/BattleScene.ts');
 if (battleScene.includes('shouldAutoAdvanceText') && battleScene.includes('messageAutoTimer')) {
@@ -277,6 +290,18 @@ if (battleScene.includes('shouldAutoAdvanceText') && battleScene.includes('messa
 const battleAnims = read('src/scenes/battle/BattleAnims.ts');
 if (battleAnims.includes('ELEMENT_BURSTS')) ok('Element-typed battle move VFX');
 else fail('BattleAnims missing element VFX');
+if (battleAnims.includes('animateAttackLunge')) ok('Battle attack lunge animation');
+else fail('BattleAnims missing attack lunge');
+
+const tilesProc = read('src/utils/sprites/tiles.ts');
+if (tilesProc.includes('OUTDOOR_PROC_TILE_COUNT') && tilesProc.includes('drawGrassPathAutotile')) {
+  ok('Procedural outdoor autotile frames');
+} else fail('tiles.ts missing procedural autotile bake');
+
+const mapRenderer = existsSync(join(root, 'src/scenes/overworld/MapRenderer.ts'))
+  ? read('src/scenes/overworld/MapRenderer.ts') : '';
+if (mapRenderer.includes('applyMapAutotiles')) ok('MapRenderer procedural autotile pass');
+else fail('MapRenderer missing applyMapAutotiles');
 
 const musicTs = read('src/utils/music.ts');
 if (musicTs.includes('bgm_') && musicTs.includes('bindMusicScene')) ok('Phaser BGM loop player');

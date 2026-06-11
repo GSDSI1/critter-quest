@@ -1,6 +1,6 @@
 # Critter Quest — Build Queue
 
-Last updated: 2026-06-10. Source: `GAMEPLAN.md`.
+Last updated: 2026-06-09. Source: `GAMEPLAN.md`.
 
 ## Done
 
@@ -18,6 +18,9 @@ Last updated: 2026-06-10. Source: `GAMEPLAN.md`.
 | **Opt** | Battle feel pass (back idle, text speed, element VFX, walk puffs) | ✓ |
 | **Opt** | Lum Berry held item + pause-menu mute toggle | ✓ |
 | **Opt** | Chiptune BGM WAV loops + footstep SFX + Critterdex learnset scroll | ✓ |
+| **Opt** | Procedural outdoor autotiles (grass/path + water shore) | ✓ |
+| **Opt** | Sitrus Berry + type-boost held items (shop/party) | ✓ |
+| **Opt** | Battle attack lunge + Region Map pause menu | ✓ |
 
 ## Optional polish (future)
 

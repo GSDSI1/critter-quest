@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { calcDamage, stageMult, expGain, tryRun, tryCatchWithItem, applyMoveStatus } from '../battle';
+import { calcDamage, stageMult, expGain, tryRun, tryCatchWithItem, applyMoveStatus, tryHeldBerry } from '../battle';
 import { createCritter } from '../stats';
 import { createSeededRng } from '../rng';
 import { typeMultiplier } from '../../data/types';
@@ -73,5 +73,26 @@ describe('lum berry', () => {
     expect(msg).toContain('Lum Berry');
     expect(def.status).toBeNull();
     expect(def.heldItem).toBeUndefined();
+  });
+});
+
+describe('sitrus berry', () => {
+  it('heals at or below 25% HP and is consumed', () => {
+    const c = createCritter('mossling', 10);
+    c.heldItem = 'sitrus_berry';
+    c.currentHp = Math.floor(c.maxHp / 4);
+    const before = c.currentHp;
+    const msg = tryHeldBerry(c);
+    expect(msg).toContain('Sitrus Berry');
+    expect(c.currentHp).toBeGreaterThan(before);
+    expect(c.heldItem).toBeUndefined();
+  });
+
+  it('does not trigger above 25% HP', () => {
+    const c = createCritter('mossling', 10);
+    c.heldItem = 'sitrus_berry';
+    c.currentHp = Math.floor(c.maxHp / 4) + 1;
+    expect(tryHeldBerry(c)).toBeNull();
+    expect(c.heldItem).toBe('sitrus_berry');
   });
 });
