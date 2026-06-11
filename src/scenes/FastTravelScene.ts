@@ -6,13 +6,13 @@ import { trySave } from '../utils/saveFeedback';
 import { buildScreenOverlay, buildMenuPanel } from '../ui/sceneBackdrops';
 import { Input } from '../systems/input';
 import { Sfx } from '../utils/audio';
-import { HEAL_RETURN_SPAWN, listFastTravelDestinations } from '../systems/healTravel';
+import { listFastTravelDestinations, type FastTravelDest } from '../systems/healTravel';
 import { wipeToScene } from '../ui/transitions';
 import { TouchMenuNav } from '../ui/touchMenuNav';
 
 export class FastTravelScene extends Phaser.Scene {
   private selected = 0;
-  private destinations: { id: string; label: string }[] = [];
+  private destinations: FastTravelDest[] = [];
   private touchNav?: TouchMenuNav;
 
   constructor() {
@@ -29,7 +29,7 @@ export class FastTravelScene extends Phaser.Scene {
       fontFamily: FONT, fontSize: '22px', color: '#f5c542',
     }).setOrigin(0.5);
 
-    this.add.text(GAME_WIDTH / 2, 134, 'Visit a Healing Center', {
+    this.add.text(GAME_WIDTH / 2, 134, 'Healing Centers & discovered sites', {
       fontFamily: FONT, fontSize: '11px', color: '#8899aa',
     }).setOrigin(0.5);
 
@@ -91,11 +91,10 @@ export class FastTravelScene extends Phaser.Scene {
   private travel(): void {
     const dest = this.destinations[this.selected];
     if (!dest) return;
-    const spawn = HEAL_RETURN_SPAWN[dest.id] ?? { x: 10, y: 10 };
     Sfx.menuConfirm();
-    GameState.player.mapId = dest.id;
-    GameState.player.x = spawn.x;
-    GameState.player.y = spawn.y;
+    GameState.player.mapId = dest.mapId;
+    GameState.player.x = dest.x;
+    GameState.player.y = dest.y;
     trySave(this);
     this.scene.stop('PauseMenu');
     this.scene.stop();

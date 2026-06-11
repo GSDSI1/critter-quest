@@ -33,6 +33,12 @@ export const DEX_MILESTONES: DexMilestone[] = [
     lines: ['Eighty caught — incredible!', 'A true Critterdex master.'],
     apply: (p) => { p.money += 2000; addItem(p.items, 'contest_ribbon', 1); },
   },
+  {
+    count: 90,
+    flag: 'dex_milestone_90',
+    lines: ['Ninety on the dex!', 'The region\'s catalog is nearly complete.'],
+    apply: (p) => { p.money += 3000; addItem(p.items, 'ultra_orb', 3); },
+  },
 ];
 
 /** Returns the highest unclaimed milestone the player qualifies for, or null. */

@@ -4,7 +4,7 @@ export interface RegionNode {
   label: string;
   x: number;
   y: number;
-  kind: 'town' | 'route' | 'gym' | 'dungeon';
+  kind: 'town' | 'route' | 'gym' | 'dungeon' | 'minigame';
   badge?: string;
   hub?: boolean;
 }
@@ -19,18 +19,18 @@ export const REGION_NODES: RegionNode[] = [
   { id: 'gym2', label: 'Gym 2', x: 560, y: 300, kind: 'gym', badge: 'ember' },
   { id: 'crystal_cave', label: 'Crystal Cave', x: 452, y: 220, kind: 'dungeon' },
   { id: 'route3', label: 'Route 3', x: 452, y: 300, kind: 'route' },
-  { id: 'fishing_pier', label: 'Fishing Pier', x: 420, y: 340, kind: 'route' },
+  { id: 'fishing_pier', label: '★ Pier', x: 420, y: 340, kind: 'minigame' },
   { id: 'ember_city', label: 'Ember City', x: 528, y: 260, kind: 'town', badge: 'ember', hub: true },
   { id: 'volcanic_path', label: 'Volcanic Path', x: 528, y: 340, kind: 'route' },
   { id: 'route4', label: 'Route 4', x: 300, y: 180, kind: 'route' },
   { id: 'glacier_pass', label: 'Glacier Pass', x: 376, y: 140, kind: 'route' },
   { id: 'frostvale', label: 'Frostvale', x: 452, y: 100, kind: 'town', badge: 'frost', hub: true },
-  { id: 'contest_hall', label: 'Contest Hall', x: 480, y: 130, kind: 'route' },
+  { id: 'contest_hall', label: '★ Contest', x: 480, y: 130, kind: 'minigame' },
   { id: 'gym3', label: 'Gym 3', x: 420, y: 80, kind: 'gym', badge: 'frost' },
   { id: 'route5', label: 'Route 5', x: 528, y: 100, kind: 'route' },
   { id: 'mindspire', label: 'Mindspire', x: 568, y: 160, kind: 'town', badge: 'psyche', hub: true },
   { id: 'gym4', label: 'Gym 4', x: 600, y: 180, kind: 'gym', badge: 'psyche' },
-  { id: 'secret_grove', label: 'Secret Grove', x: 260, y: 260, kind: 'dungeon' },
+  { id: 'secret_grove', label: '★ Grove', x: 260, y: 260, kind: 'minigame' },
   { id: 'victory_road', label: 'Victory Road', x: 568, y: 60, kind: 'dungeon', badge: 'psyche' },
 ];
 

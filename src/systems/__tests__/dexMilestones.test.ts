@@ -28,6 +28,6 @@ describe('dexMilestones', () => {
   });
 
   it('has four tiers defined', () => {
-    expect(DEX_MILESTONES.length).toBe(4);
+    expect(DEX_MILESTONES.length).toBe(5);
   });
 });

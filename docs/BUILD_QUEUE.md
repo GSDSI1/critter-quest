@@ -1,143 +1,120 @@
 # Critter Quest — Build Queue
 
-Last updated: 2026-06-11 (P4 minigames + full backlog). Source: `GAMEPLAN.md` + sprint audits.
+Last updated: 2026-06-11 (P7 discoverability + P8 species 95). **Source of truth for forward work.**
 
 ## Snapshot
 
 | Metric | Value |
 |--------|-------|
-| Species | 90 |
-| Maps | 25 (+ 3 new chests on route4 / glacier / contest hall) |
-| Scenes (lazy) | 20+ incl. Fishing / BugCatch / CritterContest |
-| Unit tests | 56 (11 files) |
-| E2E specs | 11 (incl. fishing completion) |
-| Verify checks | ~100+, green |
-| Unpushed | 1 commit (`2871cdf` P2+P3) + P4 in progress |
-
-Use **verify + this file** for counts — not stale `GAMEPLAN.md` line items.
+| Species | **95** |
+| Maps | 25 |
+| Unit tests | 59 (12 files) |
+| E2E specs | 14 |
+| Dex milestones | 20 / 40 / 60 / 80 / **90** |
+| Verify | ~100 checks, green |
 
 ---
 
-## Shipped (2026-06-11)
+## Shipped (cumulative)
 
 | Band | Deliverables |
 |------|----------------|
-| **Movement sprint** | BFS walk, 25 maps, 3 minigames, fun layer, species 71–87 |
-| **P1 UX** | Night HUD, bug hints, dex toasts, intro skip, map hold-walk |
-| **P2 refactor** | `ChestRewards`, `MinigameNpcHandlers`, `WalkController`, `warpGates` + tests |
-| **P3 content** | Species 88–90 (tidewrack, embercoil, prizefawn), evo lines, contest sign |
-| **P4 (this session)** | Minigame bests, fishing e2e, 3 chests, contest daily host hint |
+| Movement sprint | BFS walk, 25 maps, 3 minigames, fun layer, species 71–87 |
+| P1 UX | Night HUD, dex toasts, intro skip, map hold-walk |
+| P2 | ChestRewards, MinigameHandlers, WalkController, warpGates |
+| P3 | Species 88–90, evo lines, contest sign |
+| P4 | Minigame bests, fishing/bug/contest e2e, 3 chests |
+| **P7** | `regionDiscovery.ts`, region map hints (★ nodes), Mom/Prof lines, fast travel to minigames |
+| **P8 partial** | Species 91–95, psychoglow→psychomyst, abysswisp→voidreaper, dex milestone 90 |
 
 ---
 
 ## Active pain points
 
-| # | Issue | Next fix |
-|---|-------|----------|
-| 1 | **Minigame discoverability** | Region map `???` fog; no post-badge quest hints to pier/grove/hall |
-| 2 | **God file** | `NpcManager.ts` ~537 LOC — trainer battles + warp dialogs still inline |
-| 3 | **Procedural art** | Species 71–90 lack hand pixel art (batch6 queued) |
-| 4 | **Dex headroom** | 90/100 species — psychoglow, abysswisp still single-stage |
-| 5 | **Arcade** | Ember City `COIN` token is inline RNG — optional `ArcadeScene` |
+| # | Issue | Next |
+|---|-------|------|
+| 1 | NpcManager still ~550 LOC | Trainer battle extract |
+| 2 | Procedural art 71–95 | batch6 hand art |
+| 3 | 95/100 species | Final 5 legendaries |
+| 4 | Grove walk e2e flaky | Optional: `stepOntoWarp` test bridge |
 
 ---
 
 ## Queued work (prioritized)
 
-### P0 — Ship (~15 min)
+### P0 — Hygiene
 
 | ID | Task | Status |
 |----|------|--------|
-| p0-push | `git push origin main` (P2+P3+P4) | **do after verify** |
-| p0-e2e-full | Full `npm run test:e2e` green | pending |
-| p0-gameplan-90 | Bump `GAMEPLAN.md` snapshot to 90 species | pending |
+| p0-e2e-full | Full `npm run test:e2e` before release | pending |
+| p0-push | Push after green CI | pending |
 
 ### P2 — Refactor (remaining)
 
-| ID | Task | Notes |
-|----|------|-------|
-| p2-trainer-extract | `TrainerBattleHandler.ts` from NpcManager | launchBattle, rematch, gauntlet |
-| p2-warp-dialog | `WarpBlockDialog.ts` — badge/flag bounce-back copy | Uses `warpGates.ts` |
-| p2-overworld-trim | OverworldScene < 350 LOC | pointer/input helper |
+| ID | Task |
+|----|------|
+| p2-trainer-extract | `TrainerBattleHandler.ts` from NpcManager |
+| p2-warp-dialog | `WarpBlockDialog.ts` for bounce-back copy |
+| p2-overworld-trim | Pointer/input helper; OverworldScene < 350 LOC |
 
-### P3 — Content (remaining)
+### P3 — Art
 
-| ID | Task | Notes |
-|----|------|-------|
-| p3-batch6-art | `scripts/critter-art/batch6.mjs` for pier/grove 71–87 | Hand pixels |
-| p3-species-100 | Species 91–100 (10 more) | Route toward full regional dex |
-| p3-evo-psychic | psychoglow→?, abysswisp→? | Optional 1-stage each |
-| p3-frostvale-sign | Frostvale town sign → contest hall pointer | Discoverability |
+| ID | Task |
+|----|------|
+| p3-batch6-art | Hand pixels for pier/grove species 71–87 |
+| p3-kenney | Kenney tileset import |
 
-### P4 — Minigames & fun v2
+### P4 — Minigames (remaining)
 
 | ID | Task | Status |
 |----|------|--------|
-| p4-fishing-e2e | Complete cast via `resolveFishing(2)`, dex grows | **done** |
-| p4-highscores | `fishing_best` / `bug_best` in save + pause menu | **done** |
-| p4-more-chests | route4, glacier_pass, contest_hall | **done** |
-| p4-contest-daily | Host Vera warns if already entered today | **done** |
-| p4-bug-e2e | `resolveBugCatch(30)` → nightmoth in dex | queued |
-| p4-contest-e2e | Win contest → `contest_winner` flag | queued |
-| p4-arcade-scene | Dedicated `ArcadeScene` (low priority) | deferred |
+| p4-bug-e2e | Bug catch nightmoth reward | **done** |
+| p4-contest-e2e | contest_winner flag | **done** |
+| p4-arcade-scene | Optional ArcadeScene | deferred |
 
-### P5 — Graphics & audio (multi-day)
+### P6 — E2E (remaining)
+
+| ID | Task | Status |
+|----|------|--------|
+| p6-grove-gate | Grove accessible with badges | **done** (teleport smoke) |
+| p6-dex-milestone | Milestone at 20 caught | **done** |
+| p6-shop-sell | Shop sell roundtrip | queued |
+| p6-gym2-4 | Gyms 2–4 badge smoke | queued |
+| p6-chest-loot | Chest interact e2e | queued |
+| p6-grove-walk | Walk onto forest warp tile | queued |
+
+### P7 — Discoverability
+
+| ID | Task | Status |
+|----|------|--------|
+| p7-region-hints | Mom/Prof minigame lines | **done** |
+| p7-region-map | ★ hinted/visited minigame nodes | **done** |
+| p7-fast-travel | Pier/grove/contest in fast travel | **done** |
+| p7-frostvale-sign | Frostvale guide mentions contest | done (existing sign) |
+
+### P8 — Content “100 species”
+
+| ID | Task | Status |
+|----|------|--------|
+| p8-species-91-95 | glowfern, stormlet, cavemaw, psychomyst, voidreaper | **done** |
+| p8-species-96-100 | 5 endgame species | queued |
+| p8-dex-milestone-90 | Prof reward at 90 caught | **done** |
+| p8-evo-finish | Remaining single-stage rares | optional |
+
+### P5 — Graphics & audio
 
 | ID | Task |
 |----|------|
-| p5-kenney | Kenney tiles + `npm run import-tileset` |
-| p5-cc0-bgm | Licensed BGM loops + `CREDITS.md` |
-| p5-critter-polish | Generator v3 or batch6 hand art |
-
-### P6 — E2E & QA expansion
-
-| ID | Task |
-|----|------|
-| p6-shop-sell | Shop sell roundtrip |
-| p6-grove-gate | secret_grove warp with verdant+ember badges |
-| p6-dex-milestone | Prof grants reward at 20 caught |
-| p6-gym2-4 | Smoke gyms 2–4 via `__cq` |
-| p6-chest-loot | Open route4/glacier chest via interact |
-
-### P7 — Discoverability sprint (recommended next UX)
-
-| ID | Task | Acceptance |
-|----|------|------------|
-| p7-region-hints | After badge N, Mom/prof mention pier/grove/contest | 1 dialog line each |
-| p7-region-map-labels | Visited minigame maps show icon on region map | Not just `???` after visit |
-| p7-fast-travel-minigames | Frost badge+ unlocks contest hall in fast travel | Optional |
-
-### P8 — Content batch “100 species”
-
-| ID | Task |
-|----|------|
-| p8-species-91-95 | Mid-game gap fillers (route6?, cave rares) |
-| p8-species-96-100 | Endgame legendaries / pseudo-legendaries |
-| p8-dex-milestone-90 | Prof reward at 90 caught (optional 5th milestone) |
+| p5-cc0-bgm | Licensed BGM + CREDITS.md |
+| p5-critter-polish | Generator v3 or batch art |
 
 ---
 
 ## Suggested next sprint
 
-**Pick one:**
-
-1. **P0 ship + P7 discoverability** — push + quest hints (highest player ROI)
-2. **P2 finish + P6 e2e** — maintainability + CI confidence
-3. **P8 species 91–95** — content velocity toward 100 dex
-
----
-
-## Done (historical)
-
-| Phase | Item |
-|-------|------|
-| 0–4 | Core game, CI, Pages deploy |
-| Opt | Atlas, autotiles, BGM, region map, touch nav |
-| Sprint | Walk BFS, 25 maps, minigames, fun layer, 70→90 species |
-| P1 | Night HUD, dex toast, intro skip, walk hold |
-| P2 | ChestRewards, MinigameHandlers, WalkController, warpGates |
-| P3 | Species 88–90, evo lines, contest sign |
-| P4 | High scores, fishing e2e, 3 chests, contest daily hint |
+1. **P8 species 96–100** — finish regional dex
+2. **P2 trainer extract** — maintainability before more content
+3. **P6 gym2–4 + shop sell e2e** — CI confidence
 
 ---
 
@@ -152,10 +129,8 @@ npm run verify && npx tsc --noEmit && npm run test:unit && npm run test:e2e
 
 | Area | Path |
 |------|------|
-| Walk | `src/scenes/overworld/WalkController.ts` |
-| NPC minigames | `src/scenes/overworld/MinigameNpcHandlers.ts` |
-| Chest loot | `src/scenes/overworld/ChestRewards.ts` |
-| Warp gates | `src/systems/warpGates.ts` |
+| Region discovery | `src/systems/regionDiscovery.ts` |
+| Fast travel | `src/systems/healTravel.ts` |
 | Minigame scores | `src/systems/minigameScores.ts` |
-| Dex notify | `src/systems/dexNotify.ts` |
-| Test bridge | `src/main.ts` → `window.__cq` |
+| Dex milestones | `src/systems/dexMilestones.ts` |
+| Test bridge | `src/main.ts` → `__cq` |

@@ -27,6 +27,7 @@ import { playDayIndex } from '../../ui/minigameShell';
 import { pendingDexMilestone, claimDexMilestone } from '../../systems/dexMilestones';
 import { warpGateAllowed } from '../../systems/warpGates';
 import { tryHandleMinigameNpc } from './MinigameNpcHandlers';
+import { momDiscoverabilityLine, profDiscoverabilityLine } from '../../systems/regionDiscovery';
 
 type Critter = ReturnType<typeof createCritter>;
 
@@ -369,6 +370,8 @@ export class NpcManager {
     if (npc.id === 'mom') {
       const day = playDayIndex(GameState.player.playTime);
       const lines = [...this.getMomLines()];
+      const hint = momDiscoverabilityLine(GameState.player);
+      if (hint) lines.push(hint);
       if (GameState.player.lastMomGiftDay !== day) {
         GameState.player.lastMomGiftDay = day;
         const gift = Math.random() < 0.5 ? 'potion' : 'oran_berry';
@@ -388,6 +391,13 @@ export class NpcManager {
         claimDexMilestone(GameState.player, milestone);
         trySave(this.scene);
         this.dialog.show(milestone.lines, () => { this.callbacks.setInputLocked(false); });
+        return;
+      }
+      const hint = profDiscoverabilityLine(GameState.player);
+      if (hint) {
+        this.dialog.show([hint, 'Keep exploring — the region has secrets!'], () => {
+          this.callbacks.setInputLocked(false);
+        });
         return;
       }
     }

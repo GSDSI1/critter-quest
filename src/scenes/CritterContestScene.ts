@@ -105,6 +105,11 @@ export class CritterContestScene extends Phaser.Scene {
     }
   }
 
+  /** DEV test bridge — award contest win without playing rounds. */
+  devWin(): void {
+    this.winContest();
+  }
+
   private winContest(): void {
     GameState.player.storyFlags.contest_winner = true;
     GameState.player.lastContestDay = playDayIndex(GameState.player.playTime);

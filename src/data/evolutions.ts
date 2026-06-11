@@ -45,6 +45,8 @@ export const EVOLUTIONS: EvolutionDef[] = [
   { from: 'frostwisp', to: 'glaciwhisp', level: 20 },
   { from: 'tidepod', to: 'tidewrack', level: 22 },
   { from: 'embermite', to: 'embercoil', level: 20 },
+  { from: 'psychoglow', to: 'psychomyst', level: 24 },
+  { from: 'abysswisp', to: 'voidreaper', level: 36 },
 ];
 
 export function getEvolution(speciesId: string, level: number): string | null {

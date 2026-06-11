@@ -8,6 +8,7 @@ import { buildScreenOverlay, buildMenuPanel } from '../ui/sceneBackdrops';
 import { Input } from '../systems/input';
 import { Sfx } from '../utils/audio';
 import { REGION_NODES, REGION_LINKS } from '../data/regionMap';
+import { regionNodeVisibility } from '../systems/regionDiscovery';
 import { TouchMenuNav } from '../ui/touchMenuNav';
 
 export class RegionMapScene extends Phaser.Scene {
@@ -38,25 +39,29 @@ export class RegionMapScene extends Phaser.Scene {
     for (const node of REGION_NODES) {
       const isHere = here === node.id || here.startsWith(node.id);
       const visitedHub = node.hub && GameState.player.visitedHealCenters.includes(node.id);
-      const discovered = isHere || visitedHub || GameState.player.visitedMaps.includes(node.id);
+      const visibility = regionNodeVisibility(node.id, GameState.player, here);
+      const hubKnown = visitedHub || (node.hub && visibility !== 'hidden');
+      const known = visibility === 'known' || hubKnown;
+      const hinted = visibility === 'hinted' && !known;
       const hasBadge = node.badge && GameState.player.badges.includes(node.badge);
-      const color = !discovered ? 0x1e293b
+      const color = !known && !hinted ? 0x1e293b
         : isHere ? COLORS.gold
           : hasBadge ? 0x22c55e
-            : visitedHub ? 0x60a5fa
-              : node.kind === 'gym' ? 0xf97316
-                : 0x64748b;
-      const nodeAlpha = discovered ? (isHere ? 1 : 0.85) : 0.4;
+            : node.kind === 'minigame' ? 0xa855f7
+              : visitedHub ? 0x60a5fa
+                : node.kind === 'gym' ? 0xf97316
+                  : 0x64748b;
+      const nodeAlpha = known ? (isHere ? 1 : 0.85) : hinted ? 0.55 : 0.35;
 
       this.add.circle(node.x, node.y, isHere ? 10 : 7, color, nodeAlpha).setDepth(2);
       if (hasBadge) {
         const badge = getBadge(node.badge!);
         this.add.circle(node.x + 8, node.y - 8, 4, badge.color).setDepth(3);
       }
-      const label = discovered ? node.label : '???';
+      const label = known ? node.label : hinted ? node.label : '???';
       this.add.text(node.x, node.y + 14, label, {
         fontFamily: FONT, fontSize: '8px',
-        color: isHere ? '#f5c542' : discovered ? '#8899aa' : '#334155',
+        color: isHere ? '#f5c542' : known ? '#8899aa' : hinted ? '#64748b' : '#334155',
       }).setOrigin(0.5).setDepth(2);
     }
 

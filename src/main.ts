@@ -3,6 +3,8 @@ import { GAME_WIDTH, GAME_HEIGHT } from './data/types';
 import { getMap } from './data/maps';
 import { resolveTrainerParty } from './data/maps/helpers';
 import { getItem, addItem } from './data/items';
+import { DEX_ORDER } from './data/creatures';
+import { pendingDexMilestone, claimDexMilestone } from './systems/dexMilestones';
 import { saveGame, depositToStorage, withdrawFromStorage } from './systems/save';
 import { GameState, createCritter, registerSeen, registerCaught } from './systems/stats';
 import { BootScene } from './scenes/BootScene';
@@ -14,6 +16,7 @@ import type { BattleScene } from './scenes/BattleScene';
 import type { OverworldScene } from './scenes/OverworldScene';
 import type { FishingScene } from './scenes/FishingScene';
 import type { BugCatchScene } from './scenes/BugCatchScene';
+import type { CritterContestScene } from './scenes/CritterContestScene';
 
 const config = {
   type: Phaser.AUTO,
@@ -56,6 +59,7 @@ declare global {
         partyCount: number;
         storageCount: number;
         dexCaught: string[];
+        storyFlags: Record<string, boolean>;
       };
       teleport: (mapId: string, x: number, y: number, facing?: 'up' | 'down' | 'left' | 'right') => void;
       startNewGame: () => void;
@@ -82,6 +86,9 @@ declare global {
       setNight: () => void;
       resolveFishing: (hits: number) => void;
       resolveBugCatch: (score: number) => void;
+      resolveContest: () => void;
+      fillDex: (count: number) => void;
+      claimPendingDexMilestone: () => number;
     };
   }
 }
@@ -101,6 +108,7 @@ if (import.meta.env.DEV) {
       partyCount: GameState.player.party.length,
       storageCount: GameState.player.storage.length,
       dexCaught: [...GameState.player.dexCaught],
+      storyFlags: { ...GameState.player.storyFlags },
     }),
     teleport(mapId, x, y, facing = 'up') {
       GameState.player.mapId = mapId;
@@ -252,6 +260,21 @@ if (import.meta.env.DEV) {
     },
     resolveBugCatch(score) {
       (game.scene.getScene('BugCatch') as BugCatchScene | null)?.devFinish(score);
+    },
+    resolveContest() {
+      (game.scene.getScene('CritterContest') as CritterContestScene | null)?.devWin();
+    },
+    fillDex(count) {
+      const n = Math.max(0, Math.min(DEX_ORDER.length, count));
+      GameState.player.dexCaught = DEX_ORDER.slice(0, n);
+      GameState.player.dexSeen = [...GameState.player.dexCaught];
+      saveGame();
+    },
+    claimPendingDexMilestone() {
+      const m = pendingDexMilestone(GameState.player);
+      if (m) claimDexMilestone(GameState.player, m);
+      saveGame();
+      return m?.count ?? 0;
     },
   };
 }

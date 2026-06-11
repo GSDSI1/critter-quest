@@ -722,6 +722,46 @@ export const CREATURES: Record<string, CreatureDef> = {
     description: 'Contest crowds adore its graceful psychic displays.',
     ability: 'synchronize', habitat: 'Frostvale', height: 0.8, weight: 18,
   },
+  glowfern: {
+    id: 'glowfern', name: 'Glowfern', types: ['leaf', 'psychic'], dexNumber: 91,
+    baseStats: { hp: 58, atk: 50, def: 55, spa: 72, spd: 68, spe: 62 },
+    moves: ['vine', 'psybeam', 'photosynthesis', 'sleep_powder'],
+    catchRate: 18, expYield: 145, color: 0x4ade80, shape: 'blob',
+    description: 'Bioluminescent fronds light the Secret Grove at night.',
+    ability: 'overgrow', habitat: 'Secret Grove', height: 0.5, weight: 8,
+  },
+  stormlet: {
+    id: 'stormlet', name: 'Stormlet', types: ['volt'], dexNumber: 92,
+    baseStats: { hp: 54, atk: 58, def: 48, spa: 70, spd: 55, spe: 85 },
+    moves: ['spark', 'thunderbolt', 'thunderwave', 'tackle'],
+    catchRate: 24, expYield: 128, color: 0xfacc15, shape: 'avian',
+    description: 'Rides updrafts along Route 5 toward Mindspire.',
+    ability: 'static', habitat: 'Route 5', height: 0.5, weight: 5,
+  },
+  cavemaw: {
+    id: 'cavemaw', name: 'Cavemaw', types: ['shadow', 'stone'], dexNumber: 93,
+    baseStats: { hp: 70, atk: 78, def: 72, spa: 52, spd: 48, spe: 45 },
+    moves: ['shadowclaw', 'boulder', 'darkpulse', 'tackle'],
+    catchRate: 16, expYield: 165, color: 0x57534e, shape: 'quadruped',
+    description: 'Lurks in crystal caverns, jaws glinting in the dark.',
+    ability: 'sturdy', habitat: 'Crystal Cave', height: 0.9, weight: 42,
+  },
+  psychomyst: {
+    id: 'psychomyst', name: 'Psychomyst', types: ['psychic'], dexNumber: 94,
+    baseStats: { hp: 68, atk: 52, def: 62, spa: 98, spd: 88, spe: 82 },
+    moves: ['calm_mind', 'mindblast', 'psybeam', 'hypnosis'],
+    catchRate: 14, expYield: 178, color: 0xc084fc, shape: 'humanoid',
+    description: 'Meditates atop Mindspire, bending thoughts like mist.',
+    ability: 'synchronize', habitat: 'Mindspire', height: 1.1, weight: 28,
+  },
+  voidreaper: {
+    id: 'voidreaper', name: 'Voidreaper', types: ['shadow', 'psychic'], dexNumber: 95,
+    baseStats: { hp: 75, atk: 58, def: 65, spa: 110, spd: 95, spe: 88 },
+    moves: ['darkpulse', 'mindblast', 'shadow_dust', 'hypnosis'],
+    catchRate: 5, expYield: 240, color: 0x312e81, shape: 'humanoid',
+    description: 'A rare specter that only appears on Victory Road.',
+    ability: 'shadow_tag', habitat: 'Victory Road', height: 1.2, weight: 0.1,
+  },
 };
 
 export const STARTERS = ['emberpup', 'aqualet', 'leafkit'] as const;
