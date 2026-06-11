@@ -40,16 +40,26 @@ function drawTile(tileId, frame = 0) {
   switch (tileId) {
     case 0:
       fillRect(rgba, W, W, 0, 0, W, W, [...C.grass, 255]);
-      for (let i = 0; i < 6; i++) {
+      for (let i = 0; i < 8; i++) {
         s((i * 3 + tileId) % 14 + 1, (i * 2 + 1) % 13 + 1, [...shade(C.grassDark, 10), 255]);
       }
+      for (let i = 0; i < 4; i++) {
+        s((i * 5 + 2) % 13 + 1, (i * 4 + 3) % 12 + 2, [...shade(C.grass, 30), 140]);
+      }
       fillRect(rgba, W, W, 0, 0, W, 1, [...shade(C.grass, 25), 200]);
+      s(0, 0, [...shade(C.grassDark, -5), 180]);
+      s(W - 1, W - 1, [...shade(C.grass, 20), 160]);
       break;
     case 1:
       fillRect(rgba, W, W, 0, 0, W, W, [...C.path, 255]);
       fillRect(rgba, W, W, 0, 0, W, 1, [...shade(C.path, 30), 180]);
       fillRect(rgba, W, W, 0, W - 2, W, 2, [...shade(C.path, -25), 200]);
-      for (let x = 2; x < W - 2; x += 4) s(x, 7, [...shade(C.path, -15), 120]);
+      for (let x = 1; x < W - 1; x += 3) {
+        for (let y = 2; y < W - 2; y += 3) {
+          if ((x + y) % 5 === 0) s(x, y, [...shade(C.path, -18), 200]);
+          else if ((x + y) % 5 === 2) s(x, y, [...shade(C.path, 12), 160]);
+        }
+      }
       break;
     case 2: {
       fillRect(rgba, W, W, 0, 0, W, W, [...C.grassDark, 255]);
@@ -63,16 +73,20 @@ function drawTile(tileId, frame = 0) {
     }
     case 3: {
       fillRect(rgba, W, W, 0, 0, W, W, [...C.water, 255]);
-      const wy = 4 + frame * 2;
-      fillRect(rgba, W, W, 1, wy, W - 2, 2, [...shade(C.water, 40), 160]);
-      fillRect(rgba, W, W, 2, wy + 5, W - 4, 1, [...shade(C.water, 20), 100]);
+      const wy = 3 + frame * 2;
+      fillRect(rgba, W, W, 1, wy, W - 2, 2, [...shade(C.water, 55), 200]);
+      fillRect(rgba, W, W, 2, wy + 5, W - 4, 1, [...shade(C.water, 35), 140]);
+      for (let x = 2; x < W - 2; x += 4) s(x, wy + 1, [200, 230, 255, 180]);
       break;
     }
     case 4:
       fillRect(rgba, W, W, 0, 0, W, W, [...C.grass, 255]);
       fillRect(rgba, W, W, 7, 10, 2, 6, [20, 50, 20, 255]);
-      fillCircle(rgba, W, W, 8, 7, 6, [...C.tree, 255]);
-      fillCircle(rgba, W, W, 6, 6, 2, [...shade(C.tree, 40), 200]);
+      fillRect(rgba, W, W, 6, 11, 4, 2, [...shade([20, 50, 20], -20), 255]);
+      fillCircle(rgba, W, W, 8, 6, 7, [...shade(C.tree, -15), 255]);
+      fillCircle(rgba, W, W, 8, 5, 5, [...C.tree, 255]);
+      fillCircle(rgba, W, W, 5, 4, 2, [...shade(C.tree, 45), 200]);
+      fillCircle(rgba, W, W, 11, 5, 2, [...shade(C.tree, 30), 180]);
       break;
     case 5:
       fillRect(rgba, W, W, 0, 0, W, W, [...C.wall, 255]);
@@ -126,6 +140,9 @@ function drawTile(tileId, frame = 0) {
       fillRect(rgba, W, W, 0, 0, W, W, [...C.grass, 255]);
       fillCircle(rgba, W, W, 8, 10, 5, [120, 113, 108, 255]);
       fillCircle(rgba, W, W, 6, 9, 2, [...shade([120, 113, 108], 25), 255]);
+      s(5, 8, [...shade([120, 113, 108], -25), 255]);
+      s(11, 11, [...shade([120, 113, 108], 35), 220]);
+      s(9, 7, [90, 85, 80, 200]);
       break;
     case 13:
       fillRect(rgba, W, W, 0, 0, W, W, [...C.water, 255]);
@@ -178,6 +195,12 @@ function drawGrassPathAutotile(mask) {
   if ((mask & 6) === 6) fillRect(rgba, W, W, W - edge, W - edge, edge, edge, [...C.path, 255]);
   if ((mask & 9) === 9) fillRect(rgba, W, W, 0, 0, edge, edge, [...C.path, 255]);
   if ((mask & 12) === 12) fillRect(rgba, W, W, 0, W - edge, edge, edge, [...C.path, 255]);
+  const blend = (x, y, c) => {
+    const i = (y * W + x) * 4;
+    if (rgba[i + 3] > 0) setPx(rgba, W, x, y, c);
+  };
+  if (mask & 1) blend(2, edge - 1, [...shade(C.grass, 15), 200]);
+  if (mask & 4) blend(2, W - edge, [...shade(C.grass, 15), 200]);
   for (let i = 0; i < 4; i++) {
     const bx = (i * 3 + mask) % 12 + 2;
     const by = (i * 2 + mask) % 10 + 3;

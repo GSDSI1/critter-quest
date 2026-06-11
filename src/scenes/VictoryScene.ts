@@ -1,3 +1,4 @@
+import { FONT } from '../ui/theme';
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT } from '../data/types';
 import { GameState } from '../systems/stats';
@@ -66,7 +67,7 @@ export class VictoryScene extends Phaser.Scene {
 
     this.creditTexts = lines.map((line, i) =>
       this.add.text(GAME_WIDTH / 2, GAME_HEIGHT + i * 28, line, {
-        fontFamily: '"Courier New", monospace',
+        fontFamily: FONT,
         fontSize: line === 'CRITTER QUEST' ? '22px' : '13px',
         color: line.startsWith('Congratulations') ? '#f5c542' : '#c0c0c0',
         fontStyle: line === 'CRITTER QUEST' ? 'bold' : 'normal',

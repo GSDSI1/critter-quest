@@ -1,3 +1,4 @@
+import { FONT } from '../ui/theme';
 import Phaser from 'phaser';
 import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../data/types';
 import { getMove } from '../data/moves';
@@ -36,7 +37,7 @@ export class LearnMoveScene extends Phaser.Scene {
 
     const move = getMove(this.moveId);
     this.add.text(GAME_WIDTH / 2, 40, `${displayName(this.critter)} wants to learn ${move.name}!`, {
-      fontFamily: '"Courier New", monospace', fontSize: '14px', color: '#f5c542', align: 'center',
+      fontFamily: FONT, fontSize: '14px', color: '#f5c542', align: 'center',
       wordWrap: { width: GAME_WIDTH - 40 },
     }).setOrigin(0.5);
 
@@ -68,7 +69,7 @@ export class LearnMoveScene extends Phaser.Scene {
     if (this.phase === 'confirm') {
       ['Yes', 'No'].forEach((label, i) => {
         const t = this.add.text(GAME_WIDTH / 2 - 60 + i * 120, 120, (i === this.selected ? '▶ ' : '') + label, {
-          fontFamily: '"Courier New", monospace', fontSize: '16px',
+          fontFamily: FONT, fontSize: '16px',
           color: i === this.selected ? '#f5c542' : '#8899aa',
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
         t.on('pointerdown', () => { this.selected = i; this.confirm(); });
@@ -76,13 +77,13 @@ export class LearnMoveScene extends Phaser.Scene {
       });
     } else {
       this.container.add(this.add.text(GAME_WIDTH / 2, 90, 'Forget a move to make room:', {
-        fontFamily: '"Courier New", monospace', fontSize: '12px', color: '#8899aa',
+        fontFamily: FONT, fontSize: '12px', color: '#8899aa',
       }).setOrigin(0.5));
 
       this.critter.moves.forEach((m, i) => {
         const move = getMove(m.id);
         const t = this.add.text(GAME_WIDTH / 2, 120 + i * 28, (i === this.selected ? '▶ ' : '') + move.name, {
-          fontFamily: '"Courier New", monospace', fontSize: '14px',
+          fontFamily: FONT, fontSize: '14px',
           color: i === this.selected ? '#f5c542' : '#c0c0c0',
         }).setOrigin(0.5).setInteractive({ useHandCursor: true });
         t.on('pointerdown', () => { this.selected = i; this.forgetMove(); });
@@ -153,15 +154,15 @@ export class NicknameScene extends Phaser.Scene {
     this.add.graphics().fillStyle(0x000000, 0.8).fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
     this.add.text(GAME_WIDTH / 2, 80, `Give a nickname to ${data.speciesName}?`, {
-      fontFamily: '"Courier New", monospace', fontSize: '16px', color: '#f5c542',
+      fontFamily: FONT, fontSize: '16px', color: '#f5c542',
     }).setOrigin(0.5);
 
     this.display = this.add.text(GAME_WIDTH / 2, 140, '_', {
-      fontFamily: '"Courier New", monospace', fontSize: '18px', color: '#f0f0f0',
+      fontFamily: FONT, fontSize: '18px', color: '#f0f0f0',
     }).setOrigin(0.5);
 
     this.add.text(GAME_WIDTH / 2, 200, 'A / Enter: skip or confirm  ·  Keyboard to type', {
-      fontFamily: '"Courier New", monospace', fontSize: '11px', color: '#667788',
+      fontFamily: FONT, fontSize: '11px', color: '#667788',
     }).setOrigin(0.5);
 
     this.input.keyboard?.on('keydown', (ev: KeyboardEvent) => {

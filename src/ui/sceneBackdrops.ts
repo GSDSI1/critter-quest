@@ -12,9 +12,7 @@ export function buildMenuPanel(
   depth = 5,
 ): Phaser.GameObjects.Graphics | Phaser.GameObjects.NineSlice {
   if (scene.textures.exists('ui_panel')) {
-    scene.add.nineslice(x, y, 'ui_panel', undefined, w, h, 12, 12, 12, 12).setDepth(depth);
-    const g = scene.add.graphics().setDepth(depth);
-    return g;
+    return scene.add.nineslice(x, y, 'ui_panel', undefined, w, h, 12, 12, 12, 12).setDepth(depth);
   }
   const panel = scene.add.graphics().setDepth(depth);
   panel.fillStyle(COLORS.panel, 0.94);
@@ -167,5 +165,14 @@ export function buildHealInterior(scene: Phaser.Scene, depth = -5): Phaser.GameO
 
 /** Battle arena background image for a map. */
 export function buildBattleArena(scene: Phaser.Scene, mapId: string, depth = -10): Phaser.GameObjects.Image {
-  return scene.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, battleBgForMap(mapId)).setDepth(depth);
+  const key = battleBgForMap(mapId);
+  const farKey = `${key}_far`;
+  if (scene.textures.exists(farKey)) {
+    const far = scene.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, farKey).setDepth(depth - 1).setAlpha(0.85);
+    far.setScrollFactor(0);
+    scene.tweens.add({
+      targets: far, x: far.x + 24, duration: 12000, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
+    });
+  }
+  return scene.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, key).setDepth(depth);
 }

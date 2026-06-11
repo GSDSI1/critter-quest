@@ -1,3 +1,4 @@
+import { FONT } from './theme';
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT } from '../data/types';
 import { createScreenBackdrop, pinContainerChildren } from './screenUi';
@@ -49,14 +50,14 @@ export class ControlsPanel {
 
     const panel = scene.add.image(0, 0, 'controls_panel').setOrigin(0.5);
     this.titleText = scene.add.text(0, -120, '', {
-      fontFamily: '"Courier New", monospace', fontSize: '18px', color: '#f5c542',
+      fontFamily: FONT, fontSize: '18px', color: '#f5c542',
     }).setOrigin(0.5);
     this.bodyText = scene.add.text(-240, -80, '', {
-      fontFamily: '"Courier New", monospace', fontSize: '12px', color: '#c0c0c0',
+      fontFamily: FONT, fontSize: '12px', color: '#c0c0c0',
       lineSpacing: 10,
     });
     this.pageHint = scene.add.text(0, 120, '', {
-      fontFamily: '"Courier New", monospace', fontSize: '11px', color: '#667788',
+      fontFamily: FONT, fontSize: '11px', color: '#667788',
     }).setOrigin(0.5);
 
     this.container.add([panel, this.titleText, this.bodyText, this.pageHint]);

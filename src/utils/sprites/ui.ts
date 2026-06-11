@@ -54,10 +54,17 @@ export function generateUiAssets(scene: Phaser.Scene): void {
     const panelG = scene.make.graphics({ x: 0, y: 0 });
     panelG.fillStyle(COLORS.panel, 0.98);
     panelG.fillRoundedRect(0, 0, 48, 48, 10);
-    panelG.lineStyle(3, COLORS.gold, 0.9);
-    panelG.strokeRoundedRect(1, 1, 46, 46, 9);
-    panelG.fillStyle(COLORS.accent, 0.25);
-    panelG.fillRect(6, 6, 36, 4);
+    panelG.lineStyle(2, COLORS.gold, 1);
+    panelG.strokeRoundedRect(0, 0, 48, 48, 10);
+    panelG.lineStyle(1, lighten(COLORS.gold, 30), 0.5);
+    panelG.strokeRoundedRect(3, 3, 42, 42, 8);
+    panelG.fillStyle(COLORS.accent, 0.2);
+    panelG.fillRect(6, 6, 36, 3);
+    panelG.fillStyle(COLORS.gold, 0.9);
+    panelG.fillRect(4, 4, 4, 4);
+    panelG.fillRect(40, 4, 4, 4);
+    panelG.fillRect(4, 40, 4, 4);
+    panelG.fillRect(40, 40, 4, 4);
     panelG.generateTexture('ui_panel', 48, 48);
     panelG.destroy();
   }
@@ -190,13 +197,19 @@ export function generateUiAssets(scene: Phaser.Scene): void {
   }
 
   const dialogG = scene.make.graphics({ x: 0, y: 0 });
+  const dw = GAME_WIDTH - 32;
   dialogG.fillStyle(COLORS.panel, 0.97);
-  dialogG.fillRoundedRect(0, 0, GAME_WIDTH - 32, 96, 10);
-  dialogG.lineStyle(3, COLORS.gold, 0.9);
-  dialogG.strokeRoundedRect(0, 0, GAME_WIDTH - 32, 96, 10);
-  dialogG.fillStyle(COLORS.accent, 0.12);
-  dialogG.fillRect(8, 8, GAME_WIDTH - 48, 3);
-  dialogG.generateTexture('dialog_frame', GAME_WIDTH - 32, 96);
+  dialogG.fillRoundedRect(0, 0, dw, 96, 10);
+  dialogG.lineStyle(2, COLORS.gold, 1);
+  dialogG.strokeRoundedRect(0, 0, dw, 96, 10);
+  dialogG.lineStyle(1, lighten(COLORS.gold, 25), 0.4);
+  dialogG.strokeRoundedRect(3, 3, dw - 6, 90, 8);
+  dialogG.fillStyle(COLORS.accent, 0.15);
+  dialogG.fillRect(8, 8, dw - 16, 3);
+  dialogG.fillStyle(COLORS.gold, 0.85);
+  dialogG.fillRect(6, 6, 5, 5);
+  dialogG.fillRect(dw - 11, 6, 5, 5);
+  dialogG.generateTexture('dialog_frame', dw, 96);
   dialogG.destroy();
 
   const ctrlG = scene.make.graphics({ x: 0, y: 0 });

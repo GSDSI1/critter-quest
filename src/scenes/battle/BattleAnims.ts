@@ -6,74 +6,44 @@ function isPlayerSprite(sprite: Phaser.GameObjects.Image): boolean {
   return sprite.x < GAME_WIDTH / 2;
 }
 
-type BurstFn = (scene: Phaser.Scene, x: number, y: number, color: number) => void;
+const ELEMENT_COLORS: Record<string, number> = {
+  flame: 0xff6b35, tide: 0x3b82f6, leaf: 0x22c55e, volt: 0xfacc15,
+  stone: 0xa8a29e, shadow: 0x7c3aed, ice: 0x67e8f9, psychic: 0xf472b6,
+};
 
-function burstCircles(scene: Phaser.Scene, x: number, y: number, color: number, count: number, spread: number, dy = 0): void {
-  for (let i = 0; i < count; i++) {
-    const g = scene.add.graphics().setDepth(200);
-    g.fillStyle(color, 0.9);
-    g.fillCircle(0, 0, 3 + (i % 2));
-    g.setPosition(x + (i - count / 2) * spread, y + dy);
-    scene.tweens.add({
-      targets: g,
-      x: g.x + (i - count / 2) * 4,
-      y: g.y - 8 - Math.abs(i - count / 2) * 3,
-      alpha: 0,
-      scaleX: 1.8,
-      scaleY: 1.8,
-      duration: 280 + i * 30,
-      onComplete: () => g.destroy(),
-    });
-  }
-}
+type EmitterCfg = {
+  count: number;
+  speed: { min: number; max: number };
+  angle: { min: number; max: number };
+  scale: { start: number; end: number };
+  lifespan: number;
+  gravityY?: number;
+  tint?: number;
+};
 
-function burstLines(scene: Phaser.Scene, x: number, y: number, color: number): void {
-  for (let i = 0; i < 5; i++) {
-    const g = scene.add.graphics().setDepth(200);
-    g.lineStyle(2, color, 0.95);
-    const angle = (-60 + i * 30) * (Math.PI / 180);
-    g.lineBetween(0, 0, Math.cos(angle) * 14, Math.sin(angle) * 14);
-    g.setPosition(x, y);
-    scene.tweens.add({
-      targets: g,
-      x: x + Math.cos(angle) * 18,
-      y: y + Math.sin(angle) * 18,
-      alpha: 0,
-      duration: 220,
-      onComplete: () => g.destroy(),
-    });
-  }
-}
-
-function burstRing(scene: Phaser.Scene, x: number, y: number, color: number): void {
-  const g = scene.add.graphics().setDepth(200);
-  g.lineStyle(3, color, 0.85);
-  g.strokeCircle(0, 0, 6);
-  g.setPosition(x, y);
-  scene.tweens.add({
-    targets: g, scaleX: 2.8, scaleY: 2.8, alpha: 0, duration: 360, onComplete: () => g.destroy(),
-  });
-}
-
-const ELEMENT_BURSTS: Record<string, BurstFn> = {
-  flame: (s, x, y, c) => burstCircles(s, x, y, c, 5, 6, -4),
-  tide: (s, x, y, c) => {
-    burstCircles(s, x, y - 4, c, 4, 8, 6);
-    burstCircles(s, x, y + 2, c, 3, 5, 0);
-  },
-  leaf: (s, x, y, c) => burstCircles(s, x - 6, y, c, 4, 5, -2),
-  volt: (s, x, y, c) => burstLines(s, x, y, c),
-  stone: (s, x, y, c) => burstCircles(s, x, y + 4, c, 6, 4, 4),
-  shadow: (s, x, y, c) => {
-    burstCircles(s, x, y, c, 3, 7, 0);
-    burstRing(s, x, y, c);
-  },
-  ice: (s, x, y, c) => burstCircles(s, x, y - 2, c, 5, 5, -6),
-  psychic: (s, x, y, c) => burstRing(s, x, y, c),
+const ELEMENT_EMITTERS: Record<string, EmitterCfg> = {
+  flame: { count: 14, speed: { min: 40, max: 120 }, angle: { min: 240, max: 300 }, scale: { start: 0.5, end: 0 }, lifespan: 380, gravityY: -30 },
+  tide: { count: 12, speed: { min: 30, max: 90 }, angle: { min: 200, max: 340 }, scale: { start: 0.45, end: 0 }, lifespan: 420, gravityY: 60 },
+  leaf: { count: 10, speed: { min: 25, max: 70 }, angle: { min: 0, max: 360 }, scale: { start: 0.4, end: 0 }, lifespan: 500, gravityY: 20 },
+  volt: { count: 16, speed: { min: 80, max: 180 }, angle: { min: 0, max: 360 }, scale: { start: 0.35, end: 0 }, lifespan: 220 },
+  stone: { count: 12, speed: { min: 50, max: 110 }, angle: { min: 0, max: 360 }, scale: { start: 0.5, end: 0.1 }, lifespan: 350, gravityY: 80 },
+  shadow: { count: 10, speed: { min: 20, max: 55 }, angle: { min: 0, max: 360 }, scale: { start: 0.55, end: 0 }, lifespan: 450 },
+  ice: { count: 12, speed: { min: 35, max: 90 }, angle: { min: 220, max: 320 }, scale: { start: 0.4, end: 0 }, lifespan: 400, gravityY: 40 },
+  psychic: { count: 14, speed: { min: 15, max: 45 }, angle: { min: 0, max: 360 }, scale: { start: 0.6, end: 0 }, lifespan: 480 },
 };
 
 export class BattleAnims {
-  constructor(private scene: Phaser.Scene) {}
+  private particleKey = 'battle_particle';
+
+  constructor(private scene: Phaser.Scene) {
+    if (!scene.textures.exists(this.particleKey)) {
+      const g = scene.make.graphics({ x: 0, y: 0 });
+      g.fillStyle(0xffffff, 1);
+      g.fillCircle(4, 4, 4);
+      g.generateTexture(this.particleKey, 8, 8);
+      g.destroy();
+    }
+  }
 
   animateSendOut(sprite: Phaser.GameObjects.Image, endX: number, isPlayer: boolean): void {
     sprite.setScale(isPlayer ? 2 : 1.5);
@@ -93,14 +63,14 @@ export class BattleAnims {
     });
   }
 
-  playHitOnEnemy(enemySprite: Phaser.GameObjects.Image, moveType?: string): void {
+  playHitOnEnemy(enemySprite: Phaser.GameObjects.Image, moveType?: string, effectiveness?: number): void {
     Sfx.hit();
     this.scene.cameras.main.shake(120, 0.004);
     this.scene.tweens.add({ targets: enemySprite, x: 490, duration: 50, yoyo: true, repeat: 3 });
     if (moveType) this.playMoveVfx(moveType, enemySprite.x, enemySprite.y);
+    if (effectiveness && effectiveness >= 2) this.flashSuperEffective();
   }
 
-  /** Quick lunge toward the opponent before impact. */
   animateAttackLunge(sprite: Phaser.GameObjects.Image, towardEnemy: boolean, onDone?: () => void): void {
     const baseX = sprite.x;
     const delta = towardEnemy ? 28 : -28;
@@ -118,14 +88,25 @@ export class BattleAnims {
   }
 
   playMoveVfx(element: string, x: number, y: number): void {
-    const colors: Record<string, number> = {
-      flame: 0xff6b35, tide: 0x3b82f6, leaf: 0x22c55e, volt: 0xfacc15,
-      stone: 0xa8a29e, shadow: 0x7c3aed, ice: 0x67e8f9, psychic: 0xf472b6,
-    };
-    const color = colors[element] ?? 0xffffff;
-    const burst = ELEMENT_BURSTS[element];
-    if (burst) burst(this.scene, x, y, color);
-    else burstCircles(this.scene, x, y, color, 4, 5);
+    const color = ELEMENT_COLORS[element] ?? 0xffffff;
+    const cfg = ELEMENT_EMITTERS[element] ?? ELEMENT_EMITTERS.flame;
+    const emitter = this.scene.add.particles(x, y, this.particleKey, {
+      speed: cfg.speed,
+      angle: cfg.angle,
+      scale: cfg.scale,
+      lifespan: cfg.lifespan,
+      gravityY: cfg.gravityY ?? 0,
+      tint: color,
+      quantity: cfg.count,
+      emitting: false,
+      blendMode: 'ADD',
+    }).setDepth(200);
+    emitter.explode(cfg.count);
+    this.scene.time.delayedCall(cfg.lifespan + 80, () => emitter.destroy());
+  }
+
+  private flashSuperEffective(): void {
+    this.scene.cameras.main.flash(180, 255, 255, 255, false, undefined, 0.35);
   }
 
   applyEffectivenessTint(

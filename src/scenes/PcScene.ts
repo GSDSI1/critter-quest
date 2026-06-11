@@ -1,3 +1,4 @@
+import { FONT } from '../ui/theme';
 import Phaser from 'phaser';
 import { COLORS, GAME_WIDTH, GAME_HEIGHT, TYPE_NAMES } from '../data/types';
 import { getCreature } from '../data/creatures';
@@ -23,11 +24,11 @@ export class PcScene extends Phaser.Scene {
     buildMenuPanel(this, 16, 12, GAME_WIDTH - 32, GAME_HEIGHT - 24, 3);
 
     this.add.text(GAME_WIDTH / 2, 16, 'Critter Storage System', {
-      fontFamily: '"Courier New", monospace', fontSize: '20px', color: '#3b82f6',
+      fontFamily: FONT, fontSize: '20px', color: '#3b82f6',
     }).setOrigin(0.5);
 
     this.add.text(40, 40, 'Tab: switch  ·  A/Z: deposit/withdraw  ·  B/ESC: close', {
-      fontFamily: '"Courier New", monospace', fontSize: '10px', color: '#667788',
+      fontFamily: FONT, fontSize: '10px', color: '#667788',
     });
 
     this.render();
@@ -66,14 +67,14 @@ export class PcScene extends Phaser.Scene {
     this.container = this.add.container(0, 0);
 
     const label = this.add.text(40, 58, this.mode === 'party' ? `Party (${GameState.player.party.length}/6)` : `Storage (${GameState.player.storage.length})`, {
-      fontFamily: '"Courier New", monospace', fontSize: '14px', color: '#f5c542',
+      fontFamily: FONT, fontSize: '14px', color: '#f5c542',
     });
     this.container.add(label);
 
     const items = this.list();
     if (items.length === 0) {
       this.container.add(this.add.text(40, 90, '(empty)', {
-        fontFamily: '"Courier New", monospace', fontSize: '12px', color: '#667788',
+        fontFamily: FONT, fontSize: '12px', color: '#667788',
       }));
       return;
     }
@@ -92,10 +93,10 @@ export class PcScene extends Phaser.Scene {
       this.container.add(spr);
 
       this.container.add(this.add.text(82, y + 6, `${sel ? '▶ ' : ''}${displayName(c)}  Lv.${c.level}`, {
-        fontFamily: '"Courier New", monospace', fontSize: '12px', color: '#f0f0f0',
+        fontFamily: FONT, fontSize: '12px', color: '#f0f0f0',
       }));
       this.container.add(this.add.text(82, y + 22, `${TYPE_NAMES[def.types[0]]}  HP ${c.currentHp}/${c.maxHp}`, {
-        fontFamily: '"Courier New", monospace', fontSize: '10px', color: '#8899aa',
+        fontFamily: FONT, fontSize: '10px', color: '#8899aa',
       }));
       drawHpBar(this, 82, y + 36, 160, 6, c.currentHp, c.maxHp);
     });

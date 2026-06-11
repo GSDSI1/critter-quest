@@ -1,3 +1,4 @@
+import { FONT } from '../ui/theme';
 import Phaser from 'phaser';
 import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../data/types';
 import { Sfx } from '../utils/audio';
@@ -5,6 +6,7 @@ import { npcTextureKey } from '../utils/assetLoader';
 import { playerBackTextureKey } from '../utils/sprites';
 import { GameState } from '../systems/stats';
 import { buildBattleArena } from '../ui/sceneBackdrops';
+import { wipeToScene } from '../ui/transitions';
 
 export class TrainerIntroScene extends Phaser.Scene {
   constructor() {
@@ -33,7 +35,7 @@ export class TrainerIntroScene extends Phaser.Scene {
       rightPanel.fillRect(GAME_WIDTH / 2, 0, GAME_WIDTH / 2, GAME_HEIGHT);
 
       const vs = this.add.text(GAME_WIDTH / 2, 80, 'VS', {
-        fontFamily: '"Courier New", monospace', fontSize: '52px', color: '#e94560', fontStyle: 'bold',
+        fontFamily: FONT, fontSize: '52px', color: '#e94560', fontStyle: 'bold',
       }).setOrigin(0.5).setScale(0).setDepth(5);
 
       this.tweens.add({ targets: vs, scale: 1, duration: 400, ease: 'Back.easeOut' });
@@ -46,11 +48,11 @@ export class TrainerIntroScene extends Phaser.Scene {
       ).setScale(2).setFlipX(true).setAlpha(0).setDepth(5);
 
       const trainerName = this.add.text(GAME_WIDTH / 4, 340, data.trainerName, {
-        fontFamily: '"Courier New", monospace', fontSize: '16px', color: '#f0f0f0',
+        fontFamily: FONT, fontSize: '16px', color: '#f0f0f0',
       }).setOrigin(0.5).setAlpha(0).setDepth(5);
 
       const playerLabel = this.add.text(GAME_WIDTH * 3 / 4, 360, GameState.player.name, {
-        fontFamily: '"Courier New", monospace', fontSize: '16px', color: '#f5c542',
+        fontFamily: FONT, fontSize: '16px', color: '#f5c542',
       }).setOrigin(0.5).setAlpha(0).setDepth(5);
 
       this.tweens.add({ targets: trainerSprite, alpha: 1, x: 140, duration: 500, delay: 200 });
@@ -59,18 +61,15 @@ export class TrainerIntroScene extends Phaser.Scene {
       this.tweens.add({ targets: playerLabel, alpha: 1, duration: 400, delay: 500 });
     } else {
       this.add.text(GAME_WIDTH / 2, GAME_HEIGHT / 2 - 20, 'Wild Battle!', {
-        fontFamily: '"Courier New", monospace', fontSize: '24px', color: '#f5c542',
+        fontFamily: FONT, fontSize: '24px', color: '#f5c542',
       }).setOrigin(0.5).setDepth(5);
       this.add.text(GAME_WIDTH / 2, GAME_HEIGHT / 2 + 20, 'A wild critter appeared!', {
-        fontFamily: '"Courier New", monospace', fontSize: '12px', color: '#8899aa',
+        fontFamily: FONT, fontSize: '12px', color: '#8899aa',
       }).setOrigin(0.5).setDepth(5);
     }
 
     this.time.delayedCall(2000, () => {
-      this.cameras.main.fadeOut(300, 0, 0, 0);
-      this.time.delayedCall(300, () => {
-        this.scene.start('Battle', data.battleData);
-      });
+      wipeToScene(this, 'Battle', data.battleData, 'right', 320);
     });
   }
 }

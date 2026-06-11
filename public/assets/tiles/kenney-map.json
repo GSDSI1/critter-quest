@@ -1,0 +1,8 @@
+{
+  "_comment": "Map Kenney 16×16 PNG filenames (in kenney/) to tileset frame indices 0–50. See public/assets/tiles/README.md.",
+  "grass.png": 0,
+  "path.png": 1,
+  "tall_grass.png": 2,
+  "water.png": 3,
+  "tree.png": 4
+}

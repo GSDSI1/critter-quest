@@ -1,3 +1,4 @@
+import { FONT } from '../ui/theme';
 import Phaser from 'phaser';
 import { COLORS, GAME_WIDTH } from '../data/types';
 import { generateAssets, ensureAllCreatureTextures } from '../utils/sprites';
@@ -23,12 +24,12 @@ export class BootScene extends Phaser.Scene {
     const cx = GAME_WIDTH / 2;
 
     this.add.text(cx, 160, 'CRITTER QUEST', {
-      fontFamily: '"Courier New", monospace', fontSize: '32px', color: '#f5c542',
+      fontFamily: FONT, fontSize: '32px', color: '#f5c542',
       stroke: '#e94560', strokeThickness: 2,
     }).setOrigin(0.5);
 
     this.add.text(cx, 195, `Loading adventure... v${import.meta.env.VITE_APP_VERSION ?? '1.0.0'}`, {
-      fontFamily: '"Courier New", monospace', fontSize: '12px', color: '#667788',
+      fontFamily: FONT, fontSize: '12px', color: '#667788',
     }).setOrigin(0.5);
 
     this.progressBox = this.add.graphics();
@@ -39,7 +40,7 @@ export class BootScene extends Phaser.Scene {
 
     this.progressBar = this.add.graphics();
     this.loadText = this.add.text(cx, 320, '0%', {
-      fontFamily: '"Courier New", monospace', fontSize: '11px', color: '#8899aa',
+      fontFamily: FONT, fontSize: '11px', color: '#8899aa',
     }).setOrigin(0.5);
 
     this.load.on('progress', (v: number) => {

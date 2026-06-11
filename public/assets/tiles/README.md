@@ -44,3 +44,13 @@ Must match the legend in [`src/data/maps.ts`](../../src/data/maps.ts):
 - [Kenney Roguelike/RPG packs](https://kenney.nl/assets) (CC0)
 
 Repack into a single 16×N column spritesheet (16px wide frames) or a grid where frame index = tile ID above.
+
+## Kenney drop-in (recommended)
+
+1. Place 16×16 PNGs in [`kenney/`](kenney/).
+2. Map filenames → frame indices in [`kenney-map.json`](kenney-map.json).
+3. Run `npm run import-tileset` (merges into `tileset.png` without touching unmapped frames).
+
+**Do not** run `npm run pack-tileset` after importing Kenney art — it overwrites the sheet. Re-run `import-tileset` instead.
+
+`npm run gen-assets` calls `pack-tileset` internally; re-import Kenney tiles after `gen-assets` if you use both.

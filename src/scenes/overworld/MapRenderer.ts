@@ -42,7 +42,7 @@ export class MapRenderer {
         this.tileLayer = tm.createLayer(0, tileset, 0, 0)?.setDepth(0);
         if (this.tileLayer) applyMapAutotiles(map, this.tileLayer);
         this.buildAnimatedOverlays(map, true);
-        this.renderEdgeOverlays(true);
+        // Autotiled external sheet already has soft edges — skip procedural overlays.
         this.decorLayer = this.scene.add.container(0, 0).setDepth(6);
         this.renderDecorations();
         return;
@@ -109,6 +109,10 @@ export class MapRenderer {
         }
       }
     }
+  }
+
+  setDayNightTint(tint: number): void {
+    this.tileLayer?.setTint(tint);
   }
 
   update(delta: number): void {

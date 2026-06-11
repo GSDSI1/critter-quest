@@ -9,6 +9,10 @@ function drawBiomeBattleBg(
 ): void {
   g.fillGradientStyle(b.sky, b.sky, b.ground, b.ground, 1);
   g.fillRect(0, 0, 640, 480);
+  g.fillStyle(darken(b.sky, 15), 0.35);
+  g.fillEllipse(160, 90, 140, 40);
+  g.fillEllipse(480, 70, 180, 50);
+  g.fillEllipse(320, 120, 220, 35);
   g.fillStyle(darken(b.sky, 30), 0.3);
   g.fillRect(0, 280, 640, 2);
 
@@ -61,5 +65,13 @@ export function generateBattleBgAssets(scene: Phaser.Scene): void {
     drawBiomeBattleBg(bg, b, b.variant);
     bg.generateTexture(b.key, 640, 480);
     bg.destroy();
+
+    const far = scene.make.graphics({ x: 0, y: 0 });
+    far.fillStyle(darken(b.sky, 10), 0.25);
+    far.fillEllipse(100, 100, 200, 50);
+    far.fillEllipse(400, 80, 260, 60);
+    far.fillEllipse(580, 120, 120, 40);
+    far.generateTexture(`${b.key}_far`, 640, 480);
+    far.destroy();
   }
 }

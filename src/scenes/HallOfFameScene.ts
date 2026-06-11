@@ -1,3 +1,4 @@
+import { FONT } from '../ui/theme';
 import Phaser from 'phaser';
 import { COLORS, GAME_WIDTH, GAME_HEIGHT, TYPE_NAMES } from '../data/types';
 import { getCreature, totalSpecies } from '../data/creatures';
@@ -32,21 +33,21 @@ export class HallOfFameScene extends Phaser.Scene {
     bg.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
     this.add.text(GAME_WIDTH / 2, 36, 'HALL OF FAME', {
-      fontFamily: '"Courier New", monospace', fontSize: '26px', color: '#f5c542', fontStyle: 'bold',
+      fontFamily: FONT, fontSize: '26px', color: '#f5c542', fontStyle: 'bold',
     }).setOrigin(0.5);
 
     const p = GameState.player;
     this.add.text(GAME_WIDTH / 2, 68, `${p.name} — Regional Champion`, {
-      fontFamily: '"Courier New", monospace', fontSize: '14px', color: '#f0f0f0',
+      fontFamily: FONT, fontSize: '14px', color: '#f0f0f0',
     }).setOrigin(0.5);
 
     const badgeLine = p.badges.map(b => getBadge(b).name.split(' ')[0]).join(' · ');
     this.add.text(GAME_WIDTH / 2, 88, badgeLine || 'No badges', {
-      fontFamily: '"Courier New", monospace', fontSize: '11px', color: '#8899aa',
+      fontFamily: FONT, fontSize: '11px', color: '#8899aa',
     }).setOrigin(0.5);
 
     this.add.text(40, 110, 'Champion Party', {
-      fontFamily: '"Courier New", monospace', fontSize: '13px', color: '#f5c542',
+      fontFamily: FONT, fontSize: '13px', color: '#f5c542',
     });
 
     p.party.forEach((c, i) => {
@@ -56,10 +57,10 @@ export class HallOfFameScene extends Phaser.Scene {
         addCreatureImage(this, 70, y + 20, c.speciesId).setScale(2);
       }
       this.add.text(110, y, displayName(c), {
-        fontFamily: '"Courier New", monospace', fontSize: '14px', color: '#f0f0f0',
+        fontFamily: FONT, fontSize: '14px', color: '#f0f0f0',
       });
       this.add.text(110, y + 18, `Lv.${c.level}  ${def.types.map(t => TYPE_NAMES[t]).join('/')}`, {
-        fontFamily: '"Courier New", monospace', fontSize: '11px', color: '#8899aa',
+        fontFamily: FONT, fontSize: '11px', color: '#8899aa',
       });
     });
 
@@ -70,11 +71,11 @@ export class HallOfFameScene extends Phaser.Scene {
       '',
       'Thank you for playing Critter Quest!',
     ].join('\n'), {
-      fontFamily: '"Courier New", monospace', fontSize: '12px', color: '#c0c0c0', align: 'center',
+      fontFamily: FONT, fontSize: '12px', color: '#c0c0c0', align: 'center',
     }).setOrigin(0.5);
 
     this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 24, 'Press A / Z to return to title', {
-      fontFamily: '"Courier New", monospace', fontSize: '11px', color: '#8899aa',
+      fontFamily: FONT, fontSize: '11px', color: '#8899aa',
     }).setOrigin(0.5);
 
     this.time.delayedCall(1500, () => { this.canExit = true; });

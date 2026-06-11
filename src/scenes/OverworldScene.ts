@@ -1,3 +1,4 @@
+import { FONT } from '../ui/theme';
 import Phaser from 'phaser';
 import { TILE_SIZE, GAME_WIDTH, GAME_HEIGHT } from '../data/types';
 import { getMap, type GameMap } from '../data/maps';
@@ -14,10 +15,13 @@ import { resumeAudio } from '../utils/audio';
 import { setMusicThemeForMap, startMusic, stopMusic } from '../utils/music';
 import { Input } from '../systems/input';
 import { canAlwaysRun } from '../systems/options';
-import { isOutdoorMap, nightTintAlpha } from '../systems/dayNight';
+import { isOutdoorMap, nightTintAlpha, tileNightTint } from '../systems/dayNight';
 import { MapRenderer } from './overworld/MapRenderer';
 import { NpcManager } from './overworld/NpcManager';
-import { fadeInOnStart } from '../ui/transitions';
+import { buildSkyLayer } from './overworld/SkyLayer';
+import { buildHealInterior } from '../ui/sceneBackdrops';
+import { fadeInOnStart, wipeInOnStart } from '../ui/transitions';
+import { markTouchPreferred } from '../ui/touchMenuNav';
 
 export class OverworldScene extends Phaser.Scene {
   private player!: Phaser.GameObjects.Sprite;
@@ -40,8 +44,9 @@ export class OverworldScene extends Phaser.Scene {
     super('Overworld');
   }
 
-  create(data: { showIntro?: boolean; fromBattle?: boolean; blackout?: boolean; _fadeIn?: boolean }): void {
+  create(data: { showIntro?: boolean; fromBattle?: boolean; blackout?: boolean; _fadeIn?: boolean; _wipeIn?: boolean }): void {
     fadeInOnStart(this, data, 400);
+    wipeInOnStart(this, data, 300);
     resumeAudio();
     setMusicThemeForMap(GameState.player.mapId);
     Input.bind(this);
@@ -51,12 +56,15 @@ export class OverworldScene extends Phaser.Scene {
     this.hud = new OverworldHUD(this);
     this.hud.refresh(this.map.name);
     this.inputHint = this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 28, '', {
-      fontFamily: '"Courier New", monospace', fontSize: '11px', color: '#8899aa',
+      fontFamily: FONT, fontSize: '11px', color: '#8899aa',
     }).setOrigin(0.5).setDepth(1100).setVisible(false);
     pinToScreen(this.inputHint, 1100);
     this.addVignette();
     this.nightOverlay = this.add.graphics().setDepth(840).setScrollFactor(0);
     pinToScreen(this.nightOverlay, 840);
+
+    if (isOutdoorMap(this.map.id)) buildSkyLayer(this);
+    if (this.map.id === 'heal_center') buildHealInterior(this);
 
     this.mapRenderer = new MapRenderer(this);
     this.npcManager = new NpcManager(this, () => this.map, this.dialog, {
@@ -73,6 +81,13 @@ export class OverworldScene extends Phaser.Scene {
       () => this.npcManager.tryInteract(),
       () => { this.scene.launch('PauseMenu'); this.scene.pause(); },
     );
+    const coarse = typeof window !== 'undefined' && window.matchMedia('(pointer: fine)').matches;
+    if (coarse) this.touchPad.setVisible(false);
+    this.input.on('pointerdown', () => {
+      markTouchPreferred();
+      this.touchPad?.setVisible(true);
+      this.hud.setTouchHints(true);
+    });
 
     this.mapRenderer.render(this.map);
     ({ player: this.player, shadow: this.playerShadow } = this.npcManager.spawnPlayer());
@@ -204,18 +219,22 @@ export class OverworldScene extends Phaser.Scene {
 
   private updateDayNightTint(): void {
     if (!this.nightOverlay) return;
-    const alpha = isOutdoorMap(this.map.id) ? nightTintAlpha(GameState.player.playTime) : 0;
+    const outdoor = isOutdoorMap(this.map.id);
+    const alpha = outdoor ? nightTintAlpha(GameState.player.playTime) : 0;
     this.nightOverlay.clear();
     if (alpha > 0.01) {
       this.nightOverlay.fillStyle(0x1e1b4b, alpha);
       this.nightOverlay.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    }
+    if (outdoor) {
+      this.mapRenderer.setDayNightTint(tileNightTint(GameState.player.playTime));
     }
   }
 
   private showPadToast(msg: string): void {
     this.padToast?.destroy();
     this.padToast = this.add.text(GAME_WIDTH / 2, 40, msg, {
-      fontFamily: '"Courier New", monospace', fontSize: '12px', color: '#f5c542',
+      fontFamily: FONT, fontSize: '12px', color: '#f5c542',
       backgroundColor: '#16213e', padding: { x: 8, y: 4 },
     }).setOrigin(0.5).setDepth(100);
     pinToScreen(this.padToast, 100);

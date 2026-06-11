@@ -1,3 +1,4 @@
+import { FONT } from '../ui/theme';
 import Phaser from 'phaser';
 import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../data/types';
 import { GameState } from '../systems/stats';
@@ -56,12 +57,12 @@ export class MenuScene extends Phaser.Scene {
     addTitleLogo(this, 88);
 
     this.add.text(GAME_WIDTH / 2, 138, 'Catch · Battle · Explore', {
-      fontFamily: '"Courier New", monospace', fontSize: '12px', color: '#8899aa',
+      fontFamily: FONT, fontSize: '12px', color: '#8899aa',
     }).setOrigin(0.5);
 
     if (saveStatus === 'corrupt') {
       this.add.text(GAME_WIDTH / 2, 200, 'Save file is corrupted.\nDelete it to start fresh.', {
-        fontFamily: '"Courier New", monospace', fontSize: '12px', color: '#e94560',
+        fontFamily: FONT, fontSize: '12px', color: '#e94560',
         align: 'center',
       }).setOrigin(0.5);
     } else if (this.canContinue) {
@@ -81,7 +82,7 @@ export class MenuScene extends Phaser.Scene {
       const y = menuStartY + i * 48;
       const btn = this.add.image(GAME_WIDTH / 2, y, 'btn_normal').setOrigin(0.5).setInteractive({ useHandCursor: true });
       const text = this.add.text(GAME_WIDTH / 2, y, label, {
-        fontFamily: '"Courier New", monospace', fontSize: '18px', color: '#f0f0f0',
+        fontFamily: FONT, fontSize: '18px', color: '#f0f0f0',
       }).setOrigin(0.5);
       btn.on('pointerover', () => {
         if (!this.confirmingDelete) {
@@ -98,7 +99,7 @@ export class MenuScene extends Phaser.Scene {
     addBlinkingPrompt(this, '↑↓ select  ·  A / Z confirm', GAME_HEIGHT - 36);
 
     this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 14, 'Keyboard · Controller supported', {
-      fontFamily: '"Courier New", monospace', fontSize: '10px', color: '#556677',
+      fontFamily: FONT, fontSize: '10px', color: '#556677',
     }).setOrigin(0.5);
 
     this.refreshMenu();
@@ -119,7 +120,7 @@ export class MenuScene extends Phaser.Scene {
     this.add.sprite(520, 210, playerTextureKey(p.characterId, 'down', 0)).setScale(3);
     const preset = getTrainer(p.characterId);
     this.add.text(520, 248, preset.label, {
-      fontFamily: '"Courier New", monospace', fontSize: '10px', color: '#8899aa',
+      fontFamily: FONT, fontSize: '10px', color: '#8899aa',
     }).setOrigin(0.5);
   }
 
@@ -194,15 +195,15 @@ export class MenuScene extends Phaser.Scene {
     overlay.add(panel);
 
     overlay.add(this.add.text(GAME_WIDTH / 2, 210, 'Delete save file?', {
-      fontFamily: '"Courier New", monospace', fontSize: '16px', color: '#f5c542',
+      fontFamily: FONT, fontSize: '16px', color: '#f5c542',
     }).setOrigin(0.5));
 
     overlay.add(this.add.text(GAME_WIDTH / 2 - 60, 250, 'Yes', {
-      fontFamily: '"Courier New", monospace', fontSize: '14px', color: '#8899aa',
+      fontFamily: FONT, fontSize: '14px', color: '#8899aa',
     }).setOrigin(0.5).setName('delYes'));
 
     overlay.add(this.add.text(GAME_WIDTH / 2 + 60, 250, 'No', {
-      fontFamily: '"Courier New", monospace', fontSize: '14px', color: '#8899aa',
+      fontFamily: FONT, fontSize: '14px', color: '#8899aa',
     }).setOrigin(0.5).setName('delNo'));
 
     this.deleteOverlay = overlay;

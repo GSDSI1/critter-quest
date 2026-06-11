@@ -1,3 +1,4 @@
+import { FONT } from '../ui/theme';
 import Phaser from 'phaser';
 import { COLORS, GAME_WIDTH, TYPE_NAMES, TYPE_COLORS, type ElementType } from '../data/types';
 import { STARTERS, getCreature } from '../data/creatures';
@@ -86,15 +87,15 @@ export class StarterSelectScene extends Phaser.Scene {
     });
 
     this.nameText = this.add.text(PANEL_CX, LAYOUT.nameY, 'Choose your partner!', {
-      fontFamily: '"Courier New", monospace', fontSize: '18px', color: '#f5c542', fontStyle: 'bold',
+      fontFamily: FONT, fontSize: '18px', color: '#f5c542', fontStyle: 'bold',
     }).setOrigin(0.5).setDepth(6);
 
     this.statText = this.add.text(PANEL_CX, LAYOUT.statsY, '', {
-      fontFamily: '"Courier New", monospace', fontSize: '11px', color: '#c0c0c0',
+      fontFamily: FONT, fontSize: '11px', color: '#c0c0c0',
     }).setOrigin(0.5).setDepth(6).setVisible(false);
 
     this.descText = this.add.text(PANEL_CX, LAYOUT.descY, 'Listen to Prof. Elmwood, then pick an orb.', {
-      fontFamily: '"Courier New", monospace', fontSize: '10px', color: '#8899aa',
+      fontFamily: FONT, fontSize: '10px', color: '#8899aa',
       wordWrap: { width: 280 }, align: 'center',
     }).setOrigin(0.5).setDepth(6);
 
@@ -300,7 +301,7 @@ function buildTrainerChip(scene: Phaser.Scene): Phaser.GameObjects.Container {
   g.lineStyle(2, COLORS.gold, 0.85);
   g.strokeRoundedRect(-48, -20, 96, 56, 8);
   const name = scene.add.text(0, -10, GameState.player.name, {
-    fontFamily: '"Courier New", monospace', fontSize: '10px', color: '#f5c542',
+    fontFamily: FONT, fontSize: '10px', color: '#f5c542',
   }).setOrigin(0.5);
   const spr = scene.add.sprite(0, 14, playerTextureKey(GameState.player.characterId, 'down', 0))
     .setScale(2);

@@ -1,3 +1,4 @@
+import { FONT } from '../ui/theme';
 import Phaser from 'phaser';
 import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../data/types';
 import { DialogBox } from '../ui/DialogBox';
@@ -33,13 +34,13 @@ export class LabIntroScene extends Phaser.Scene {
     frame.fillRoundedRect(70, 170, 120, 140, 8);
 
     this.add.text(280, 100, 'Prof. Elmwood', {
-      fontFamily: '"Courier New", monospace', fontSize: '24px', color: '#f5c542',
+      fontFamily: FONT, fontSize: '24px', color: '#f5c542',
     });
     this.add.text(280, 128, 'Verdant Region Research Lab', {
-      fontFamily: '"Courier New", monospace', fontSize: '11px', color: '#8899aa',
+      fontFamily: FONT, fontSize: '11px', color: '#8899aa',
     });
     this.add.text(280, 158, `Trainer ${name}`, {
-      fontFamily: '"Courier New", monospace', fontSize: '15px', color: '#f0f0f0',
+      fontFamily: FONT, fontSize: '15px', color: '#f0f0f0',
     });
 
     this.playerSprite = this.add.sprite(500, 260, playerTextureKey(GameState.player.characterId, 'down', 0)).setScale(2.5);

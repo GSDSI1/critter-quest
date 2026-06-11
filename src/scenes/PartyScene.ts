@@ -1,3 +1,4 @@
+import { FONT } from '../ui/theme';
 import Phaser from 'phaser';
 import { COLORS, GAME_WIDTH, GAME_HEIGHT, TYPE_NAMES } from '../data/types';
 import { getCreature } from '../data/creatures';
@@ -11,6 +12,7 @@ import { addCreatureImage } from '../utils/assetLoader';
 import { trySave } from '../utils/saveFeedback';
 import { buildScreenOverlay, buildMenuPanel } from '../ui/sceneBackdrops';
 import { Input } from '../systems/input';
+import { TouchMenuNav } from '../ui/touchMenuNav';
 
 const HELD_ITEMS = [
   'oran_berry', 'sitrus_berry', 'lum_berry',
@@ -23,6 +25,7 @@ export class PartyScene extends Phaser.Scene {
   private voluntarySwitch = true;
   private fromPause = false;
   private detailIndex: number | null = null;
+  private touchNav?: TouchMenuNav;
 
   constructor() {
     super('Party');
@@ -44,13 +47,13 @@ export class PartyScene extends Phaser.Scene {
     buildMenuPanel(this, 20, 16, GAME_WIDTH - 40, GAME_HEIGHT - 32, 5);
 
     this.add.text(GAME_WIDTH / 2, 24, this.battleSwitch ? 'Choose a Critter' : 'Your Party', {
-      fontFamily: '"Courier New", monospace', fontSize: '22px', color: '#f5c542',
+      fontFamily: FONT, fontSize: '22px', color: '#f5c542',
     }).setOrigin(0.5);
 
     const party = GameState.player.party;
     if (party.length === 0) {
       this.add.text(GAME_WIDTH / 2, 240, 'No critters yet!', {
-        fontFamily: '"Courier New", monospace', fontSize: '16px', color: '#8899aa',
+        fontFamily: FONT, fontSize: '16px', color: '#8899aa',
       }).setOrigin(0.5);
     }
 
@@ -76,45 +79,45 @@ export class PartyScene extends Phaser.Scene {
       });
 
       this.add.text(x + 80, y + 12, displayName(c), {
-        fontFamily: '"Courier New", monospace', fontSize: '14px', color: fainted ? '#666' : '#f0f0f0', fontStyle: 'bold',
+        fontFamily: FONT, fontSize: '14px', color: fainted ? '#666' : '#f0f0f0', fontStyle: 'bold',
       });
       this.add.text(x + 80, y + 30, `Lv.${c.level}  ${getNature(c.nature).name}`, {
-        fontFamily: '"Courier New", monospace', fontSize: '10px', color: '#8899aa',
+        fontFamily: FONT, fontSize: '10px', color: '#8899aa',
       });
       this.add.text(x + 80, y + 46, `${c.currentHp}/${c.maxHp} HP  ${getAbility(c.ability).name}`, {
-        fontFamily: '"Courier New", monospace', fontSize: '9px', color: '#8899aa',
+        fontFamily: FONT, fontSize: '9px', color: '#8899aa',
       });
       drawHpBar(this, x + 80, y + 62, 180, 8, c.currentHp, c.maxHp);
 
       if (showingDetail) {
         const iv = c.ivs;
         this.add.text(x + 80, y + 78, `IVs HP${iv.hp} ATK${iv.atk} DEF${iv.def} SPA${iv.spa} SPD${iv.spd} SPE${iv.spe}`, {
-          fontFamily: '"Courier New", monospace', fontSize: '7px', color: '#667788',
+          fontFamily: FONT, fontSize: '7px', color: '#667788',
         });
         if (c.heldItem) {
           this.add.text(x + 80, y + 92, `Held: ${getItem(c.heldItem).name}`, {
-            fontFamily: '"Courier New", monospace', fontSize: '8px', color: '#f5c542',
+            fontFamily: FONT, fontSize: '8px', color: '#f5c542',
           });
         }
       } else {
         const moves = c.moves.map(m => getMove(m.id).name).join(', ');
         this.add.text(x + 80, y + 78, moves, {
-          fontFamily: '"Courier New", monospace', fontSize: '8px', color: '#667788', wordWrap: { width: 190 },
+          fontFamily: FONT, fontSize: '8px', color: '#667788', wordWrap: { width: 190 },
         });
       }
 
       if (this.battleSwitch && !fainted) {
         const btn = this.add.text(x + 230, y + 90, 'Send Out', {
-          fontFamily: '"Courier New", monospace', fontSize: '11px', color: '#e94560',
+          fontFamily: FONT, fontSize: '11px', color: '#e94560',
         }).setInteractive({ useHandCursor: true });
         btn.on('pointerdown', () => this.selectForBattle(i));
       } else if (!this.battleSwitch) {
         const info = this.add.text(x + 200, y + 90, showingDetail ? 'Close' : 'Stats', {
-          fontFamily: '"Courier New", monospace', fontSize: '10px', color: '#8899aa',
+          fontFamily: FONT, fontSize: '10px', color: '#8899aa',
         }).setInteractive({ useHandCursor: true });
         info.on('pointerdown', () => { this.detailIndex = showingDetail ? null : i; this.render(); });
         const nick = this.add.text(x + 248, y + 90, 'Nick', {
-          fontFamily: '"Courier New", monospace', fontSize: '10px', color: '#e94560',
+          fontFamily: FONT, fontSize: '10px', color: '#e94560',
         }).setInteractive({ useHandCursor: true });
         nick.on('pointerdown', () => this.promptNickname(i));
       }
@@ -124,18 +127,26 @@ export class PartyScene extends Phaser.Scene {
 
     if (GameState.player.storage.length > 0) {
       this.add.text(GAME_WIDTH / 2, 420, `+ ${GameState.player.storage.length} in storage`, {
-        fontFamily: '"Courier New", monospace', fontSize: '11px', color: '#667788',
+        fontFamily: FONT, fontSize: '11px', color: '#667788',
       }).setOrigin(0.5);
     }
 
     this.add.text(GAME_WIDTH / 2, 450, '[ ESC / Z to close ]', {
-      fontFamily: '"Courier New", monospace', fontSize: '12px', color: '#8899aa',
+      fontFamily: FONT, fontSize: '12px', color: '#8899aa',
     }).setOrigin(0.5).setInteractive({ useHandCursor: true }).on('pointerdown', () => this.close());
 
     this.input.keyboard?.off('keydown-ESC');
     this.input.keyboard?.off('keydown-Z');
     this.input.keyboard?.on('keydown-ESC', () => this.close());
     this.input.keyboard?.on('keydown-Z', () => this.close());
+
+    this.touchNav?.destroy();
+    this.touchNav = new TouchMenuNav(this, {
+      onUp: () => {},
+      onDown: () => {},
+      onConfirm: () => this.close(),
+      onCancel: () => this.close(),
+    });
   }
 
   update(): void {
@@ -148,12 +159,12 @@ export class PartyScene extends Phaser.Scene {
     if (available.length === 0 || GameState.player.party.length === 0) return;
 
     this.add.text(40, 400, 'Give held item to lead critter:', {
-      fontFamily: '"Courier New", monospace', fontSize: '10px', color: '#8899aa',
+      fontFamily: FONT, fontSize: '10px', color: '#8899aa',
     });
     available.forEach((id, i) => {
       const item = getItem(id);
       const t = this.add.text(40 + i * 120, 418, item.name, {
-        fontFamily: '"Courier New", monospace', fontSize: '10px', color: '#f5c542',
+        fontFamily: FONT, fontSize: '10px', color: '#f5c542',
       }).setInteractive({ useHandCursor: true });
       t.on('pointerdown', () => {
         if ((GameState.player.items[id] ?? 0) <= 0) return;

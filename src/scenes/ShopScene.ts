@@ -1,3 +1,4 @@
+import { FONT } from '../ui/theme';
 import Phaser from 'phaser';
 import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../data/types';
 import { SHOP_STOCK, getItem, addItem, removeItem } from '../data/items';
@@ -25,17 +26,17 @@ export class ShopScene extends Phaser.Scene {
     buildMenuPanel(this, 40, 60, GAME_WIDTH - 80, 360, 5);
 
     this.add.text(GAME_WIDTH / 2, 20, 'Verdant Mart', {
-      fontFamily: '"Courier New", monospace', fontSize: '22px', color: '#f5c542',
+      fontFamily: FONT, fontSize: '22px', color: '#f5c542',
     }).setOrigin(0.5);
 
     this.add.text(GAME_WIDTH / 2, 44, `Your money: $${GameState.player.money}`, {
-      fontFamily: '"Courier New", monospace', fontSize: '12px', color: '#8899aa',
+      fontFamily: FONT, fontSize: '12px', color: '#8899aa',
     }).setOrigin(0.5);
 
     this.renderList();
 
     this.add.text(GAME_WIDTH / 2, 450, '↑↓ item  ·  ←→ mode  ·  Z confirm  ·  ESC leave', {
-      fontFamily: '"Courier New", monospace', fontSize: '11px', color: '#667788',
+      fontFamily: FONT, fontSize: '11px', color: '#667788',
     }).setOrigin(0.5);
 
     this.input.keyboard?.on('keydown-UP', () => { this.selected = Math.max(0, this.selected - 1); this.renderList(); });
@@ -65,7 +66,7 @@ export class ShopScene extends Phaser.Scene {
     this.children.getByName('desc')?.destroy();
 
     this.add.text(GAME_WIDTH / 2, 28, this.mode === 'buy' ? 'BUY' : 'SELL', {
-      fontFamily: '"Press Start 2P", "Courier New", monospace', fontSize: '14px', color: '#f5c542',
+      fontFamily: FONT, fontSize: '14px', color: '#f5c542',
     }).setOrigin(0.5).setName('modeLabel');
 
     SHOP_STOCK.forEach((id, i) => {
@@ -73,7 +74,7 @@ export class ShopScene extends Phaser.Scene {
       const owned = GameState.player.items[id] ?? 0;
       const prefix = i === this.selected ? '▶ ' : '  ';
       const t = this.add.text(40, 70 + i * 28, `${prefix}${item.name.padEnd(14)} $${item.price}  x${owned}`, {
-        fontFamily: '"Courier New", monospace',
+        fontFamily: FONT,
         fontSize: '12px',
         color: i === this.selected ? '#f5c542' : '#c0c0c0',
       });
@@ -82,7 +83,7 @@ export class ShopScene extends Phaser.Scene {
 
     const sel = getItem(SHOP_STOCK[this.selected]);
     this.add.text(40, 400, sel.description, {
-      fontFamily: '"Courier New", monospace', fontSize: '11px', color: '#8899aa',
+      fontFamily: FONT, fontSize: '11px', color: '#8899aa',
     }).setName('desc');
     const old = this.children.getByName('desc');
     // desc recreated each render - fine

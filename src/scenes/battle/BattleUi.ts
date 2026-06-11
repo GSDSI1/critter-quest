@@ -1,3 +1,4 @@
+import { FONT } from '../../ui/theme';
 import Phaser from 'phaser';
 import { COLORS, GAME_WIDTH } from '../../data/types';
 import { getCreature } from '../../data/creatures';
@@ -81,7 +82,7 @@ export class BattleUi {
     eBox.strokeRoundedRect(340, 24, 260, 80, 8);
 
     this.enemyNameText = this.scene.add.text(356, 32, '', {
-      fontFamily: '"Courier New", monospace', fontSize: '14px', color: '#f0f0f0', fontStyle: 'bold',
+      fontFamily: FONT, fontSize: '14px', color: '#f0f0f0', fontStyle: 'bold',
     });
     this.enemyHpBar = drawHpBar(this.scene, 356, 68, 180, 10, 0, 1);
 
@@ -96,16 +97,16 @@ export class BattleUi {
     pBox.strokeRoundedRect(40, 248, 260, 88, 8);
 
     this.scene.add.text(56, 256, displayName(this.host.playerMon), {
-      fontFamily: '"Courier New", monospace', fontSize: '14px', color: '#f0f0f0', fontStyle: 'bold',
+      fontFamily: FONT, fontSize: '14px', color: '#f0f0f0', fontStyle: 'bold',
     });
     this.scene.add.text(56, 274, `Lv.${this.host.playerMon.level}`, {
-      fontFamily: '"Courier New", monospace', fontSize: '11px', color: '#8899aa',
+      fontFamily: FONT, fontSize: '11px', color: '#8899aa',
     });
     this.abilityText = this.scene.add.text(200, 274, '', {
-      fontFamily: '"Courier New", monospace', fontSize: '9px', color: '#667788',
+      fontFamily: FONT, fontSize: '9px', color: '#667788',
     }).setOrigin(1, 0);
     this.playerHpText = this.scene.add.text(230, 274, '', {
-      fontFamily: '"Courier New", monospace', fontSize: '10px', color: '#8899aa',
+      fontFamily: FONT, fontSize: '10px', color: '#8899aa',
     });
     this.playerHpBar = drawHpBar(this.scene, 56, 292, 180, 10, 0, 1);
     this.expBar = drawHpBar(this.scene, 56, 308, 180, 6, 0, 1, 50);
@@ -121,7 +122,7 @@ export class BattleUi {
     }
 
     this.messageText = this.scene.add.text(32, 384, '', {
-      fontFamily: '"Courier New", monospace', fontSize: '14px', color: '#f0f0f0',
+      fontFamily: FONT, fontSize: '14px', color: '#f0f0f0',
       wordWrap: { width: GAME_WIDTH - 64 },
     });
 
@@ -207,10 +208,10 @@ export class BattleUi {
       const [x, y] = MENU_POS[i];
       const bg = this.scene.add.graphics();
       bg.fillStyle(COLORS.panelBorder, 0.8);
-      bg.fillRoundedRect(x - 4, y - 4, 110, 32, 6);
+      bg.fillRoundedRect(x - 8, y - 8, 126, 44, 6);
       const t = this.scene.add.text(x + 55, y + 12, label, {
-        fontFamily: '"Courier New", monospace', fontSize: '14px', color: '#f0f0f0',
-      }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+        fontFamily: FONT, fontSize: '14px', color: '#f0f0f0',
+      }).setOrigin(0.5).setInteractive({ useHandCursor: true, hitArea: new Phaser.Geom.Rectangle(-55, -16, 126, 44), hitAreaCallback: Phaser.Geom.Rectangle.Contains });
       t.on('pointerdown', () => { this.host.menuIndex = i; this.updateMenuHighlight(); this.host.menuChoice(label); });
       const hi = this.scene.add.graphics();
       this.menuHighlights.push(hi);
@@ -277,7 +278,7 @@ export class BattleUi {
       bg.fillRoundedRect(x, y, 270, 30, 5);
       this.scene.add.image(x + 8, y + 15, `type_${move.type}`).setOrigin(0, 0.5).setScale(0.7);
       const label = this.scene.add.text(x + 28, y + 6, `${move.name}  ${m.pp}/${m.maxPp}`, {
-        fontFamily: '"Courier New", monospace', fontSize: '11px', color: i === this.host.moveIndex ? '#f5c542' : '#f0f0f0',
+        fontFamily: FONT, fontSize: '11px', color: i === this.host.moveIndex ? '#f5c542' : '#f0f0f0',
       }).setInteractive({ useHandCursor: true });
       label.on('pointerdown', () => { this.host.moveIndex = i; this.host.useMove(i); });
       this.moveContainer.add([bg, label]);
@@ -289,7 +290,7 @@ export class BattleUi {
     const items = getBattleUsableItems(GameState.player.items, !this.host.isTrainer);
     if (items.length === 0) {
       this.bagContainer.add(this.scene.add.text(40, 390, 'No usable items!', {
-        fontFamily: '"Courier New", monospace', fontSize: '12px', color: '#8899aa',
+        fontFamily: FONT, fontSize: '12px', color: '#8899aa',
       }));
       return;
     }
@@ -300,7 +301,7 @@ export class BattleUi {
       bg.fillStyle(COLORS.panelBorder, i === this.host.bagIndex ? 1 : 0.85);
       bg.fillRoundedRect(32, y, 300, 24, 4);
       const label = this.scene.add.text(40, y + 4, `${i === this.host.bagIndex ? '▶ ' : ''}${item.name} x${GameState.player.items[id]}`, {
-        fontFamily: '"Courier New", monospace', fontSize: '11px', color: i === this.host.bagIndex ? '#f5c542' : '#f0f0f0',
+        fontFamily: FONT, fontSize: '11px', color: i === this.host.bagIndex ? '#f5c542' : '#f0f0f0',
       }).setInteractive({ useHandCursor: true });
       label.on('pointerdown', () => { this.host.bagIndex = i; this.host.useBagItem(id); });
       this.bagContainer.add([bg, label]);

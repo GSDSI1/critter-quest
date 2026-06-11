@@ -288,10 +288,34 @@ if (battleScene.includes('shouldAutoAdvanceText') && battleScene.includes('messa
 } else fail('BattleScene missing text speed wiring');
 
 const battleAnims = read('src/scenes/battle/BattleAnims.ts');
-if (battleAnims.includes('ELEMENT_BURSTS')) ok('Element-typed battle move VFX');
-else fail('BattleAnims missing element VFX');
+if (battleAnims.includes('add.particles') && battleAnims.includes('ELEMENT_EMITTERS')) ok('Particle battle move VFX');
+else fail('BattleAnims missing particle VFX');
 if (battleAnims.includes('animateAttackLunge')) ok('Battle attack lunge animation');
 else fail('BattleAnims missing attack lunge');
+if (battleAnims.includes('flashSuperEffective')) ok('Super-effective hit flash');
+
+if (existsSync(join(root, 'src/ui/theme.ts'))) {
+  const theme = read('src/ui/theme.ts');
+  if (theme.includes('Press Start 2P') && read('src/ui/DialogBox.ts').includes('FONT')) ok('UI theme + Press Start 2P font');
+  else fail('theme.ts or DialogBox FONT wiring incomplete');
+} else fail('src/ui/theme.ts missing');
+
+const transitions = read('src/ui/transitions.ts');
+if (transitions.includes('wipeToScene') && transitions.includes('wipeRestartScene')) ok('Wipe scene transitions');
+else fail('transitions.ts missing wipe helpers');
+
+if (overworld.includes('buildHealInterior') && overworld.includes('buildSkyLayer')) ok('Heal interior + sky parallax');
+else fail('OverworldScene missing atmosphere layers');
+
+if (existsSync(join(root, 'src/ui/touchMenuNav.ts'))) ok('Touch menu navigation');
+else fail('touchMenuNav.ts missing');
+
+if (existsSync(join(root, 'scripts/import-kenney-tileset.mjs'))) ok('Kenney tileset import script');
+else fail('import-kenney-tileset.mjs missing');
+
+const optionsScene = read('src/scenes/OptionsScene.ts');
+if (optionsScene.includes('Master Vol') && optionsScene.includes('audio.master')) ok('Options master volume');
+else fail('OptionsScene missing master volume');
 
 const tilesProc = read('src/utils/sprites/tiles.ts');
 if (tilesProc.includes('OUTDOOR_PROC_TILE_COUNT') && tilesProc.includes('drawGrassPathAutotile')) {

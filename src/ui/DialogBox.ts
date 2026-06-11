@@ -1,3 +1,4 @@
+import { FONT } from './theme';
 import Phaser from 'phaser';
 import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../data/types';
 import { pinContainerChildren } from './screenUi';
@@ -42,13 +43,13 @@ export class DialogBox {
     }
 
     this.speakerText = scene.add.text(BOX_X + 16, BOX_Y + 8, '', {
-      fontFamily: '"Courier New", monospace',
+      fontFamily: FONT,
       fontSize: '12px',
       color: '#f5c542',
     });
 
     this.textObj = scene.add.text(BOX_X + 16, BOX_Y + 28, '', {
-      fontFamily: '"Courier New", monospace',
+      fontFamily: FONT,
       fontSize: '15px',
       color: '#f0f0f0',
       stroke: '#0a0a14',

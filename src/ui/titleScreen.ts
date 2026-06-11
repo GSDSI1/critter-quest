@@ -1,3 +1,4 @@
+import { FONT } from './theme';
 import Phaser from 'phaser';
 import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../data/types';
 
@@ -63,7 +64,7 @@ export function addTitleLogo(
 
   const banner = scene.add.image(0, 0, 'title_banner').setOrigin(0.5);
   const title = scene.add.text(0, -4, 'CRITTER QUEST', {
-    fontFamily: '"Courier New", monospace',
+    fontFamily: FONT,
     fontSize: '36px',
     color: '#f5c542',
     stroke: '#e94560',
@@ -82,7 +83,7 @@ export function addBlinkingPrompt(
   depth = 20,
 ): Phaser.GameObjects.Text {
   const t = scene.add.text(GAME_WIDTH / 2, y, text, {
-    fontFamily: '"Courier New", monospace',
+    fontFamily: FONT,
     fontSize: '13px',
     color: '#f0f0f0',
   }).setOrigin(0.5).setDepth(depth);
@@ -111,7 +112,7 @@ export function drawSaveSummaryPanel(
 
   lines.forEach((line, i) => {
     c.add(scene.add.text(0, 14 + i * 16, line, {
-      fontFamily: '"Courier New", monospace',
+      fontFamily: FONT,
       fontSize: '11px',
       color: i === 0 ? '#f5c542' : '#c0c0c0',
     }).setOrigin(0.5, 0));

@@ -1,3 +1,4 @@
+import { FONT } from '../ui/theme';
 import Phaser from 'phaser';
 import { COLORS, GAME_WIDTH } from '../data/types';
 import { getBadge } from '../data/badges';
@@ -9,11 +10,13 @@ import { Sfx } from '../utils/audio';
 import { canFastTravel } from '../systems/healTravel';
 import { loadAudioSettings, saveAudioSettings } from '../systems/audioSettings';
 import { refreshMusicVolume } from '../utils/music';
+import { TouchMenuNav } from '../ui/touchMenuNav';
 
 export class PauseMenuScene extends Phaser.Scene {
   private selected = 0;
   private options: string[] = [];
   private muted = false;
+  private touchNav?: TouchMenuNav;
 
   constructor() {
     super('PauseMenu');
@@ -28,19 +31,19 @@ export class PauseMenuScene extends Phaser.Scene {
     buildMenuPanel(this, 170, 70, 300, 360, 5);
 
     this.add.text(GAME_WIDTH / 2, 110, 'MENU', {
-      fontFamily: '"Courier New", monospace', fontSize: '24px', color: '#f5c542',
+      fontFamily: FONT, fontSize: '24px', color: '#f5c542',
     }).setOrigin(0.5);
 
     this.add.text(GAME_WIDTH / 2, 132, GameState.player.name, {
-      fontFamily: '"Courier New", monospace', fontSize: '13px', color: '#f0f0f0',
+      fontFamily: FONT, fontSize: '13px', color: '#f0f0f0',
     }).setOrigin(0.5);
 
     this.add.text(GAME_WIDTH / 2, 152, `$${GameState.player.money}  |  Badges: ${GameState.player.badges.length}`, {
-      fontFamily: '"Courier New", monospace', fontSize: '11px', color: '#8899aa',
+      fontFamily: FONT, fontSize: '11px', color: '#8899aa',
     }).setOrigin(0.5);
 
     this.add.text(GAME_WIDTH / 2, 168, `v${import.meta.env.VITE_APP_VERSION ?? '1.0.0'}`, {
-      fontFamily: '"Courier New", monospace', fontSize: '9px', color: '#556677',
+      fontFamily: FONT, fontSize: '9px', color: '#556677',
     }).setOrigin(0.5);
 
     if (GameState.player.badges.length > 0) {
@@ -51,6 +54,12 @@ export class PauseMenuScene extends Phaser.Scene {
     }
 
     this.renderOptions();
+    this.touchNav = new TouchMenuNav(this, {
+      onUp: () => { this.selected = (this.selected - 1 + this.options.length) % this.options.length; this.renderOptions(); },
+      onDown: () => { this.selected = (this.selected + 1) % this.options.length; this.renderOptions(); },
+      onConfirm: () => this.confirm(),
+      onCancel: () => this.close(),
+    });
   }
 
   private buildOptions(): string[] {
@@ -81,7 +90,7 @@ export class PauseMenuScene extends Phaser.Scene {
     this.optionTexts = [];
     this.options.forEach((opt, i) => {
       const t = this.add.text(GAME_WIDTH / 2, 200 + i * 36, (i === this.selected ? '▶ ' : '  ') + opt, {
-        fontFamily: '"Courier New", monospace', fontSize: '15px',
+        fontFamily: FONT, fontSize: '15px',
         color: i === this.selected ? '#f5c542' : '#c0c0c0',
       }).setOrigin(0.5);
       this.optionTexts.push(t);

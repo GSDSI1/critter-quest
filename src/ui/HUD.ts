@@ -1,3 +1,4 @@
+import { FONT } from './theme';
 import Phaser from 'phaser';
 import { COLORS, GAME_WIDTH } from '../data/types';
 import { getBadge } from '../data/badges';
@@ -11,6 +12,7 @@ export class OverworldHUD {
   private orbText!: Phaser.GameObjects.Text;
   private mapText!: Phaser.GameObjects.Text;
   private badgeText!: Phaser.GameObjects.Text;
+  private hintsText!: Phaser.GameObjects.Text;
 
   constructor(scene: Phaser.Scene) {
     this.container = scene.add.container(0, 0).setDepth(900);
@@ -23,26 +25,26 @@ export class OverworldHUD {
     bg.strokeRoundedRect(8, 8, 224, 72, 8);
 
     this.mapText = scene.add.text(16, 12, '', {
-      fontFamily: '"Courier New", monospace', fontSize: '11px', color: '#f5c542',
+      fontFamily: FONT, fontSize: '11px', color: '#f5c542',
     });
 
     this.moneyText = scene.add.text(16, 28, '', {
-      fontFamily: '"Courier New", monospace', fontSize: '11px', color: '#f0f0f0',
+      fontFamily: FONT, fontSize: '11px', color: '#f0f0f0',
     });
 
     this.orbText = scene.add.text(16, 42, '', {
-      fontFamily: '"Courier New", monospace', fontSize: '11px', color: '#f0f0f0',
+      fontFamily: FONT, fontSize: '11px', color: '#f0f0f0',
     });
 
     this.badgeText = scene.add.text(16, 56, '', {
-      fontFamily: '"Courier New", monospace', fontSize: '10px', color: '#8899aa',
+      fontFamily: FONT, fontSize: '10px', color: '#8899aa',
     });
 
-    const hints = scene.add.text(GAME_WIDTH - 140, 12, '[P] Menu  [X] Party', {
-      fontFamily: '"Courier New", monospace', fontSize: '10px', color: '#8899aa',
+    this.hintsText = scene.add.text(GAME_WIDTH - 140, 12, '[P] Menu  [X] Party', {
+      fontFamily: FONT, fontSize: '10px', color: '#8899aa',
     });
 
-    this.container.add([bg, this.mapText, this.moneyText, this.orbText, this.badgeText, hints]);
+    this.container.add([bg, this.mapText, this.moneyText, this.orbText, this.badgeText, this.hintsText]);
     this.refresh('');
   }
 
@@ -53,6 +55,10 @@ export class OverworldHUD {
     this.orbText.setText(`Orbs: ${totalOrbs(p.items)}`);
     const badges = p.badges.map(b => getBadge(b).name.split(' ')[0][0]).join('');
     this.badgeText.setText(badges ? `Badges: ${badges}` : '');
+  }
+
+  setTouchHints(touch: boolean): void {
+    this.hintsText.setText(touch ? 'Menu · Party' : '[P] Menu  [X] Party');
   }
 }
 

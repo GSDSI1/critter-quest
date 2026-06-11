@@ -1,3 +1,4 @@
+import { FONT } from '../ui/theme';
 import Phaser from 'phaser';
 import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../data/types';
 import { getOptions, setOptions, type TextSpeed } from '../systems/options';
@@ -7,6 +8,7 @@ import { Sfx } from '../utils/audio';
 
 import { loadAudioSettings, saveAudioSettings, type AudioSettings } from '../systems/audioSettings';
 import { startMusic, refreshMusicVolume } from '../utils/music';
+import { TouchMenuNav } from '../ui/touchMenuNav';
 
 const SPEEDS: TextSpeed[] = ['slow', 'normal', 'fast'];
 const VOL_STEPS = [0, 0.25, 0.5, 0.75, 1];
@@ -27,6 +29,7 @@ export class OptionsScene extends Phaser.Scene {
   private alwaysRun = false;
   private audio: AudioSettings = loadAudioSettings();
   private optionTexts: Phaser.GameObjects.Text[] = [];
+  private touchNav?: TouchMenuNav;
 
   constructor() {
     super('Options');
@@ -43,10 +46,16 @@ export class OptionsScene extends Phaser.Scene {
     buildMenuPanel(this, 120, 40, 400, 420, 5);
 
     this.add.text(GAME_WIDTH / 2, 70, 'OPTIONS', {
-      fontFamily: '"Courier New", monospace', fontSize: '24px', color: '#f5c542',
+      fontFamily: FONT, fontSize: '24px', color: '#f5c542',
     }).setOrigin(0.5);
 
     this.renderOptions();
+    this.touchNav = new TouchMenuNav(this, {
+      onUp: () => { this.selected = (this.selected - 1 + this.optionCount()) % this.optionCount(); this.renderOptions(); },
+      onDown: () => { this.selected = (this.selected + 1) % this.optionCount(); this.renderOptions(); },
+      onConfirm: () => { if (this.selected === this.optionCount() - 1) this.close(); else this.adjust(); },
+      onCancel: () => this.close(),
+    });
   }
 
   update(): void {
@@ -67,7 +76,7 @@ export class OptionsScene extends Phaser.Scene {
     if (Input.justPressed('cancel')) this.close();
   }
 
-  private optionCount(): number { return 6; }
+  private optionCount(): number { return 7; }
 
   private volLabel(v: number): string {
     return v === 0 ? 'OFF' : `${Math.round(v * 100)}%`;
@@ -79,6 +88,7 @@ export class OptionsScene extends Phaser.Scene {
     return [
       `Text Speed:  ${this.textSpeed.toUpperCase()}`,
       `Always Run:  ${runLabel}`,
+      `Master Vol:  ${this.volLabel(this.audio.master)}`,
       `Music Vol:   ${this.volLabel(this.audio.music)}`,
       `SFX Vol:     ${this.volLabel(this.audio.sfx)}`,
       `Mute All:    ${muteLabel}`,
@@ -91,7 +101,7 @@ export class OptionsScene extends Phaser.Scene {
     this.optionTexts = [];
     this.label().forEach((opt, i) => {
       const t = this.add.text(GAME_WIDTH / 2, 110 + i * 38, (i === this.selected ? '▶ ' : '  ') + opt, {
-        fontFamily: '"Courier New", monospace', fontSize: '16px',
+        fontFamily: FONT, fontSize: '16px',
         color: i === this.selected ? '#f5c542' : '#c0c0c0',
       }).setOrigin(0.5);
       this.optionTexts.push(t);
@@ -108,16 +118,21 @@ export class OptionsScene extends Phaser.Scene {
       this.alwaysRun = !this.alwaysRun;
       setOptions({ alwaysRun: this.alwaysRun });
     } else if (this.selected === 2) {
+      const idx = volIndex(this.audio.master);
+      this.audio.master = VOL_STEPS[(idx + 1) % VOL_STEPS.length];
+      saveAudioSettings(this.audio);
+      refreshMusicVolume();
+    } else if (this.selected === 3) {
       const idx = volIndex(this.audio.music);
       this.audio.music = VOL_STEPS[(idx + 1) % VOL_STEPS.length];
       saveAudioSettings(this.audio);
       startMusic('overworld');
       refreshMusicVolume();
-    } else if (this.selected === 3) {
+    } else if (this.selected === 4) {
       const idx = volIndex(this.audio.sfx);
       this.audio.sfx = VOL_STEPS[(idx + 1) % VOL_STEPS.length];
       saveAudioSettings(this.audio);
-    } else if (this.selected === 4) {
+    } else if (this.selected === 5) {
       this.audio.muted = !this.audio.muted;
       saveAudioSettings(this.audio);
       if (!this.audio.muted) startMusic('overworld');

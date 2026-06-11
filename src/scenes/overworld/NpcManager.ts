@@ -21,6 +21,7 @@ import {
   startEliteGauntlet, findGauntletNpc, buildTrainerBattleData, rematchLevelBonus,
 } from '../../systems/eliteGauntlet';
 import { registerHealVisit } from '../../systems/healTravel';
+import { wipeRestartScene } from '../../ui/transitions';
 
 type Critter = ReturnType<typeof createCritter>;
 
@@ -72,6 +73,10 @@ export class NpcManager {
           delay: 2500 + Math.random() * 3500,
           loop: true,
           callback: () => { if (spr.active) spr.setFlipX(Math.random() > 0.5); },
+        });
+        this.scene.tweens.add({
+          targets: spr, y: spr.y - 1, duration: 900 + Math.random() * 400,
+          yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
         });
       }
     }
@@ -334,7 +339,7 @@ export class NpcManager {
     GameState.player.x = x;
     GameState.player.y = y;
     trySave(this.scene);
-    this.scene.scene.restart({ fromBattle: false });
+    wipeRestartScene(this.scene, { fromBattle: false });
   }
 
   private startWildBattle(): void {

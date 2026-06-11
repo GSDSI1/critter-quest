@@ -1,3 +1,4 @@
+import { FONT } from '../ui/theme';
 import Phaser from 'phaser';
 import { COLORS, GAME_WIDTH } from '../data/types';
 import { getBadge } from '../data/badges';
@@ -19,7 +20,7 @@ export class RegionMapScene extends Phaser.Scene {
     buildMenuPanel(this, 24, 24, GAME_WIDTH - 48, 432, 5);
 
     this.add.text(GAME_WIDTH / 2, 44, 'VERDANT REGION', {
-      fontFamily: '"Courier New", monospace', fontSize: '20px', color: '#f5c542',
+      fontFamily: FONT, fontSize: '20px', color: '#f5c542',
     }).setOrigin(0.5);
 
     const here = GameState.player.mapId;
@@ -47,18 +48,18 @@ export class RegionMapScene extends Phaser.Scene {
         this.add.circle(node.x + 8, node.y - 8, 4, badge.color).setDepth(3);
       }
       this.add.text(node.x, node.y + 14, node.label, {
-        fontFamily: '"Courier New", monospace', fontSize: '8px',
+        fontFamily: FONT, fontSize: '8px',
         color: isHere ? '#f5c542' : '#8899aa',
       }).setOrigin(0.5).setDepth(2);
     }
 
     const hubCount = GameState.player.visitedHealCenters.filter(id => HEAL_HUBS[id]).length;
     this.add.text(GAME_WIDTH / 2, 400, `You are here: ${here}  ·  Hubs: ${hubCount}/5  ·  Badges: ${GameState.player.badges.length}/4`, {
-      fontFamily: '"Courier New", monospace', fontSize: '10px', color: '#667788',
+      fontFamily: FONT, fontSize: '10px', color: '#667788',
     }).setOrigin(0.5);
 
     this.add.text(GAME_WIDTH / 2, 420, 'Press B / ESC to close', {
-      fontFamily: '"Courier New", monospace', fontSize: '11px', color: '#8899aa',
+      fontFamily: FONT, fontSize: '11px', color: '#8899aa',
     }).setOrigin(0.5);
   }
 

@@ -20,3 +20,13 @@ export function isOutdoorMap(mapId: string): boolean {
 export function isNight(playTimeSec: number): boolean {
   return dayFactor(playTimeSec) < 0.35;
 }
+
+/** RGB tint for outdoor tilemap at dusk/night (multiply blend). */
+export function tileNightTint(playTimeSec: number): number {
+  const day = dayFactor(playTimeSec);
+  const night = Math.max(0, 0.65 - day);
+  const r = Math.floor(255 - night * 90);
+  const g = Math.floor(255 - night * 110);
+  const b = Math.floor(255 - night * 30);
+  return (r << 16) | (g << 8) | b;
+}

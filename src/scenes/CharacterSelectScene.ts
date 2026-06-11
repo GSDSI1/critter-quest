@@ -1,3 +1,4 @@
+import { FONT } from '../ui/theme';
 import Phaser from 'phaser';
 import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../data/types';
 import { TRAINER_PRESETS } from '../data/characters';
@@ -37,11 +38,11 @@ export class CharacterSelectScene extends Phaser.Scene {
     buildMenuPanel(this, 40, 24, GAME_WIDTH - 80, GAME_HEIGHT - 48, 5);
 
     this.add.text(GAME_WIDTH / 2, 48, 'Who are you?', {
-      fontFamily: '"Courier New", monospace', fontSize: '26px', color: '#f5c542',
+      fontFamily: FONT, fontSize: '26px', color: '#f5c542',
     }).setOrigin(0.5).setDepth(10);
 
     this.add.text(GAME_WIDTH / 2, 78, 'Pick your trainer · Enter your name', {
-      fontFamily: '"Courier New", monospace', fontSize: '12px', color: '#8899aa',
+      fontFamily: FONT, fontSize: '12px', color: '#8899aa',
     }).setOrigin(0.5).setDepth(10);
 
     const previewBox = this.add.graphics().setDepth(10);
@@ -62,7 +63,7 @@ export class CharacterSelectScene extends Phaser.Scene {
     this.rightArrow.on('pointerdown', () => this.cycle(1));
 
     this.labelText = this.add.text(GAME_WIDTH / 2, 300, '', {
-      fontFamily: '"Courier New", monospace', fontSize: '18px', color: '#f0f0f0',
+      fontFamily: FONT, fontSize: '18px', color: '#f0f0f0',
     }).setOrigin(0.5).setDepth(10);
 
     TRAINER_PRESETS.forEach((_, i) => {
@@ -73,7 +74,7 @@ export class CharacterSelectScene extends Phaser.Scene {
     });
 
     this.add.text(GAME_WIDTH / 2, 355, 'Your name', {
-      fontFamily: '"Courier New", monospace', fontSize: '12px', color: '#8899aa',
+      fontFamily: FONT, fontSize: '12px', color: '#8899aa',
     }).setOrigin(0.5).setDepth(10);
 
     const nameBox = this.add.graphics().setDepth(10);
@@ -83,7 +84,7 @@ export class CharacterSelectScene extends Phaser.Scene {
     nameBox.strokeRoundedRect(GAME_WIDTH / 2 - 100, 368, 200, 36, 6);
 
     this.nameDisplay = this.add.text(GAME_WIDTH / 2, 386, '', {
-      fontFamily: '"Courier New", monospace', fontSize: '20px', color: '#f5c542',
+      fontFamily: FONT, fontSize: '20px', color: '#f5c542',
     }).setOrigin(0.5).setDepth(10);
 
     addBlinkingPrompt(this, 'Type name · tap Confirm or press Z', GAME_HEIGHT - 52);

@@ -1,3 +1,4 @@
+import { FONT } from './theme';
 import Phaser from 'phaser';
 import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../data/types';
 import { pinContainerChildren } from './screenUi';
@@ -52,7 +53,7 @@ export function createTouchButton(
   const bg = scene.add.graphics();
   drawButtonBg(bg, w, h, false);
   const text = scene.add.text(0, 0, label, {
-    fontFamily: '"Courier New", monospace',
+    fontFamily: FONT,
     fontSize: opts?.fontSize ?? '13px',
     color: '#f0f0f0',
   }).setOrigin(0.5);
@@ -172,7 +173,7 @@ export function createTypePill(
     g.strokeRoundedRect(-w / 2, -10, w, 20, 6);
   }
   const t = scene.add.text(0, 0, text, {
-    fontFamily: '"Courier New", monospace',
+    fontFamily: FONT,
     fontSize: '11px',
     color: '#ffffff',
     fontStyle: selected ? 'bold' : 'normal',

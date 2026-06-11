@@ -1,3 +1,4 @@
+import { FONT } from '../ui/theme';
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT } from '../data/types';
 import { addCreatureImage } from '../utils/assetLoader';
@@ -28,7 +29,7 @@ export class IntroScene extends Phaser.Scene {
     });
 
     const tagline = this.add.text(GAME_WIDTH / 2, 155, 'Catch · Battle · Explore', {
-      fontFamily: '"Courier New", monospace', fontSize: '15px', color: '#8899aa',
+      fontFamily: FONT, fontSize: '15px', color: '#8899aa',
     }).setOrigin(0.5).setAlpha(0);
     this.tweens.add({ targets: tagline, alpha: 1, duration: 500, delay: 600 });
 
@@ -70,7 +71,7 @@ export class IntroScene extends Phaser.Scene {
     }
 
     this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 18, 'v1.0  ·  Verdant Region', {
-      fontFamily: '"Courier New", monospace', fontSize: '10px', color: '#556677',
+      fontFamily: FONT, fontSize: '10px', color: '#556677',
     }).setOrigin(0.5);
 
     addBlinkingPrompt(this, 'Press  A / Z  or  Start  to begin', GAME_HEIGHT - 48);

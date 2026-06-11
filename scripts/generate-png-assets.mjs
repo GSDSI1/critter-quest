@@ -71,9 +71,12 @@ function drawCreature(rgba, w, h, { color, shape, types }, opts = {}) {
   const s = w;
 
   if (back) {
-    fillEllipse(rgba, w, h, cx, cy, s * 0.28, s * 0.22, [...rgb, 255]);
-    fillRect(rgba, w, h, cx - s * 0.08, cy - s * 0.15, s * 0.16, s * 0.25, [...dark, 255]);
-    fillEllipse(rgba, w, h, cx, cy + s * 0.22, s * 0.12, s * 0.08, [...shade(rgb, -20), 255]);
+    fillEllipse(rgba, w, h, cx, cy + s * 0.04, s * 0.26, s * 0.2, [...rgb, 255]);
+    fillEllipse(rgba, w, h, cx, cy - s * 0.12, s * 0.14, s * 0.12, [...shade(rgb, 10), 255]);
+    fillEllipse(rgba, w, h, cx, cy + s * 0.24, s * 0.1, s * 0.07, [...dark, 255]);
+    fillCircle(rgba, w, h, cx - s * 0.14, cy - s * 0.1, s * 0.05, [...light, 180]);
+    fillCircle(rgba, w, h, cx + s * 0.14, cy - s * 0.1, s * 0.05, [...light, 180]);
+    fillRect(rgba, w, h, cx - s * 0.04, cy - s * 0.2, s * 0.08, s * 0.06, [...shade(rgb, 20), 255]);
     outlineShape(rgba, w, h);
     return;
   }

@@ -96,7 +96,7 @@ export class BattleFlow {
     if (result.damage && result.damage > 0) {
       const moveType = getMove(this.host.playerMon.moves[index].id).type;
       this.host.battleAnims.animateAttackLunge(this.host.ui.playerSprite, true, () => {
-        this.host.battleAnims.playHitOnEnemy(this.host.ui.enemySprite, moveType);
+        this.host.battleAnims.playHitOnEnemy(this.host.ui.enemySprite, moveType, result.effectiveness);
         this.host.ui.animateEnemyHp();
         this.host.battleAnims.applyEffectivenessTint(this.host.ui.enemySprite, result.effectiveness);
       });

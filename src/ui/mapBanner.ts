@@ -1,3 +1,4 @@
+import { FONT } from './theme';
 import Phaser from 'phaser';
 import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../data/types';
 import { GameState } from '../systems/stats';
@@ -14,7 +15,7 @@ export function showMapBanner(scene: Phaser.Scene, mapName: string): void {
   bg.strokeRoundedRect(-140, -18, 280, 36, 8);
 
   const label = scene.add.text(0, 0, mapName, {
-    fontFamily: '"Courier New", monospace', fontSize: '14px', color: '#f5c542',
+    fontFamily: FONT, fontSize: '14px', color: '#f5c542',
   }).setOrigin(0.5);
 
   banner.add([bg, label]);
@@ -35,7 +36,7 @@ export function showMapBanner(scene: Phaser.Scene, mapName: string): void {
 /** Brief toast message (screen-space). */
 export function showToast(scene: Phaser.Scene, msg: string, durationMs = 1800): void {
   const t = scene.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 72, msg, {
-    fontFamily: '"Courier New", monospace', fontSize: '12px', color: '#f5c542',
+    fontFamily: FONT, fontSize: '12px', color: '#f5c542',
     backgroundColor: '#16213e', padding: { x: 10, y: 6 },
   }).setOrigin(0.5).setDepth(960).setScrollFactor(0).setAlpha(0);
 
