@@ -78,10 +78,11 @@ export function createTouchButton(
     onClick();
   };
 
-  container.setInteractive(
-    new Phaser.Geom.Rectangle(-w / 2, -h / 2, w, h),
-    Phaser.Geom.Rectangle.Contains,
-  );
+  const hitArea = new Phaser.Geom.Rectangle(-w / 2, -h / 2, w, h);
+  const enableHit = () => {
+    container.setInteractive(hitArea, Phaser.Geom.Rectangle.Contains);
+  };
+  enableHit();
   container.on('pointerdown', () => {
     fire();
     stopRepeat();
@@ -105,7 +106,11 @@ export function createTouchButton(
     setEnabled(value: boolean) {
       enabled = value;
       container.setAlpha(value ? 1 : 0.45);
-      if (!value) stopRepeat();
+      if (value) enableHit();
+      else {
+        container.disableInteractive();
+        stopRepeat();
+      }
     },
     destroy() {
       stopRepeat();

@@ -14,7 +14,9 @@ export const forest: GameMap = {
     { id: 'rival_forest', x: 12, y: 4, name: 'Kai', role: 'rival', lines: ['Not bad getting this far!', 'But you still can\'t beat me!'],
       trainer: { party: [{ creatureId: '__RIVAL_EVO__', level: 12 }, { creatureId: 'pebblite', level: 11 }], reward: 400 } },
     { id: 'bugcatcher', x: 8, y: 14, name: 'Ben', role: 'trainer_m', lines: ['Bug-type? We have leaf types!', 'En garde!'],
-      trainer: { party: [{ creatureId: 'mossling', level: 10 }, { creatureId: 'bloomoss', level: 11 }], reward: 220 } },
+      trainer: { party: [{ creatureId: 'thornbud', level: 10 }, { creatureId: 'bloomoss', level: 11 }], reward: 240 } },
+    { id: 'shadow_hunter', x: 4, y: 6, name: 'Hunter Cole', role: 'trainer_m', lines: ['Murkfoxes vanish before you blink.', 'Try to keep up!'],
+      trainer: { party: [{ creatureId: 'murkfox', level: 11 }, { creatureId: 'shadeling', level: 12 }], reward: 320 } },
     { id: 'sign3', x: 12, y: 19, name: 'Sign', lines: ['Verdant Forest', '↓ Route 1  |  → Route 2 / Mossgrove City'] },
   ],
   tiles: t([

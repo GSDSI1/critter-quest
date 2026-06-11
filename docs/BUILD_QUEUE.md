@@ -30,6 +30,8 @@ Last updated: 2026-06-09 (graphics sprint). Source: `GAMEPLAN.md`.
 | **Opt** | Battle/shop/PC/fast-travel touch nav + fly wipe | ✓ |
 | **Opt** | 50 species + 4 moves + kelpling line + city atmosphere + NPC art v2 | ✓ |
 | **Opt** | 55 species + coalemb→embershell + biome skies + route trainers | ✓ |
+| **Opt** | Playtest polish: always-on touch pad, 6-stat UI, overlap fixes, starter pixel art | ✓ |
+| **Opt** | 60 species + frostnip/murkfox evos + stage-2 starter art + cave/forest tint | ✓ |
 
 ## Optional polish (future)
 

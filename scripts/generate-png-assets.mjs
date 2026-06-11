@@ -9,6 +9,7 @@ import {
   writePng, setPx, fillRect, fillCircle, fillEllipse, outlineShape,
   shade, rgbFromHex, hashSeed,
 } from './png-utils.mjs';
+import { drawStarterOverride } from './critter-art/starters.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
@@ -61,8 +62,9 @@ function drawTypeDetail(rgba, w, h, type, cx, cy, s, frame) {
   }
 }
 
-function drawCreature(rgba, w, h, { color, shape, types }, opts = {}) {
+function drawCreature(rgba, w, h, { id, color, shape, types }, opts = {}) {
   const { frame = 0, back = false } = opts;
+  if (id && drawStarterOverride(rgba, w, id, { frame, back })) return;
   const rgb = rgbFromHex(color);
   const dark = shade(rgb, -45);
   const light = shade(rgb, 45);

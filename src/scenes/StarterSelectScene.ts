@@ -13,15 +13,17 @@ import { Input } from '../systems/input';
 import { Sfx } from '../utils/audio';
 import { DialogBox } from '../ui/DialogBox';
 import { addItem } from '../data/items';
+import { previewStatsAtLevel } from '../ui/statDisplay';
 
 const ORB_TYPES = ['flame', 'tide', 'leaf'] as const;
 
 const LAYOUT = {
-  panel: { x: 100, y: 48, w: 440, h: 228 },
+  panel: { x: 100, y: 48, w: 440, h: 240 },
   nameY: 62,
-  spriteY: 130,
-  statsY: 188,
-  descY: 206,
+  spriteY: 128,
+  statsY: 182,
+  statsY2: 196,
+  descY: 214,
   orbY: 296,
   orbX: [200, 320, 440] as const,
   pillY: 44,
@@ -38,6 +40,7 @@ export class StarterSelectScene extends Phaser.Scene {
   private typePills: Phaser.GameObjects.Container[] = [];
   private introSprites: Phaser.GameObjects.Image[] = [];
   private statText!: Phaser.GameObjects.Text;
+  private statText2!: Phaser.GameObjects.Text;
   private descText!: Phaser.GameObjects.Text;
   private nameText!: Phaser.GameObjects.Text;
   private creaturePreview!: Phaser.GameObjects.Image;
@@ -76,7 +79,7 @@ export class StarterSelectScene extends Phaser.Scene {
 
     this.previewGlow = this.add.graphics().setDepth(3);
     this.creaturePreview = addCreatureImage(this, PANEL_CX, LAYOUT.spriteY, STARTERS[0])
-      .setScale(2).setVisible(false).setDepth(5);
+      .setScale(2.5).setVisible(false).setDepth(5);
     this.tweens.add({
       targets: this.creaturePreview,
       y: LAYOUT.spriteY - 4,
@@ -91,7 +94,10 @@ export class StarterSelectScene extends Phaser.Scene {
     }).setOrigin(0.5).setDepth(6);
 
     this.statText = this.add.text(PANEL_CX, LAYOUT.statsY, '', {
-      fontFamily: FONT, fontSize: '11px', color: '#c0c0c0',
+      fontFamily: FONT, fontSize: '10px', color: '#c0c0c0',
+    }).setOrigin(0.5).setDepth(6).setVisible(false);
+    this.statText2 = this.add.text(PANEL_CX, LAYOUT.statsY2, '', {
+      fontFamily: FONT, fontSize: '10px', color: '#8899aa',
     }).setOrigin(0.5).setDepth(6).setVisible(false);
 
     this.descText = this.add.text(PANEL_CX, LAYOUT.descY, 'Listen to Prof. Elmwood, then pick an orb.', {
@@ -209,11 +215,12 @@ export class StarterSelectScene extends Phaser.Scene {
     if (!this.introShown) return;
     const id = STARTERS[this.selected];
     const def = getCreature(id);
-    const b = def.baseStats;
     const typeColor = TYPE_COLORS[def.types[0] as ElementType];
+    const [row1, row2] = previewStatsAtLevel(id, 5);
 
     this.nameText.setText(def.name);
-    this.statText.setText(`HP ${b.hp}   ATK ${b.atk}   DEF ${b.def}   SPE ${b.spe}`).setVisible(true);
+    this.statText.setText(row1).setVisible(true);
+    this.statText2.setText(row2).setVisible(true);
     this.descText.setText(def.description);
     applyCreatureTexture(this.creaturePreview, this, id);
     this.creaturePreview.setVisible(true);

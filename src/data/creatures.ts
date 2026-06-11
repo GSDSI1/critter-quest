@@ -442,6 +442,46 @@ export const CREATURES: Record<string, CreatureDef> = {
     description: 'Rides headwinds while broadcasting telepathic chirps.',
     ability: 'static', habitat: 'Victory Road', height: 0.7, weight: 10,
   },
+  glaciara: {
+    id: 'glaciara', name: 'Glaciara', types: ['ice'], dexNumber: 56,
+    baseStats: { hp: 68, atk: 58, def: 62, spa: 88, spd: 75, spe: 72 },
+    moves: ['glacier_fang', 'frost_shatter', 'icebeam', 'frostbite'],
+    catchRate: 22, expYield: 148, color: 0xbae6fd, shape: 'quadruped',
+    description: 'Ice crystals armor its shoulders like a living glacier.',
+    ability: 'snow_cloak', habitat: 'Glacier Pass', height: 1.1, weight: 42,
+  },
+  shadeprowl: {
+    id: 'shadeprowl', name: 'Shadeprowl', types: ['shadow'], dexNumber: 57,
+    baseStats: { hp: 72, atk: 92, def: 58, spa: 68, spd: 62, spe: 102 },
+    moves: ['night_stalk', 'murk_fang', 'shadowclaw', 'darkpulse'],
+    catchRate: 18, expYield: 162, color: 0x27272a, shape: 'quadruped',
+    description: 'Hunts at dusk leaving only shadowy pawprints behind.',
+    ability: 'shadow_tag', habitat: 'Forest', height: 1.2, weight: 34,
+  },
+  crystmite: {
+    id: 'crystmite', name: 'Crystmite', types: ['psychic', 'stone'], dexNumber: 58,
+    baseStats: { hp: 54, atk: 45, def: 70, spa: 78, spd: 85, spe: 48 },
+    moves: ['prism_beam', 'psybeam', 'rockthrow', 'calm_mind'],
+    catchRate: 26, expYield: 132, color: 0xc084fc, shape: 'crystalline',
+    description: 'Faceted body refracts cave light into dazzling beams.',
+    ability: 'levitate', habitat: 'Crystal Cave', height: 0.9, weight: 28,
+  },
+  brinepup: {
+    id: 'brinepup', name: 'Brinepup', types: ['tide'], dexNumber: 59,
+    baseStats: { hp: 52, atk: 55, def: 50, spa: 48, spd: 52, spe: 62 },
+    moves: ['brine_splash', 'splash', 'tackle', 'growl'],
+    catchRate: 34, expYield: 88, color: 0x0284c7, shape: 'quadruped',
+    description: 'Pup that chases receding waves along rocky shores.',
+    ability: 'torrent', habitat: 'Route 3', height: 0.7, weight: 22,
+  },
+  thornbud: {
+    id: 'thornbud', name: 'Thornbud', types: ['leaf'], dexNumber: 60,
+    baseStats: { hp: 58, atk: 62, def: 55, spa: 45, spd: 48, spe: 52 },
+    moves: ['thorn_lash', 'vine', 'tackle', 'leer'],
+    catchRate: 30, expYield: 95, color: 0x15803d, shape: 'blob',
+    description: 'Rosebud shell hides sharp thorns until threatened.',
+    ability: 'overgrow', habitat: 'Route 2', height: 0.5, weight: 14,
+  },
 };
 
 export const STARTERS = ['emberpup', 'aqualet', 'leafkit'] as const;

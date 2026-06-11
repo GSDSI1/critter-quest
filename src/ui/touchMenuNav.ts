@@ -16,6 +16,11 @@ export function markTouchPreferred(): void {
   touchPreferred = true;
 }
 
+/** Overworld D-pad is always shown for playability (mouse + touch). */
+export function shouldShowOverworldTouchPad(): boolean {
+  return true;
+}
+
 export interface TouchMenuNavCallbacks {
   onUp: () => void;
   onDown: () => void;

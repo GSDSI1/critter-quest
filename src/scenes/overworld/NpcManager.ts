@@ -92,7 +92,7 @@ export class NpcManager {
     }
   }
 
-  tryMove(dx: number, dy: number): void {
+  tryMove(dx: number, dy: number): boolean {
     const map = this.getMap();
     const player = this.callbacks.getPlayer();
     const playerShadow = this.callbacks.getPlayerShadow();
@@ -106,14 +106,14 @@ export class NpcManager {
 
     if (!isWalkable(tile)) {
       player.setTexture(playerTextureKey(GameState.player.characterId, facing, 0));
-      return;
+      return false;
     }
 
     const npc = map.npcs.find(n => n.x === nx && n.y === ny);
     if (npc) {
       player.setTexture(playerTextureKey(GameState.player.characterId, facing, 0));
       this.interactNpc(npc);
-      return;
+      return false;
     }
 
     this.callbacks.setMoving(true);
@@ -174,6 +174,7 @@ export class NpcManager {
         }
       },
     });
+    return true;
   }
 
   private spawnWalkFx(x: number, y: number, color: number, tallGrass = false): void {

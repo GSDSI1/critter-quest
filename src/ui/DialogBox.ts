@@ -50,12 +50,13 @@ export class DialogBox {
 
     this.textObj = scene.add.text(BOX_X + 16, BOX_Y + 28, '', {
       fontFamily: FONT,
-      fontSize: '15px',
+      fontSize: '14px',
       color: '#f0f0f0',
       stroke: '#0a0a14',
       strokeThickness: 2,
       wordWrap: { width: BOX_W - 140 },
       lineSpacing: 4,
+      maxLines: 3,
     });
 
     this.container = scene.add.container(0, 0, [bg, this.speakerText, this.textObj]);

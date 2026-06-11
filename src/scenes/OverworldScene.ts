@@ -22,7 +22,8 @@ import { buildSkyLayer } from './overworld/SkyLayer';
 import { buildCityAtmosphere } from './overworld/CityAtmosphere';
 import { buildHealInterior } from '../ui/sceneBackdrops';
 import { fadeInOnStart, wipeInOnStart } from '../ui/transitions';
-import { markTouchPreferred } from '../ui/touchMenuNav';
+import { markTouchPreferred, shouldShowOverworldTouchPad } from '../ui/touchMenuNav';
+import { focusGameCanvas } from '../utils/focusCanvas';
 
 export class OverworldScene extends Phaser.Scene {
   private player!: Phaser.GameObjects.Sprite;
@@ -40,6 +41,7 @@ export class OverworldScene extends Phaser.Scene {
   private padToast?: Phaser.GameObjects.Text;
   private touchPad?: OverworldTouchPad;
   private nightOverlay?: Phaser.GameObjects.Graphics;
+  private hasMoved = false;
 
   constructor() {
     super('Overworld');
@@ -56,8 +58,8 @@ export class OverworldScene extends Phaser.Scene {
     this.controlsPanel = new ControlsPanel(this);
     this.hud = new OverworldHUD(this);
     this.hud.refresh(this.map.name);
-    this.inputHint = this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 28, '', {
-      fontFamily: FONT, fontSize: '11px', color: '#8899aa',
+    this.inputHint = this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 42, '', {
+      fontFamily: FONT, fontSize: '11px', color: '#f5c542',
     }).setOrigin(0.5).setDepth(1100).setVisible(false);
     pinToScreen(this.inputHint, 1100);
     this.addVignette();
@@ -79,17 +81,18 @@ export class OverworldScene extends Phaser.Scene {
 
     this.touchPad = new OverworldTouchPad(
       this,
-      (dx, dy) => this.npcManager.tryMove(dx, dy),
+      (dx, dy) => this.onPlayerMove(dx, dy),
       () => this.npcManager.tryInteract(),
       () => { this.scene.launch('PauseMenu'); this.scene.pause(); },
     );
-    const coarse = typeof window !== 'undefined' && window.matchMedia('(pointer: fine)').matches;
-    if (coarse) this.touchPad.setVisible(false);
+    this.touchPad.setVisible(shouldShowOverworldTouchPad());
+    this.hud.setTouchHints(true);
+    this.hud.showMoveHint(true);
     this.input.on('pointerdown', () => {
       markTouchPreferred();
-      this.touchPad?.setVisible(true);
-      this.hud.setTouchHints(true);
+      focusGameCanvas();
     });
+    this.time.delayedCall(100, () => focusGameCanvas());
 
     this.mapRenderer.render(this.map);
     ({ player: this.player, shadow: this.playerShadow } = this.npcManager.spawnPlayer());
@@ -98,28 +101,29 @@ export class OverworldScene extends Phaser.Scene {
 
     if (data.showIntro && !GameState.player.storyFlags.saw_controls) {
       this.inputLocked = true;
-      this.controlsPanel.show(() => {
-        GameState.player.storyFlags.saw_controls = true;
-        trySave(this);
-        this.dialog.show([
-          'Welcome to Verdant Town!',
-          'Walk into tall grass to find wild critters.',
-          'Good luck on your Critter Quest!',
-        ], () => { this.inputLocked = false; });
-      });
+      GameState.player.storyFlags.saw_controls = true;
+      trySave(this);
+      this.syncTouchPadModal();
+      this.dialog.show([
+        'Welcome to Verdant Town!',
+        'Use the D-pad or WASD to move. Tap Talk near people.',
+        'Walk into tall grass to find wild critters!',
+      ], () => { this.inputLocked = false; this.syncTouchPadModal(); });
     } else if (data.showIntro) {
       this.inputLocked = true;
       this.dialog.show([
         'Welcome to Verdant Town!',
         'Walk into tall grass to find wild critters.',
         'Hold Shift or L1 to run (after beating Kai).',
-      ], () => { this.inputLocked = false; });
+      ], () => { this.inputLocked = false; this.syncTouchPadModal(); });
     }
 
     if (data.blackout) {
       this.inputLocked = true;
+      this.syncTouchPadModal();
       this.dialog.show(['You whited out!', 'Scurried back to the Healing Center...'], () => {
         this.inputLocked = false;
+        this.syncTouchPadModal();
       });
     }
 
@@ -147,13 +151,25 @@ export class OverworldScene extends Phaser.Scene {
     pinToScreen(g, 850);
   }
 
+  private onPlayerMove(dx: number, dy: number): void {
+    if (this.npcManager.tryMove(dx, dy) && !this.hasMoved) {
+      this.hasMoved = true;
+      this.hud.clearMoveHint();
+    }
+  }
+
+  private syncTouchPadModal(): void {
+    const modal = this.inputLocked || this.dialog.isShowing() || this.controlsPanel.isShowing();
+    this.touchPad?.setVisible(!modal && shouldShowOverworldTouchPad());
+  }
+
   private updateInputHint(): void {
     const show = this.inputLocked || this.dialog.isShowing() || this.controlsPanel.isShowing();
     if (show) {
       this.inputHint.setText(
         this.controlsPanel.isShowing()
-          ? 'Press A / Z — continue   B / ESC — skip'
-          : 'Press A / Z to continue',
+          ? 'Tap Next or press Z to continue'
+          : 'Tap Next or press Z to continue',
       );
       this.inputHint.setVisible(true);
     } else {
@@ -169,7 +185,7 @@ export class OverworldScene extends Phaser.Scene {
     }
 
     if (this.controlsPanel.isShowing()) {
-      this.touchPad?.setEnabled(false);
+      this.syncTouchPadModal();
       if (Input.justPressed('left')) this.controlsPanel.prevPage();
       if (Input.justPressed('right')) this.controlsPanel.nextPage();
       if (Input.justPressed('confirm')) this.controlsPanel.advance();
@@ -179,7 +195,7 @@ export class OverworldScene extends Phaser.Scene {
     }
 
     if (this.dialog.isShowing()) {
-      this.touchPad?.setEnabled(false);
+      this.syncTouchPadModal();
       if (Input.justPressed('confirm') || Input.justPressed('cancel')) this.dialog.advance();
       this.updateInputHint();
       return;
@@ -187,6 +203,7 @@ export class OverworldScene extends Phaser.Scene {
 
     this.updateInputHint();
 
+    this.syncTouchPadModal();
     const blocked = this.inputLocked || this.moving || this.scene.isPaused();
     this.touchPad?.setEnabled(!blocked);
 
@@ -216,7 +233,7 @@ export class OverworldScene extends Phaser.Scene {
     this.moveDuration = running ? 100 : 200;
 
     const { dx, dy } = Input.getMovement();
-    if (dx !== 0 || dy !== 0) this.npcManager.tryMove(dx, dy);
+    if (dx !== 0 || dy !== 0) this.onPlayerMove(dx, dy);
   }
 
   private updateDayNightTint(): void {

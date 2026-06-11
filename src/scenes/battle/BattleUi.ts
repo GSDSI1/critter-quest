@@ -24,10 +24,15 @@ import { drawHpBar } from '../../ui/HUD';
 import { statusLabel } from '../../systems/status';
 import { pinContainerChildren } from '../../ui/screenUi';
 import { createTouchButton } from '../../ui/touchButtons';
+import { formatStatCompact } from '../../ui/statDisplay';
 import type { BattleAnims } from './BattleAnims';
 
 export const MENU_ITEMS = ['Fight', 'Bag', 'Switch', 'Run'] as const;
-const MENU_POS: [number, number][] = [[380, 378], [510, 378], [380, 418], [510, 418]];
+const MENU_POS: [number, number][] = [[380, 350], [510, 350], [380, 390], [510, 390]];
+
+function truncateLabel(s: string, max: number): string {
+  return s.length > max ? `${s.slice(0, max - 1)}…` : s;
+}
 
 export type BattlePhase = 'intro' | 'menu' | 'fight' | 'moves' | 'bag' | 'message' | 'enemy' | 'evolve' | 'learn';
 
@@ -58,6 +63,7 @@ export class BattleUi {
   enemyNameText!: Phaser.GameObjects.Text;
   playerHpText!: Phaser.GameObjects.Text;
   abilityText!: Phaser.GameObjects.Text;
+  playerStatsText!: Phaser.GameObjects.Text;
 
   private menuHighlights: Phaser.GameObjects.Graphics[] = [];
   private messageQueue: string[] = [];
@@ -92,9 +98,9 @@ export class BattleUi {
 
     const pBox = this.scene.add.graphics();
     pBox.fillStyle(COLORS.panel, 0.92);
-    pBox.fillRoundedRect(40, 248, 260, 88, 8);
+    pBox.fillRoundedRect(40, 248, 260, 100, 8);
     pBox.lineStyle(2, COLORS.panelBorder, 1);
-    pBox.strokeRoundedRect(40, 248, 260, 88, 8);
+    pBox.strokeRoundedRect(40, 248, 260, 100, 8);
 
     this.scene.add.text(56, 256, displayName(this.host.playerMon), {
       fontFamily: FONT, fontSize: '14px', color: '#f0f0f0', fontStyle: 'bold',
@@ -102,14 +108,17 @@ export class BattleUi {
     this.scene.add.text(56, 274, `Lv.${this.host.playerMon.level}`, {
       fontFamily: FONT, fontSize: '11px', color: '#8899aa',
     });
-    this.abilityText = this.scene.add.text(200, 274, '', {
-      fontFamily: FONT, fontSize: '9px', color: '#667788',
-    }).setOrigin(1, 0);
-    this.playerHpText = this.scene.add.text(230, 274, '', {
+    this.playerHpText = this.scene.add.text(200, 274, '', {
       fontFamily: FONT, fontSize: '10px', color: '#8899aa',
+    }).setOrigin(1, 0);
+    this.abilityText = this.scene.add.text(56, 288, '', {
+      fontFamily: FONT, fontSize: '8px', color: '#667788',
     });
-    this.playerHpBar = drawHpBar(this.scene, 56, 292, 180, 10, 0, 1);
-    this.expBar = drawHpBar(this.scene, 56, 308, 180, 6, 0, 1, 50);
+    this.playerHpBar = drawHpBar(this.scene, 56, 300, 180, 10, 0, 1);
+    this.expBar = drawHpBar(this.scene, 56, 316, 180, 6, 0, 1, 50);
+    this.playerStatsText = this.scene.add.text(56, 330, '', {
+      fontFamily: FONT, fontSize: '8px', color: '#8899aa',
+    });
 
     if (this.scene.textures.exists('dialog_frame')) {
       this.scene.add.image(GAME_WIDTH / 2, 416, 'dialog_frame').setOrigin(0.5);
@@ -122,8 +131,9 @@ export class BattleUi {
     }
 
     this.messageText = this.scene.add.text(32, 384, '', {
-      fontFamily: FONT, fontSize: '14px', color: '#f0f0f0',
-      wordWrap: { width: GAME_WIDTH - 64 },
+      fontFamily: FONT, fontSize: '13px', color: '#f0f0f0',
+      wordWrap: { width: GAME_WIDTH - 80 },
+      maxLines: 3,
     });
 
     this.buildMenu();
@@ -142,7 +152,8 @@ export class BattleUi {
 
   syncEnemyUi(animate = true): void {
     const def = getCreature(this.host.wild.speciesId);
-    this.enemyNameText.setText(`${def.name}  Lv.${this.host.wild.level}  ${statusLabel(this.host.wild.status)}`);
+    const status = statusLabel(this.host.wild.status);
+    this.enemyNameText.setText(truncateLabel(`${def.name} Lv.${this.host.wild.level}${status ? ` ${status}` : ''}`, 22));
     this.enemyIdle?.stop();
     applyCreatureTexture(this.enemySprite, this.scene, this.host.wild.speciesId);
     this.enemySprite.setAlpha(1);
@@ -165,13 +176,14 @@ export class BattleUi {
   refreshPlayerUi(): void {
     const mon = this.host.playerMon;
     this.playerHpText.setText(`${mon.currentHp}/${mon.maxHp} ${statusLabel(mon.status)}`);
-    this.animateHp(this.playerHpBar, mon.currentHp, mon.maxHp, 56, 292);
+    this.animateHp(this.playerHpBar, mon.currentHp, mon.maxHp, 56, 300);
     this.expBar.clear();
     const prog = expProgress(mon);
-    const expG = drawHpBar(this.scene, 56, 308, 180, 6, prog * 180, 180, 50);
+    const expG = drawHpBar(this.scene, 56, 316, 180, 6, prog * 180, 180, 50);
     this.expBar.destroy();
     this.expBar = expG;
-    this.abilityText.setText(getAbility(mon.ability).name);
+    this.abilityText.setText(`Ability: ${truncateLabel(getAbility(mon.ability).name, 20)}`);
+    this.playerStatsText.setText(formatStatCompact(mon));
   }
 
   animateEnemyHp(): void {
@@ -182,9 +194,11 @@ export class BattleUi {
     const show = phase === 'message' || phase === 'intro';
     this.continueBtn?.setVisible(show);
     this.continueBtn?.setEnabled(show);
+    this.messageText.setWordWrapWidth(show ? GAME_WIDTH - 150 : GAME_WIDTH - 80);
   }
 
   showMenu(): void {
+    this.continueBtn?.setVisible(false);
     this.menuContainer.setVisible(true);
     this.updateMenuHighlight();
   }
@@ -253,6 +267,7 @@ export class BattleUi {
 
   openMoveMenu(): void {
     this.host.moveIndex = 0;
+    this.continueBtn?.setVisible(false);
     this.menuContainer.setVisible(false);
     this.refreshMoveMenu();
     this.moveContainer.setVisible(true);
@@ -260,6 +275,7 @@ export class BattleUi {
 
   openBagMenu(): void {
     this.host.bagIndex = 0;
+    this.continueBtn?.setVisible(false);
     this.menuContainer.setVisible(false);
     this.refreshBagMenu();
     this.bagContainer.setVisible(true);
@@ -272,7 +288,7 @@ export class BattleUi {
       const col = i % 2;
       const row = Math.floor(i / 2);
       const x = 32 + col * 290;
-      const y = 380 + row * 36;
+      const y = 352 + row * 34;
       const bg = this.scene.add.graphics();
       bg.fillStyle(COLORS.panelBorder, i === this.host.moveIndex ? 1 : 0.85);
       bg.fillRoundedRect(x, y, 270, 30, 5);
@@ -300,7 +316,7 @@ export class BattleUi {
     }
     items.forEach((id, i) => {
       const item = getItem(id);
-      const y = 378 + i * 28;
+      const y = 350 + i * 26;
       const bg = this.scene.add.graphics();
       bg.fillStyle(COLORS.panelBorder, i === this.host.bagIndex ? 1 : 0.85);
       bg.fillRoundedRect(32, y, 300, 24, 4);

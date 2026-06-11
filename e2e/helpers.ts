@@ -79,7 +79,7 @@ export async function confirmCharacterSelect(page: Page): Promise<void> {
   if ((await sceneKeys(page)).includes('CharacterSelect')) {
     await page.evaluate(() => window.__cq?.confirmCharacter());
   }
-  await waitForScene(page, 'LabIntro', 12_000);
+  await waitForAnyScene(page, ['LabIntro', 'StarterSelect'], 12_000);
 }
 
 export async function skipIntroToMenu(page: Page): Promise<void> {
@@ -110,12 +110,12 @@ export async function startNewGameToOverworld(page: Page): Promise<void> {
   await skipIntroToMenu(page);
   await chooseNewGame(page);
   await confirmCharacterSelect(page);
-  await advanceDialogs(page, 4);
-  await page.waitForTimeout(500);
   if ((await sceneKeys(page)).includes('LabIntro')) {
+    await advanceDialogs(page, 4);
+    await page.waitForTimeout(500);
     await page.evaluate(() => window.__cq?.startStarterSelect());
+    await waitForScene(page, 'StarterSelect', 15_000);
   }
-  await waitForScene(page, 'StarterSelect', 15_000);
   await advanceDialogs(page, 3);
   await page.waitForTimeout(400);
   await pressConfirm(page);

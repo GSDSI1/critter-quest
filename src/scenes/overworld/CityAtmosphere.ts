@@ -11,6 +11,8 @@ const CITY_TINTS: Record<string, { color: number; alpha: number }> = {
   volcanic_path: { color: 0xef4444, alpha: 0.07 },
   glacier_pass: { color: 0xbfdbfe, alpha: 0.08 },
   victory_road: { color: 0x818cf8, alpha: 0.09 },
+  forest: { color: 0x22c55e, alpha: 0.05 },
+  crystal_cave: { color: 0xa855f7, alpha: 0.1 },
 };
 
 /** Subtle full-screen color wash for hub cities. */

@@ -49,15 +49,15 @@ ok(`${critterPngs.length} critter PNGs on disk`);
 // ── Data catalog ──
 const creatures = read('src/data/creatures.ts');
 const speciesIds = [...creatures.matchAll(/^\s{2}[a-z]+: \{/gm)];
-if (speciesIds.length === 55) ok('55 species in creatures.ts');
-else fail(`Expected 55 species, found ${speciesIds.length}`);
+if (speciesIds.length === 60) ok('60 species in creatures.ts');
+else fail(`Expected 60 species, found ${speciesIds.length}`);
 
 const movesSrc = read('src/data/moves.ts');
 const moveCount = (movesSrc.match(/^\s{2}[a-z][a-z0-9_]*: \{ id:/gm) ?? []).length;
-if (moveCount >= 40) ok(`${moveCount} moves in moves.ts`);
-else fail(`Expected ≥40 moves, found ${moveCount}`);
-if (movesSrc.includes('magma_crush') && movesSrc.includes('gale_dash')) ok('Batch-2 species moves');
-else fail('moves.ts missing magma_crush/gale_dash');
+if (moveCount >= 45) ok(`${moveCount} moves in moves.ts`);
+else fail(`Expected ≥45 moves, found ${moveCount}`);
+if (movesSrc.includes('glacier_fang') && movesSrc.includes('thorn_lash')) ok('Batch-3 species moves');
+else fail('moves.ts missing glacier_fang/thorn_lash');
 
 function readMapsBundle() {
   const index = read('src/data/maps/index.ts');
@@ -223,6 +223,14 @@ const npcMgr = existsSync(join(root, 'src/scenes/overworld/NpcManager.ts'))
 const owBundle = overworld + npcMgr;
 if (overworld.includes('OverworldTouchPad')) ok('Overworld touch D-pad');
 else fail('OverworldScene missing touch pad');
+if (read('src/ui/touchMenuNav.ts').includes('shouldShowOverworldTouchPad')) ok('Overworld touch pad always-on helper');
+else fail('touchMenuNav missing shouldShowOverworldTouchPad');
+if (existsSync(join(root, 'src/utils/focusCanvas.ts'))) ok('Canvas keyboard focus helper');
+else fail('focusCanvas.ts missing');
+if (existsSync(join(root, 'src/ui/statDisplay.ts'))) ok('Stat display helper (6 stats)');
+else fail('statDisplay.ts missing');
+if (existsSync(join(root, 'scripts/critter-art/starters.mjs'))) ok('Starter pixel art overrides');
+else fail('critter-art/starters.mjs missing');
 if (owBundle.includes('playerTextureKey') && overworld.includes('applyOverworldCamera')) {
   ok('Overworld: player sprite + camera');
 } else fail('OverworldScene incomplete');

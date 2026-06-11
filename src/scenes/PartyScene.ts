@@ -13,6 +13,7 @@ import { trySave } from '../utils/saveFeedback';
 import { buildScreenOverlay, buildMenuPanel } from '../ui/sceneBackdrops';
 import { Input } from '../systems/input';
 import { TouchMenuNav } from '../ui/touchMenuNav';
+import { formatStatLines } from '../ui/statDisplay';
 
 const HELD_ITEMS = [
   'oran_berry', 'sitrus_berry', 'lum_berry',
@@ -61,16 +62,17 @@ export class PartyScene extends Phaser.Scene {
       const col = i % 2;
       const row = Math.floor(i / 2);
       const x = 40 + col * 300;
-      const y = 60 + row * 130;
+      const y = 60 + row * 125;
       const def = getCreature(c.speciesId);
       const fainted = isFainted(c);
       const showingDetail = this.detailIndex === i;
 
       const panel = this.add.graphics();
       panel.fillStyle(COLORS.panel, fainted ? 0.6 : 0.95);
-      panel.fillRoundedRect(x, y, 280, showingDetail ? 130 : 115, 8);
+      const panelH = showingDetail ? 148 : 112;
+      panel.fillRoundedRect(x, y, 280, panelH, 8);
       panel.lineStyle(2, fainted ? 0x555555 : COLORS.panelBorder, 1);
-      panel.strokeRoundedRect(x, y, 280, showingDetail ? 130 : 115, 8);
+      panel.strokeRoundedRect(x, y, 280, panelH, 8);
 
       addCreatureImage(this, x + 40, y + 58, c.speciesId, true).setScale(2).setAlpha(fainted ? 0.4 : 1);
 
@@ -84,24 +86,35 @@ export class PartyScene extends Phaser.Scene {
       this.add.text(x + 80, y + 30, `Lv.${c.level}  ${getNature(c.nature).name}`, {
         fontFamily: FONT, fontSize: '10px', color: '#8899aa',
       });
-      this.add.text(x + 80, y + 46, `${c.currentHp}/${c.maxHp} HP  ${getAbility(c.ability).name}`, {
+      this.add.text(x + 80, y + 46, `${c.currentHp}/${c.maxHp} HP`, {
         fontFamily: FONT, fontSize: '9px', color: '#8899aa',
       });
-      drawHpBar(this, x + 80, y + 62, 180, 8, c.currentHp, c.maxHp);
+      drawHpBar(this, x + 80, y + 58, 180, 8, c.currentHp, c.maxHp);
 
       if (showingDetail) {
+        const [s1, s2] = formatStatLines(c);
+        this.add.text(x + 80, y + 72, s1, {
+          fontFamily: FONT, fontSize: '8px', color: '#c0c0c0',
+        });
+        this.add.text(x + 80, y + 84, s2, {
+          fontFamily: FONT, fontSize: '8px', color: '#c0c0c0',
+        });
         const iv = c.ivs;
-        this.add.text(x + 80, y + 78, `IVs HP${iv.hp} ATK${iv.atk} DEF${iv.def} SPA${iv.spa} SPD${iv.spd} SPE${iv.spe}`, {
+        this.add.text(x + 80, y + 98, `IV HP${iv.hp} ATK${iv.atk} DEF${iv.def} SPA${iv.spa} SPD${iv.spd} SPE${iv.spe}`, {
           fontFamily: FONT, fontSize: '7px', color: '#667788',
         });
+        const abil = getAbility(c.ability).name;
+        this.add.text(x + 80, y + 110, `Ability: ${abil.length > 18 ? abil.slice(0, 16) + '…' : abil}`, {
+          fontFamily: FONT, fontSize: '7px', color: '#8899aa',
+        });
         if (c.heldItem) {
-          this.add.text(x + 80, y + 92, `Held: ${getItem(c.heldItem).name}`, {
+          this.add.text(x + 80, y + 122, `Held: ${getItem(c.heldItem).name}`, {
             fontFamily: FONT, fontSize: '8px', color: '#f5c542',
           });
         }
       } else {
         const moves = c.moves.map(m => getMove(m.id).name).join(', ');
-        this.add.text(x + 80, y + 78, moves, {
+        this.add.text(x + 80, y + 72, moves, {
           fontFamily: FONT, fontSize: '8px', color: '#667788', wordWrap: { width: 190 },
         });
       }
@@ -126,12 +139,12 @@ export class PartyScene extends Phaser.Scene {
     if (!this.battleSwitch) this.renderHeldItemMenu();
 
     if (GameState.player.storage.length > 0) {
-      this.add.text(GAME_WIDTH / 2, 420, `+ ${GameState.player.storage.length} in storage`, {
+      this.add.text(GAME_WIDTH / 2, 458, `+ ${GameState.player.storage.length} in storage`, {
         fontFamily: FONT, fontSize: '11px', color: '#667788',
       }).setOrigin(0.5);
     }
 
-    this.add.text(GAME_WIDTH / 2, 450, '[ ESC / Z to close ]', {
+    this.add.text(GAME_WIDTH / 2, 468, '[ ESC / Z to close ]', {
       fontFamily: FONT, fontSize: '12px', color: '#8899aa',
     }).setOrigin(0.5).setInteractive({ useHandCursor: true }).on('pointerdown', () => this.close());
 
@@ -158,12 +171,14 @@ export class PartyScene extends Phaser.Scene {
     const available = HELD_ITEMS.filter(id => (GameState.player.items[id] ?? 0) > 0);
     if (available.length === 0 || GameState.player.party.length === 0) return;
 
-    this.add.text(40, 400, 'Give held item to lead critter:', {
+    this.add.text(40, 388, 'Give held item to lead critter:', {
       fontFamily: FONT, fontSize: '10px', color: '#8899aa',
     });
     available.forEach((id, i) => {
       const item = getItem(id);
-      const t = this.add.text(40 + i * 120, 418, item.name, {
+      const col = i % 4;
+      const row = Math.floor(i / 4);
+      const t = this.add.text(40 + col * 148, 404 + row * 16, item.name, {
         fontFamily: FONT, fontSize: '10px', color: '#f5c542',
       }).setInteractive({ useHandCursor: true });
       t.on('pointerdown', () => {

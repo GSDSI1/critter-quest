@@ -1,6 +1,6 @@
 import { FONT } from './theme';
 import Phaser from 'phaser';
-import { COLORS, GAME_WIDTH } from '../data/types';
+import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../data/types';
 import { getBadge } from '../data/badges';
 import { totalOrbs } from '../data/items';
 import { GameState } from '../systems/stats';
@@ -13,6 +13,7 @@ export class OverworldHUD {
   private mapText!: Phaser.GameObjects.Text;
   private badgeText!: Phaser.GameObjects.Text;
   private hintsText!: Phaser.GameObjects.Text;
+  private moveHintText!: Phaser.GameObjects.Text;
 
   constructor(scene: Phaser.Scene) {
     this.container = scene.add.container(0, 0).setDepth(900);
@@ -44,7 +45,11 @@ export class OverworldHUD {
       fontFamily: FONT, fontSize: '10px', color: '#8899aa',
     });
 
-    this.container.add([bg, this.mapText, this.moneyText, this.orbText, this.badgeText, this.hintsText]);
+    this.moveHintText = scene.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 14, '', {
+      fontFamily: FONT, fontSize: '9px', color: '#667788',
+    }).setOrigin(0.5);
+
+    this.container.add([bg, this.mapText, this.moneyText, this.orbText, this.badgeText, this.hintsText, this.moveHintText]);
     this.refresh('');
   }
 
@@ -59,6 +64,15 @@ export class OverworldHUD {
 
   setTouchHints(touch: boolean): void {
     this.hintsText.setText(touch ? 'Menu · Party' : '[P] Menu  [X] Party');
+  }
+
+  showMoveHint(show: boolean): void {
+    this.moveHintText.setText(show ? 'D-pad: move · Talk: interact · WASD keys' : '');
+    this.moveHintText.setVisible(show);
+  }
+
+  clearMoveHint(): void {
+    this.showMoveHint(false);
   }
 }
 

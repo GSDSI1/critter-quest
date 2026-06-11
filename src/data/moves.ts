@@ -56,6 +56,11 @@ export const MOVES: Record<string, MoveDef> = {
   frost_shatter: { id: 'frost_shatter', name: 'Frost Shatter', type: 'ice', power: 70, accuracy: 100, pp: 15, category: 'special', effect: 'sleep', effectChance: 10 },
   psy_burst: { id: 'psy_burst', name: 'Psy Burst', type: 'psychic', power: 75, accuracy: 95, pp: 12, category: 'special' },
   gale_dash: { id: 'gale_dash', name: 'Gale Dash', type: 'volt', power: 70, accuracy: 100, pp: 15, category: 'special', effect: 'paralyze', effectChance: 10 },
+  glacier_fang: { id: 'glacier_fang', name: 'Glacier Fang', type: 'ice', power: 80, accuracy: 90, pp: 12, category: 'physical', effect: 'sleep', effectChance: 10 },
+  night_stalk: { id: 'night_stalk', name: 'Night Stalk', type: 'shadow', power: 75, accuracy: 95, pp: 12, category: 'physical' },
+  prism_beam: { id: 'prism_beam', name: 'Prism Beam', type: 'psychic', power: 70, accuracy: 100, pp: 15, category: 'special' },
+  brine_splash: { id: 'brine_splash', name: 'Brine Splash', type: 'tide', power: 55, accuracy: 100, pp: 20, category: 'physical' },
+  thorn_lash: { id: 'thorn_lash', name: 'Thorn Lash', type: 'leaf', power: 65, accuracy: 95, pp: 15, category: 'physical', effect: 'poison', effectChance: 15 },
 };
 
 export function getMove(id: string): MoveDef {

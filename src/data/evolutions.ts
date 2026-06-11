@@ -28,6 +28,8 @@ export const EVOLUTIONS: EvolutionDef[] = [
   { from: 'dreamwisp', to: 'somnara', level: 28 },
   { from: 'kelpling', to: 'reefguard', level: 22 },
   { from: 'coalemb', to: 'embershell', level: 26 },
+  { from: 'frostnip', to: 'glaciara', level: 20 },
+  { from: 'murkfox', to: 'shadeprowl', level: 22 },
 ];
 
 export function getEvolution(speciesId: string, level: number): string | null {
