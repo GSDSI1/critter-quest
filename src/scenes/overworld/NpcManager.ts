@@ -22,6 +22,8 @@ import {
 } from '../../systems/eliteGauntlet';
 import { registerHealVisit } from '../../systems/healTravel';
 import { wipeRestartScene } from '../../ui/transitions';
+import { addItem } from '../../data/items';
+import { playDayIndex } from '../../ui/minigameShell';
 
 type Critter = ReturnType<typeof createCritter>;
 
@@ -154,12 +156,30 @@ export class NpcManager {
         if (warp) {
           if (warp.requiresBadge && !hasBadge(GameState.player.badges, warp.requiresBadge)) {
             this.callbacks.setInputLocked(true);
-            const msg = warp.requiresBadge === 'verdant'
-              ? 'The path is blocked. Earn the Verdant Badge first!'
-              : 'The path is blocked. Earn the Ember Badge first!';
+            const badgeNames: Record<string, string> = {
+              verdant: 'Verdant',
+              ember: 'Ember',
+              frost: 'Frost',
+              psyche: 'Psyche',
+            };
+            const badgeName = badgeNames[warp.requiresBadge] ?? warp.requiresBadge;
+            const msg = `The path is blocked. Earn the ${badgeName} Badge first!`;
             this.dialog.show(msg, () => {
               if (dy < 0) GameState.player.y++;
               else GameState.player.y--;
+              player.y = GameState.player.y * TILE_SIZE + TILE_SIZE / 2;
+              this.callbacks.setInputLocked(false);
+            });
+            return;
+          }
+          if (warp.requiresFlag && !GameState.player.storyFlags[warp.requiresFlag]) {
+            this.callbacks.setInputLocked(true);
+            this.dialog.show(['The path is sealed.', 'Only the regional Champion may enter.'], () => {
+              if (dy < 0) GameState.player.y++;
+              else if (dy > 0) GameState.player.y--;
+              else if (dx < 0) GameState.player.x++;
+              else GameState.player.x--;
+              player.x = GameState.player.x * TILE_SIZE + TILE_SIZE / 2;
               player.y = GameState.player.y * TILE_SIZE + TILE_SIZE / 2;
               this.callbacks.setInputLocked(false);
             });
@@ -210,6 +230,16 @@ export class NpcManager {
     if (npc) {
       this.interactNpc(npc);
       return;
+    }
+
+    if (getTile(map, tx, ty) === 3 && (map.id === 'route3' || map.id === 'fishing_pier')) {
+      if ((GameState.player.items.old_rod ?? 0) > 0 || GameState.player.storyFlags.fishing_unlocked) {
+        this.callbacks.setInputLocked(true);
+        this.scene.scene.launch('Fishing', { returnMap: map.id });
+        this.scene.scene.pause();
+        this.callbacks.setInputLocked(false);
+        return;
+      }
     }
 
     if (getTile(map, tx, ty) === 10) {
@@ -291,6 +321,77 @@ export class NpcManager {
       return;
     }
 
+    if (npc.lines.includes('FISH')) {
+      const intro = npc.lines.filter(l => l !== 'FISH');
+      this.dialog.show(intro, () => {
+        this.callbacks.setInputLocked(false);
+        this.scene.scene.launch('Fishing', { returnMap: this.getMap().id });
+        this.scene.scene.pause();
+      });
+      return;
+    }
+
+    if (npc.lines.includes('BUGCATCH')) {
+      if (GameState.player.dexCaught.length < 5) {
+        this.dialog.show(['Catch at least 5 species first!', 'Then come back for the firefly challenge.'], () => {
+          this.callbacks.setInputLocked(false);
+        });
+        return;
+      }
+      const intro = npc.lines.filter(l => l !== 'BUGCATCH');
+      this.dialog.show(intro, () => {
+        this.callbacks.setInputLocked(false);
+        this.scene.scene.launch('BugCatch');
+        this.scene.scene.pause();
+      });
+      return;
+    }
+
+    if (npc.lines.includes('CONTEST')) {
+      const intro = npc.lines.filter(l => l !== 'CONTEST');
+      this.dialog.show(intro, () => {
+        this.callbacks.setInputLocked(false);
+        this.scene.scene.launch('CritterContest');
+        this.scene.scene.pause();
+      });
+      return;
+    }
+
+    if (npc.lines.includes('CHEST')) {
+      const chestIdx = npc.lines.indexOf('CHEST');
+      const chestId = chestIdx >= 0 && npc.lines[chestIdx + 1] ? npc.lines[chestIdx + 1] : npc.id;
+      if (GameState.player.storyFlags[chestId]) {
+        this.dialog.show(['The chest is empty.'], () => { this.callbacks.setInputLocked(false); });
+        return;
+      }
+      GameState.player.storyFlags[chestId] = true;
+      GameState.player.money += 200;
+      addItem(GameState.player.items, 'potion', 2);
+      trySave(this.scene);
+      this.dialog.show(['You found $200 and 2 Potions!'], () => { this.callbacks.setInputLocked(false); });
+      return;
+    }
+
+    if (npc.lines.includes('COIN')) {
+      if (GameState.player.money < 100) {
+        this.dialog.show(['You need $100 to play.', 'Come back when you have more!'], () => {
+          this.callbacks.setInputLocked(false);
+        });
+        return;
+      }
+      GameState.player.money -= 100;
+      const win = Math.random() < 0.35;
+      if (win) {
+        GameState.player.money += 300;
+        trySave(this.scene);
+        this.dialog.show(['Jackpot! You won $300!'], () => { this.callbacks.setInputLocked(false); });
+      } else {
+        trySave(this.scene);
+        this.dialog.show(['No luck this time...'], () => { this.callbacks.setInputLocked(false); });
+      }
+      return;
+    }
+
     if (npc.lines.includes('HEAL')) {
       const welcome = npc.lines.filter(l => l !== 'HEAL');
       this.dialog.show(welcome, () => {
@@ -318,17 +419,36 @@ export class NpcManager {
     }
 
     if (npc.id === 'mom') {
-      this.dialog.show(this.getMomLines(), () => { this.callbacks.setInputLocked(false); });
+      const day = playDayIndex(GameState.player.playTime);
+      const lines = [...this.getMomLines()];
+      if (GameState.player.lastMomGiftDay !== day) {
+        GameState.player.lastMomGiftDay = day;
+        addItem(GameState.player.items, 'potion', 1);
+        lines.unshift('I packed a fresh Potion for you today!');
+        trySave(this.scene);
+      }
+      this.dialog.show(lines, () => { this.callbacks.setInputLocked(false); });
       return;
     }
 
     if (npc.id === 'prof' && GameState.player.storyFlags.champion) {
+      const signs = GameState.player.signsRead;
+      const extra = signs >= 20
+        ? 'You\'ve read every sign in the region — impressive!'
+        : signs >= 10
+          ? `${signs} signs read — you really explore!`
+          : '';
       this.dialog.show([
         `${GameState.player.name}! The whole region is talking about you!`,
         'Champion of Verdant — you make me proud.',
-        'Trainers across the region want rematches now. Visit anyone you\'ve beaten!',
+        extra || 'Trainers across the region want rematches now.',
       ], () => { this.callbacks.setInputLocked(false); });
       return;
+    }
+
+    if (npc.role === 'sign' || npc.id.startsWith('sign')) {
+      GameState.player.signsRead++;
+      trySave(this.scene);
     }
 
     this.dialog.show(npc.lines, () => { this.callbacks.setInputLocked(false); });

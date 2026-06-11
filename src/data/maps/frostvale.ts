@@ -9,13 +9,14 @@ export const frostvale: GameMap = {
     { x: 8, y: 6, toMap: 'heal_center', toX: 4, toY: 7 },
     { x: 12, y: 6, toMap: 'mart', toX: 4, toY: 7 },
     { x: 16, y: 6, toMap: 'gym3', toX: 6, toY: 11 },
+    { x: 14, y: 8, toMap: 'contest_hall', toX: 7, toY: 10 },
     { x: 12, y: 0, toMap: 'route5', toX: 12, toY: 18, requiresBadge: 'frost' },
   ],
   npcs: [
     { id: 'guide3', x: 12, y: 12, name: 'City Guide', role: 'generic', lines: ['Welcome to Frostvale!', 'Gym Leader Glacier awaits to the east.', 'Route 5 opens after the Frost Badge.'] },
     { id: 'cooltrainer2', x: 18, y: 10, name: 'Jordan', role: 'trainer_m', lines: ['Think you can handle the cold?', 'Prove it!'],
       trainer: { party: [{ creatureId: 'aurorabit', level: 22 }, { creatureId: 'arctodon', level: 23 }], reward: 520 } },
-    { id: 'sign12', x: 12, y: 14, name: 'Sign', role: 'sign', lines: ['Frostvale City', 'Gym →  |  ↑ Route 5 (badge required)'] },
+    { id: 'sign12', x: 12, y: 14, name: 'Sign', role: 'sign', lines: ['Frostvale City', 'Gym →  |  Contest Hall →  |  ↑ Route 5 (badge required)'] },
   ],
   tiles: t([
     'TTTTTTTTTTTTTTTTTTTTTTTT',

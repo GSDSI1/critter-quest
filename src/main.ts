@@ -9,7 +9,9 @@ import { BootScene } from './scenes/BootScene';
 import { IntroScene } from './scenes/IntroScene';
 import { MenuScene } from './scenes/MenuScene';
 import { installLazySceneLoader } from './scenes/registerScenes';
+import { installCanvasFocusOnBoot } from './utils/focusCanvas';
 import type { BattleScene } from './scenes/BattleScene';
+import type { OverworldScene } from './scenes/OverworldScene';
 
 const config = {
   type: Phaser.AUTO,
@@ -20,6 +22,7 @@ const config = {
   pixelArt: true,
   input: {
     gamepad: true,
+    keyboard: true,
   },
   scale: {
     mode: Phaser.Scale.FIT,
@@ -33,6 +36,7 @@ const config = {
 
 const game = new Phaser.Game(config);
 installLazySceneLoader(game);
+installCanvasFocusOnBoot();
 
 declare global {
   interface Window {
@@ -68,6 +72,7 @@ declare global {
       withdrawStorageSlot: (index: number) => boolean;
       addPartyMember: (speciesId: string, level?: number) => void;
       giveBadge: (id: string) => void;
+      requestWalk: (tx: number, ty: number) => void;
     };
   }
 }
@@ -203,6 +208,10 @@ if (import.meta.env.DEV) {
     giveBadge(id: string) {
       if (!GameState.player.badges.includes(id)) GameState.player.badges.push(id);
       saveGame();
+    },
+    requestWalk(tx, ty) {
+      const ow = game.scene.getScene('Overworld') as OverworldScene | null;
+      ow?.requestWalkTo(tx, ty, { force: true });
     },
   };
 }

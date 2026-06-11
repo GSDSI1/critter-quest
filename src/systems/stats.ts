@@ -58,6 +58,9 @@ export interface PlayerState {
   visitedHealCenters: string[];
   completionTime?: number;
   playTime: number;
+  signsRead: number;
+  lastMomGiftDay: number;
+  lastContestDay: number;
   started: boolean;
 }
 
@@ -224,6 +227,9 @@ export function defaultPlayer(): PlayerState {
     defeatedRematch: [],
     visitedHealCenters: [],
     playTime: 0,
+    signsRead: 0,
+    lastMomGiftDay: -1,
+    lastContestDay: -1,
     started: false,
   };
 }

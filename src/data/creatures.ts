@@ -522,6 +522,46 @@ export const CREATURES: Record<string, CreatureDef> = {
     description: 'Down crackles with static before its first flight.',
     ability: 'static', habitat: 'Route 1', height: 0.35, weight: 5,
   },
+  voltail: {
+    id: 'voltail', name: 'Voltail', types: ['volt'], dexNumber: 66,
+    baseStats: { hp: 55, atk: 62, def: 50, spa: 75, spd: 55, spe: 95 },
+    moves: ['thunder_dive', 'spark', 'static_peck', 'thunderwave'],
+    catchRate: 28, expYield: 132, color: 0xeab308, shape: 'avian',
+    description: 'Tail feathers store charge like a living capacitor.',
+    ability: 'static', habitat: 'Route 1', height: 0.7, weight: 12,
+  },
+  thunderhawk: {
+    id: 'thunderhawk', name: 'Thunderhawk', types: ['volt'], dexNumber: 67,
+    baseStats: { hp: 70, atk: 85, def: 65, spa: 110, spd: 70, spe: 115 },
+    moves: ['thunderbolt', 'thunder_dive', 'volt_ram', 'thunderwave'],
+    catchRate: 12, expYield: 210, color: 0xf59e0b, shape: 'avian',
+    description: 'Storm clouds gather wherever its wings beat.',
+    ability: 'static', habitat: 'Route 5', height: 1.2, weight: 28,
+  },
+  ashlynx: {
+    id: 'ashlynx', name: 'Ashlynx', types: ['flame'], dexNumber: 68,
+    baseStats: { hp: 58, atk: 72, def: 52, spa: 75, spd: 55, spe: 78 },
+    moves: ['scorch_claw', 'cinder_swipe', 'ember', 'leer'],
+    catchRate: 26, expYield: 128, color: 0xea580c, shape: 'quadruped',
+    description: 'Ember spots glow along its ash-gray pelt.',
+    ability: 'flash_fire', habitat: 'Volcanic Path', height: 0.9, weight: 22,
+  },
+  scorchmane: {
+    id: 'scorchmane', name: 'Scorchmane', types: ['flame'], dexNumber: 69,
+    baseStats: { hp: 72, atk: 92, def: 68, spa: 95, spd: 72, spe: 88 },
+    moves: ['ash_roar', 'scorch_claw', 'magma_crush', 'blaze'],
+    catchRate: 14, expYield: 205, color: 0xdc2626, shape: 'quadruped',
+    description: 'Its mane burns hot enough to melt stone paths.',
+    ability: 'flash_fire', habitat: 'Volcanic Path', height: 1.4, weight: 52,
+  },
+  gleamfin: {
+    id: 'gleamfin', name: 'Gleamfin', types: ['tide', 'psychic'], dexNumber: 70,
+    baseStats: { hp: 62, atk: 48, def: 58, spa: 88, spd: 75, spe: 68 },
+    moves: ['gleam_pulse', 'splash', 'psybeam', 'tidal'],
+    catchRate: 22, expYield: 142, color: 0x38bdf8, shape: 'blob',
+    description: 'Bioluminescent fins hypnotize prey in moonlit shallows.',
+    ability: 'levitate', habitat: 'Route 3', height: 0.6, weight: 16,
+  },
 };
 
 export const STARTERS = ['emberpup', 'aqualet', 'leafkit'] as const;

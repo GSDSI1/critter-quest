@@ -33,6 +33,10 @@ export const EVOLUTIONS: EvolutionDef[] = [
   { from: 'brinepup', to: 'tidemast', level: 24 },
   { from: 'thornbud', to: 'thornqueen', level: 22 },
   { from: 'crystmite', to: 'prismdon', level: 26 },
+  { from: 'voltchick', to: 'voltail', level: 16 },
+  { from: 'voltail', to: 'thunderhawk', level: 32 },
+  { from: 'ashpuff', to: 'ashlynx', level: 18 },
+  { from: 'ashlynx', to: 'scorchmane', level: 34 },
 ];
 
 export function getEvolution(speciesId: string, level: number): string | null {

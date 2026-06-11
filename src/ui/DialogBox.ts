@@ -63,6 +63,12 @@ export class DialogBox {
     this.container.setDepth(1000).setVisible(false);
     pinContainerChildren(this.container, 1000);
 
+    const tapZone = scene.add
+      .rectangle(BOX_X + BOX_W / 2, BOX_Y + BOX_H / 2, BOX_W, BOX_H, 0x000000, 0)
+      .setInteractive({ useHandCursor: false });
+    tapZone.on('pointerdown', () => this.advance());
+    this.container.add(tapZone);
+
     this.nextBtn = createTouchButton(
       scene,
       BOX_X + BOX_W - 58,

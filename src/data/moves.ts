@@ -66,6 +66,11 @@ export const MOVES: Record<string, MoveDef> = {
   crystal_lance: { id: 'crystal_lance', name: 'Crystal Lance', type: 'psychic', power: 90, accuracy: 90, pp: 8, category: 'special' },
   cinder_swipe: { id: 'cinder_swipe', name: 'Cinder Swipe', type: 'flame', power: 50, accuracy: 100, pp: 20, category: 'physical', effect: 'burn', effectChance: 15 },
   static_peck: { id: 'static_peck', name: 'Static Peck', type: 'volt', power: 45, accuracy: 100, pp: 25, category: 'physical', effect: 'paralyze', effectChance: 15 },
+  thunder_dive: { id: 'thunder_dive', name: 'Thunder Dive', type: 'volt', power: 90, accuracy: 90, pp: 10, category: 'special', effect: 'paralyze', effectChance: 20 },
+  ash_roar: { id: 'ash_roar', name: 'Ash Roar', type: 'flame', power: 65, accuracy: 95, pp: 15, category: 'special', effect: 'burn', effectChance: 25 },
+  scorch_claw: { id: 'scorch_claw', name: 'Scorch Claw', type: 'flame', power: 85, accuracy: 90, pp: 12, category: 'physical', effect: 'burn', effectChance: 15 },
+  gleam_pulse: { id: 'gleam_pulse', name: 'Gleam Pulse', type: 'psychic', power: 75, accuracy: 100, pp: 15, category: 'special' },
+  storm_beak: { id: 'storm_beak', name: 'Storm Beak', type: 'volt', power: 95, accuracy: 85, pp: 8, category: 'physical', effect: 'paralyze', effectChance: 25 },
 };
 
 export function getMove(id: string): MoveDef {

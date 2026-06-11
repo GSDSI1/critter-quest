@@ -3,7 +3,7 @@ export interface TrainerMon {
   level: number;
 }
 
-export type NpcRole = 'generic' | 'nurse' | 'clerk' | 'trainer_m' | 'trainer_f' | 'rival' | 'leader' | 'prof' | 'sign';
+export type NpcRole = 'generic' | 'nurse' | 'clerk' | 'trainer_m' | 'trainer_f' | 'rival' | 'leader' | 'prof' | 'sign' | 'chest';
 
 export interface MapNpc {
   id: string;
@@ -30,7 +30,7 @@ export interface GameMap {
   height: number;
   tiles: number[];
   spawn: { x: number; y: number };
-  warps: { x: number; y: number; toMap: string; toX: number; toY: number; requiresBadge?: string }[];
+  warps: { x: number; y: number; toMap: string; toX: number; toY: number; requiresBadge?: string; requiresFlag?: string }[];
   npcs: MapNpc[];
   encounterRate: number;
   encounterTable?: string;

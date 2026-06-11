@@ -13,34 +13,42 @@ import { Input } from '../systems/input';
 import { Sfx } from '../utils/audio';
 import { DialogBox } from '../ui/DialogBox';
 import { addItem } from '../data/items';
-import { previewStatsAtLevel } from '../ui/statDisplay';
+import { starterBaseStats } from '../ui/statDisplay';
 
 const ORB_TYPES = ['flame', 'tide', 'leaf'] as const;
 
+const PANEL_W = 400;
+const PANEL_H = 248;
+const PANEL_X = (GAME_WIDTH - PANEL_W) / 2;
+const PANEL_Y = 52;
+const PANEL_CX = GAME_WIDTH / 2;
+
 const LAYOUT = {
-  panel: { x: 100, y: 48, w: 440, h: 240 },
-  nameY: 62,
-  spriteY: 128,
-  statsY: 182,
-  statsY2: 196,
-  descY: 214,
-  orbY: 296,
-  orbX: [200, 320, 440] as const,
+  panel: { x: PANEL_X, y: PANEL_Y, w: PANEL_W, h: PANEL_H },
+  nameY: PANEL_Y + 22,
+  typeY: PANEL_Y + 44,
+  spriteY: PANEL_Y + 108,
+  statsY: PANEL_Y + 168,
+  descY: PANEL_Y + 214,
+  orbY: PANEL_Y + PANEL_H + 20,
+  orbX: [PANEL_CX - 80, PANEL_CX, PANEL_CX + 80] as const,
   pillY: 44,
-  btnY: 400,
-  trainerX: 520,
-  trainerY: 52,
+  btnY: PANEL_Y + PANEL_H + 88,
+  trainerX: PANEL_X + PANEL_W - 52,
+  trainerY: PANEL_Y + 36,
 } as const;
 
-const PANEL_CX = LAYOUT.panel.x + LAYOUT.panel.w / 2;
+const STAT_COL_X = [-108, -36, 36, 108] as const;
+const STAT_COL_LABELS = ['HP', 'ATK', 'DEF', 'SPD'] as const;
 
 export class StarterSelectScene extends Phaser.Scene {
   private selected = 0;
   private orbs: Phaser.GameObjects.Container[] = [];
   private typePills: Phaser.GameObjects.Container[] = [];
   private introSprites: Phaser.GameObjects.Image[] = [];
-  private statText!: Phaser.GameObjects.Text;
-  private statText2!: Phaser.GameObjects.Text;
+  private statContainer!: Phaser.GameObjects.Container;
+  private statValues: Phaser.GameObjects.Text[] = [];
+  private detailTypePill!: Phaser.GameObjects.Container;
   private descText!: Phaser.GameObjects.Text;
   private nameText!: Phaser.GameObjects.Text;
   private creaturePreview!: Phaser.GameObjects.Image;
@@ -64,7 +72,7 @@ export class StarterSelectScene extends Phaser.Scene {
     this.introShown = false;
     this.selected = 0;
 
-    this.add.image(GAME_WIDTH / 2, 240, 'starter_lab_bg').setDepth(-5);
+    this.add.image(PANEL_CX, 240, 'starter_lab_bg').setDepth(-5);
 
     buildMenuPanel(this, LAYOUT.panel.x, LAYOUT.panel.y, LAYOUT.panel.w, LAYOUT.panel.h, 2);
     const inner = this.add.graphics().setDepth(2);
@@ -79,7 +87,7 @@ export class StarterSelectScene extends Phaser.Scene {
 
     this.previewGlow = this.add.graphics().setDepth(3);
     this.creaturePreview = addCreatureImage(this, PANEL_CX, LAYOUT.spriteY, STARTERS[0])
-      .setScale(2.5).setVisible(false).setDepth(5);
+      .setScale(2.2).setVisible(false).setDepth(5);
     this.tweens.add({
       targets: this.creaturePreview,
       y: LAYOUT.spriteY - 4,
@@ -93,16 +101,27 @@ export class StarterSelectScene extends Phaser.Scene {
       fontFamily: FONT, fontSize: '18px', color: '#f5c542', fontStyle: 'bold',
     }).setOrigin(0.5).setDepth(6);
 
-    this.statText = this.add.text(PANEL_CX, LAYOUT.statsY, '', {
-      fontFamily: FONT, fontSize: '10px', color: '#c0c0c0',
-    }).setOrigin(0.5).setDepth(6).setVisible(false);
-    this.statText2 = this.add.text(PANEL_CX, LAYOUT.statsY2, '', {
-      fontFamily: FONT, fontSize: '10px', color: '#8899aa',
-    }).setOrigin(0.5).setDepth(6).setVisible(false);
+    this.detailTypePill = createTypePill(this, PANEL_CX, LAYOUT.typeY, 'Flame', TYPE_COLORS.flame, false)
+      .setDepth(6).setVisible(false);
+
+    this.statContainer = this.add.container(PANEL_CX, LAYOUT.statsY).setDepth(6).setVisible(false);
+    this.statContainer.add(this.add.text(0, -14, 'Base stats', {
+      fontFamily: FONT, fontSize: '8px', color: '#6b7a8a',
+    }).setOrigin(0.5));
+    STAT_COL_X.forEach((x, i) => {
+      this.statContainer.add(this.add.text(x, 0, STAT_COL_LABELS[i], {
+        fontFamily: FONT, fontSize: '8px', color: '#8899aa',
+      }).setOrigin(0.5));
+      const val = this.add.text(x, 12, '—', {
+        fontFamily: FONT, fontSize: '11px', color: '#e2e8f0',
+      }).setOrigin(0.5);
+      this.statValues.push(val);
+      this.statContainer.add(val);
+    });
 
     this.descText = this.add.text(PANEL_CX, LAYOUT.descY, 'Listen to Prof. Elmwood, then pick an orb.', {
       fontFamily: FONT, fontSize: '10px', color: '#8899aa',
-      wordWrap: { width: 280 }, align: 'center',
+      wordWrap: { width: PANEL_W - 48 }, align: 'center',
     }).setOrigin(0.5).setDepth(6);
 
     STARTERS.forEach((id, i) => {
@@ -159,13 +178,13 @@ export class StarterSelectScene extends Phaser.Scene {
     this.dialog = new DialogBox(this);
 
     this.prevBtn = createTouchButton(
-      this, PANEL_CX - 130, LAYOUT.btnY, '◀ Prev', () => this.cycle(-1), { width: 90, depth: 50 },
+      this, PANEL_CX - 118, LAYOUT.btnY, '◀ Prev', () => this.cycle(-1), { width: 90, depth: 50 },
     );
     this.chooseBtn = createTouchButton(
       this, PANEL_CX, LAYOUT.btnY, 'Choose!', () => this.confirm(), { width: 110, depth: 50 },
     );
     this.nextBtn = createTouchButton(
-      this, PANEL_CX + 130, LAYOUT.btnY, 'Next ▶', () => this.cycle(1), { width: 90, depth: 50 },
+      this, PANEL_CX + 118, LAYOUT.btnY, 'Next ▶', () => this.cycle(1), { width: 90, depth: 50 },
     );
     this.setPickerButtons(false);
 
@@ -215,21 +234,30 @@ export class StarterSelectScene extends Phaser.Scene {
     if (!this.introShown) return;
     const id = STARTERS[this.selected];
     const def = getCreature(id);
-    const typeColor = TYPE_COLORS[def.types[0] as ElementType];
-    const [row1, row2] = previewStatsAtLevel(id, 5);
+    const type = def.types[0] as ElementType;
+    const typeColor = TYPE_COLORS[type];
+    const base = starterBaseStats(id);
 
     this.nameText.setText(def.name);
-    this.statText.setText(row1).setVisible(true);
-    this.statText2.setText(row2).setVisible(true);
+    this.statContainer.setVisible(true);
+    const vals = [base.hp, base.atk, base.def, base.spd];
+    this.statValues.forEach((t, i) => t.setText(String(vals[i])));
     this.descText.setText(def.description);
+
+    this.detailTypePill.setVisible(true);
+    this.detailTypePill.destroy();
+    this.detailTypePill = createTypePill(
+      this, PANEL_CX, LAYOUT.typeY, TYPE_NAMES[type], typeColor, false,
+    ).setDepth(6);
+
     applyCreatureTexture(this.creaturePreview, this, id);
     this.creaturePreview.setVisible(true);
 
     this.previewGlow.clear();
     this.previewGlow.fillStyle(typeColor, 0.12);
-    this.previewGlow.fillCircle(PANEL_CX, LAYOUT.spriteY, 50);
+    this.previewGlow.fillCircle(PANEL_CX, LAYOUT.spriteY, 46);
     this.previewGlow.lineStyle(2, typeColor, 0.4);
-    this.previewGlow.strokeCircle(PANEL_CX, LAYOUT.spriteY, 50);
+    this.previewGlow.strokeCircle(PANEL_CX, LAYOUT.spriteY, 46);
 
     this.orbs.forEach((orb, i) => {
       const sel = i === this.selected;
@@ -304,14 +332,14 @@ function buildTrainerChip(scene: Phaser.Scene): Phaser.GameObjects.Container {
   const c = scene.add.container(LAYOUT.trainerX, LAYOUT.trainerY).setDepth(8);
   const g = scene.add.graphics();
   g.fillStyle(COLORS.panel, 0.94);
-  g.fillRoundedRect(-48, -20, 96, 56, 8);
+  g.fillRoundedRect(-44, -18, 88, 52, 8);
   g.lineStyle(2, COLORS.gold, 0.85);
-  g.strokeRoundedRect(-48, -20, 96, 56, 8);
-  const name = scene.add.text(0, -10, GameState.player.name, {
-    fontFamily: FONT, fontSize: '10px', color: '#f5c542',
+  g.strokeRoundedRect(-44, -18, 88, 52, 8);
+  const name = scene.add.text(0, -8, GameState.player.name, {
+    fontFamily: FONT, fontSize: '9px', color: '#f5c542',
   }).setOrigin(0.5);
-  const spr = scene.add.sprite(0, 14, playerTextureKey(GameState.player.characterId, 'down', 0))
-    .setScale(2);
+  const spr = scene.add.sprite(0, 12, playerTextureKey(GameState.player.characterId, 'down', 0))
+    .setScale(1.75);
   c.add([g, name, spr]);
   return c;
 }

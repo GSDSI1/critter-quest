@@ -34,3 +34,9 @@ export function formatBaseStats(speciesId: string): [string, string] {
     `SPA ${b.spa}   SPD ${b.spd}   SPE ${b.spe}`,
   ];
 }
+
+/** Four core base stats for starter comparison (species totals, not battle values). */
+export function starterBaseStats(speciesId: string): { hp: number; atk: number; def: number; spd: number } {
+  const b = getCreature(speciesId).baseStats;
+  return { hp: b.hp, atk: b.atk, def: b.def, spd: b.spe };
+}

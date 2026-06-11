@@ -30,8 +30,11 @@ import { route5 } from './route5';
 import { mindspire } from './mindspire';
 import { gym4 } from './gym4';
 import { victory_road } from './victory_road';
+import { fishing_pier } from './fishing_pier';
+import { secret_grove } from './secret_grove';
+import { contest_hall } from './contest_hall';
 
-export { town, heal_center, mart, lab, route1, forest, route2, mossgrove, gym1, crystal_cave, route3, ember_city, gym2, volcanic_path, route4, glacier_pass, frostvale, gym3, route5, mindspire, gym4, victory_road };
+export { town, heal_center, mart, lab, route1, forest, route2, mossgrove, gym1, crystal_cave, route3, ember_city, gym2, volcanic_path, route4, glacier_pass, frostvale, gym3, route5, mindspire, gym4, victory_road, fishing_pier, secret_grove, contest_hall };
 
 export const MAPS: Record<string, GameMap> = {
   town,
@@ -56,6 +59,9 @@ export const MAPS: Record<string, GameMap> = {
   mindspire,
   gym4,
   victory_road,
+  fishing_pier,
+  secret_grove,
+  contest_hall,
 };
 
 export function getMap(id: string): GameMap {

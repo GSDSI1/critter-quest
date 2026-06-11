@@ -7,6 +7,7 @@ export const forest: GameMap = {
   warps: [
     { x: 12, y: 21, toMap: 'route1', toX: 12, toY: 1 },
     { x: 23, y: 10, toMap: 'route2', toX: 1, toY: 10 },
+    { x: 18, y: 8, toMap: 'secret_grove', toX: 10, toY: 14, requiresFlag: 'champion' },
   ],
   npcs: [
     { id: 'ranger', x: 16, y: 8, name: 'Ranger Mia', role: 'trainer_f', lines: ['Rare critters lurk here!', 'Head east to Mossgrove City when you\'re ready.'],
@@ -17,7 +18,11 @@ export const forest: GameMap = {
       trainer: { party: [{ creatureId: 'thornbud', level: 10 }, { creatureId: 'bloomoss', level: 11 }], reward: 240 } },
     { id: 'shadow_hunter', x: 4, y: 6, name: 'Hunter Cole', role: 'trainer_m', lines: ['Murkfoxes vanish before you blink.', 'Try to keep up!'],
       trainer: { party: [{ creatureId: 'murkfox', level: 11 }, { creatureId: 'shadeling', level: 12 }], reward: 320 } },
-    { id: 'sign3', x: 12, y: 19, name: 'Sign', lines: ['Verdant Forest', '↓ Route 1  |  → Route 2 / Mossgrove City'] },
+    { id: 'bug_ranger', x: 6, y: 10, name: 'Ranger Lee', role: 'generic', lines: [
+      'Fireflies dance here at night!',
+      'Catch as many as you can in 30 seconds. BUGCATCH',
+    ] },
+    { id: 'sign3', x: 12, y: 19, name: 'Sign', role: 'sign', lines: ['Verdant Forest', '↓ Route 1  |  → Route 2  |  Champion? Try the east path.'] },
   ],
   tiles: t([
     'TTTTTTTTTTTTTTTTTTTTTTTT',

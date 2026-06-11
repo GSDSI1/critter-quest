@@ -1,7 +1,8 @@
 import { FONT } from './theme';
 import Phaser from 'phaser';
 import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../data/types';
-import { pinContainerChildren } from './screenUi';
+import { pinContainerChildren, pinToScreen } from './screenUi';
+import { OVERWORLD_PAD } from './overworldPointer';
 import { Sfx } from '../utils/audio';
 
 export interface TouchButton {
@@ -60,7 +61,8 @@ export function createTouchButton(
 
   container.add([bg, text]);
   container.setSize(w, h);
-  pinContainerChildren(container, depth);
+  pinToScreen(container, depth);
+  container.list.forEach(c => pinToScreen(c as Phaser.GameObjects.GameObject));
 
   let enabled = true;
   let repeatTimer: Phaser.Time.TimerEvent | undefined;
@@ -119,43 +121,64 @@ export function createTouchButton(
   };
 }
 
-/** On-screen D-pad + action buttons for overworld. */
+function drawPassiveButton(
+  scene: Phaser.Scene,
+  x: number,
+  y: number,
+  label: string,
+  w: number,
+  h: number,
+): Phaser.GameObjects.Container {
+  const container = scene.add.container(x, y).setDepth(1150);
+  const bg = scene.add.graphics();
+  drawButtonBg(bg, w, h, false);
+  const text = scene.add.text(0, 0, label, {
+    fontFamily: FONT,
+    fontSize: '13px',
+    color: '#f0f0f0',
+  }).setOrigin(0.5);
+  container.add([bg, text]);
+  pinToScreen(container, 1150);
+  container.list.forEach(c => pinToScreen(c as Phaser.GameObjects.GameObject));
+  return container;
+}
+
+/** On-screen D-pad + action buttons (visual; hits handled by OverworldScene pointer zones). */
 export class OverworldTouchPad {
-  private buttons: TouchButton[] = [];
-  private visible = true;
+  private chips: Phaser.GameObjects.Container[] = [];
+  private enabled = true;
 
-  constructor(
-    private scene: Phaser.Scene,
-    private onMove: (dx: number, dy: number) => void,
-    private onAction: () => void,
-    private onMenu: () => void,
-  ) {
-    const padX = GAME_WIDTH - 72;
-    const padY = GAME_HEIGHT - 88;
-    const gap = 46;
+  constructor(scene: Phaser.Scene) {
+    const padX = OVERWORLD_PAD.cx;
+    const padY = OVERWORLD_PAD.cy;
+    const gap = OVERWORLD_PAD.gap;
 
-    this.buttons.push(
-      createTouchButton(scene, padX, padY - gap, '▲', () => this.onMove(0, -1), { width: 52, height: 44, depth: 1150 }),
-      createTouchButton(scene, padX - gap, padY, '◀', () => this.onMove(-1, 0), { width: 52, height: 44, depth: 1150 }),
-      createTouchButton(scene, padX + gap, padY, '▶', () => this.onMove(1, 0), { width: 52, height: 44, depth: 1150 }),
-      createTouchButton(scene, padX, padY + gap, '▼', () => this.onMove(0, 1), { width: 52, height: 44, depth: 1150 }),
-      createTouchButton(scene, 72, GAME_HEIGHT - 52, 'Talk', () => this.onAction(), { width: 72, height: 40, depth: 1150 }),
-      createTouchButton(scene, 152, GAME_HEIGHT - 52, 'Menu', () => this.onMenu(), { width: 72, height: 40, depth: 1150 }),
-    );
+    this.chips = [
+      drawPassiveButton(scene, padX, padY - gap, '▲', 52, 44),
+      drawPassiveButton(scene, padX - gap, padY, '◀', 52, 44),
+      drawPassiveButton(scene, padX + gap, padY, '▶', 52, 44),
+      drawPassiveButton(scene, padX, padY + gap, '▼', 52, 44),
+      drawPassiveButton(scene, 72, GAME_HEIGHT - 52, 'Talk', 72, 40),
+      drawPassiveButton(scene, 152, GAME_HEIGHT - 52, 'Menu', 72, 40),
+    ];
   }
 
   setVisible(visible: boolean): void {
-    this.visible = visible;
-    this.buttons.forEach(b => b.setVisible(visible));
+    this.chips.forEach(c => c.setVisible(visible));
   }
 
   setEnabled(enabled: boolean): void {
-    this.buttons.forEach(b => b.setEnabled(enabled));
+    this.enabled = enabled;
+    this.chips.forEach(c => c.setAlpha(enabled ? 1 : 0.45));
+  }
+
+  isEnabled(): boolean {
+    return this.enabled;
   }
 
   destroy(): void {
-    this.buttons.forEach(b => b.destroy());
-    this.buttons = [];
+    this.chips.forEach(c => c.destroy());
+    this.chips = [];
   }
 }
 

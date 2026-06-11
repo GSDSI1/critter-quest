@@ -8,13 +8,15 @@ export const route3: GameMap = {
     { x: 12, y: 19, toMap: 'mossgrove', toX: 12, toY: 1 },
     { x: 12, y: 0, toMap: 'ember_city', toX: 12, toY: 17 },
     { x: 22, y: 8, toMap: 'route4', toX: 0, toY: 10 },
+    { x: 8, y: 11, toMap: 'fishing_pier', toX: 6, toY: 8 },
   ],
   npcs: [
     { id: 'rival2', x: 12, y: 8, name: 'Kai', role: 'rival', lines: ['You again?! My team got stronger!', 'Prepare to lose!'],
       trainer: { party: [{ creatureId: '__RIVAL_EVO__', level: 12 }, { creatureId: 'sparkbit', level: 11 }], reward: 450 } },
-    { id: 'swimmer_mia', x: 4, y: 12, name: 'Mia', role: 'trainer_f', lines: ['Kelplings play in the tide pools here!', 'Want to swim with them?'],
+    { id: 'swimmer_mia', x: 4, y: 12, name: 'Mia', role: 'trainer_f', lines: ['Kelplings play in the tide pools here!', 'Visit the pier to fish! FISH'],
       trainer: { party: [{ creatureId: 'brinepup', level: 13 }, { creatureId: 'kelpling', level: 14 }], reward: 440 } },
-    { id: 'sign7', x: 12, y: 16, name: 'Sign', role: 'sign', lines: ['Route 3', '↑ Ember City  |  → Route 4  |  ↓ Mossgrove City'] },
+    { id: 'sign7', x: 12, y: 16, name: 'Sign', role: 'sign', lines: ['Route 3', '↑ Ember City  |  → Route 4  |  ↓ Mossgrove  |  Pier →'] },
+    { id: 'sign_pier', x: 8, y: 10, name: 'Sign', role: 'sign', lines: ['Fishing Pier →', 'Cast a line for tide critters!'] },
   ],
   tiles: t([
     'TTTTTTTTTTTTTTTTTTTTTTTT',

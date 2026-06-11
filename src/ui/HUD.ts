@@ -67,7 +67,7 @@ export class OverworldHUD {
   }
 
   showMoveHint(show: boolean): void {
-    this.moveHintText.setText(show ? 'D-pad: move · Talk: interact · WASD keys' : '');
+    this.moveHintText.setText(show ? 'Tap to walk · Hold D-pad · Talk to interact' : '');
     this.moveHintText.setVisible(show);
   }
 

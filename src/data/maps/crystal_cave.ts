@@ -11,6 +11,7 @@ export const crystal_cave: GameMap = {
     { id: 'geologist', x: 16, y: 10, name: 'Geologist Ana', role: 'trainer_f', lines: ['Crystmite gems glow in the dark!', 'Let\'s battle!'],
       trainer: { party: [{ creatureId: 'crystmite', level: 15 }, { creatureId: 'geodeon', level: 16 }], reward: 480 } },
     { id: 'sign6', x: 12, y: 16, name: 'Sign', lines: ['Crystal Cave', 'Rare critters ahead. ↓ Mossgrove City'] },
+    { id: 'chest_cave', x: 20, y: 6, name: 'Chest', role: 'chest', lines: ['CHEST', 'chest_cave'] },
   ],
   tiles: t([
     'KKKKKKKKKKKKKKKKKKKKKKKK',

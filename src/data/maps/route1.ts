@@ -16,6 +16,7 @@ export const route1: GameMap = {
     { id: 'lass', x: 18, y: 14, name: 'Sarah', role: 'trainer_f', lines: ['My Bloomoss is so cute!', 'Battle me!'],
       trainer: { party: [{ creatureId: 'mossling', level: 8 }, { creatureId: 'leafkit', level: 9 }], reward: 180 } },
     { id: 'sign2', x: 12, y: 18, name: 'Sign', role: 'sign', lines: ['Route 1', '↑ Verdant Forest  |  ↓ Verdant Town'] },
+    { id: 'chest_route1', x: 4, y: 14, name: 'Chest', role: 'chest', lines: ['CHEST', 'chest_route1'] },
   ],
   tiles: t([
     'TTTTTTTTTTTTTTTTTTTTTTTT',

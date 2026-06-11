@@ -49,15 +49,15 @@ ok(`${critterPngs.length} critter PNGs on disk`);
 // ── Data catalog ──
 const creatures = read('src/data/creatures.ts');
 const speciesIds = [...creatures.matchAll(/^\s{2}[a-z]+: \{/gm)];
-if (speciesIds.length === 65) ok('65 species in creatures.ts');
-else fail(`Expected 65 species, found ${speciesIds.length}`);
+if (speciesIds.length === 70) ok('70 species in creatures.ts');
+else fail(`Expected 70 species, found ${speciesIds.length}`);
 
 const movesSrc = read('src/data/moves.ts');
 const moveCount = (movesSrc.match(/^\s{2}[a-z][a-z0-9_]*: \{ id:/gm) ?? []).length;
-if (moveCount >= 50) ok(`${moveCount} moves in moves.ts`);
-else fail(`Expected ≥50 moves, found ${moveCount}`);
-if (movesSrc.includes('tidal_maul') && movesSrc.includes('crystal_lance')) ok('Batch-4 species moves');
-else fail('moves.ts missing tidal_maul/crystal_lance');
+if (moveCount >= 55) ok(`${moveCount} moves in moves.ts`);
+else fail(`Expected ≥55 moves, found ${moveCount}`);
+if (movesSrc.includes('thunder_dive') && movesSrc.includes('gleam_pulse')) ok('Batch-5 species moves');
+else fail('moves.ts missing thunder_dive/gleam_pulse');
 
 function readMapsBundle() {
   const index = read('src/data/maps/index.ts');
@@ -70,6 +70,7 @@ const ALL_MAPS = [
   'town', 'heal_center', 'mart', 'lab', 'route1', 'forest', 'route2', 'mossgrove',
   'gym1', 'crystal_cave', 'route3', 'ember_city', 'gym2', 'volcanic_path',
   'route4', 'glacier_pass', 'frostvale', 'gym3', 'route5', 'mindspire', 'gym4', 'victory_road',
+  'fishing_pier', 'secret_grove', 'contest_hall',
 ];
 for (const mapId of ALL_MAPS) {
   if (mapsSrc.includes(`${mapId}:`)) ok(`Map "${mapId}"`);
@@ -99,6 +100,7 @@ const EAGER_SCENES = ['BootScene', 'IntroScene', 'MenuScene'];
 const LAZY_SCENE_KEYS = [
   'CharacterSelect', 'LabIntro', 'StarterSelect', 'Overworld', 'TrainerIntro', 'Battle',
   'Party', 'Shop', 'PC', 'Critterdex', 'PauseMenu', 'Options', 'FastTravel', 'RegionMap', 'HallOfFame', 'LearnMove', 'Nickname', 'Victory',
+  'Fishing', 'BugCatch', 'CritterContest',
 ];
 for (const scene of EAGER_SCENES) {
   if (main.includes(scene)) ok(`${scene} registered (eager)`);
@@ -231,8 +233,14 @@ if (existsSync(join(root, 'src/ui/statDisplay.ts'))) ok('Stat display helper (6 
 else fail('statDisplay.ts missing');
 if (existsSync(join(root, 'scripts/critter-art/starters.mjs'))) ok('Starter pixel art overrides');
 else fail('critter-art/starters.mjs missing');
+if (existsSync(join(root, 'scripts/critter-art/batch5.mjs'))) ok('Batch-5 pixel art overrides');
+else fail('critter-art/batch5.mjs missing');
 if (existsSync(join(root, 'src/scenes/overworld/CaveSparkles.ts'))) ok('Cave sparkle overlay');
 else fail('CaveSparkles.ts missing');
+if (existsSync(join(root, 'src/scenes/overworld/ForestFireflies.ts'))) ok('Forest firefly overlay');
+else fail('ForestFireflies.ts missing');
+if (existsSync(join(root, 'src/ui/overworldPointer.ts'))) ok('Overworld pointer zones (tap map/D-pad)');
+else fail('overworldPointer.ts missing');
 if (owBundle.includes('playerTextureKey') && overworld.includes('applyOverworldCamera')) {
   ok('Overworld: player sprite + camera');
 } else fail('OverworldScene incomplete');
@@ -363,6 +371,19 @@ const encounters = read('src/data/encounters.ts');
 if (encounters.includes('resolveEncounterTable') && encounters.includes('forest_night')) {
   ok('Day/night encounter table variants');
 } else fail('encounters.ts missing night tables');
+if (encounters.includes('fishing_catch') && encounters.includes('secret_grove')) {
+  ok('Minigame + secret grove encounter tables');
+} else fail('encounters.ts missing fishing_catch or secret_grove');
+
+if (existsSync(join(root, 'src/systems/walkPath.ts'))) ok('Walk path BFS module');
+else fail('src/systems/walkPath.ts missing');
+if (existsSync(join(root, 'src/ui/minigameShell.ts'))) ok('Minigame UI shell');
+else fail('src/ui/minigameShell.ts missing');
+if (existsSync(join(root, 'src/scenes/FishingScene.ts'))) ok('FishingScene');
+else fail('FishingScene.ts missing');
+if (read('src/data/items.ts').includes('old_rod') && read('src/data/items.ts').includes('contest_ribbon')) {
+  ok('Minigame items (old_rod, contest_ribbon)');
+} else fail('items.ts missing minigame items');
 
 if (existsSync(join(root, 'src/ui/mapBanner.ts'))) ok('Map banner + toast UI');
 else fail('mapBanner.ts missing');
@@ -407,6 +428,8 @@ if (existsSync(join(root, 'src/ui/sceneBackdrops.ts'))) {
 
 if (existsSync(join(root, 'e2e/lab-intro.spec.ts'))) ok('E2E lab intro spec');
 else fail('e2e/lab-intro.spec.ts missing');
+if (existsSync(join(root, 'e2e/movement.spec.ts'))) ok('E2E movement spec');
+else fail('e2e/movement.spec.ts missing');
 
 if (!battleScene.includes('setupInput')) ok('BattleScene no duplicate setupInput');
 else fail('BattleScene still calls setupInput()');

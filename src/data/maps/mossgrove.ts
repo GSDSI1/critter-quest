@@ -16,6 +16,7 @@ export const mossgrove: GameMap = {
     { id: 'cooltrainer', x: 18, y: 10, name: 'Alex', lines: ['Think you\'re ready for the Gym?', 'Prove it!'],
       trainer: { party: [{ creatureId: 'sparkbit', level: 13 }, { creatureId: 'voltwing', level: 14 }], reward: 400 } },
     { id: 'sign5', x: 12, y: 14, name: 'Sign', lines: ['Mossgrove City', 'Gym →  |  ↑ Crystal Cave (badge required)'] },
+    { id: 'chest_moss', x: 4, y: 10, name: 'Chest', role: 'chest', lines: ['CHEST', 'chest_moss'] },
   ],
   tiles: t([
     'TTTTTTTTTTTTTTTTTTTTTTTT',

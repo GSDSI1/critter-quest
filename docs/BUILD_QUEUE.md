@@ -33,6 +33,8 @@ Last updated: 2026-06-09 (graphics sprint). Source: `GAMEPLAN.md`.
 | **Opt** | Playtest polish: always-on touch pad, 6-stat UI, overlap fixes, starter pixel art | ✓ |
 | **Opt** | 60 species + frostnip/murkfox evos + stage-2 starter art + cave/forest tint | ✓ |
 | **Opt** | 65 species + 3 evo lines + cave sparkles + dev-port SIGKILL cleanup | ✓ |
+| **Opt** | 70 species + volt/ash evo lines + tap-move + forest fireflies + batch-5 art | ✓ |
+| **Sprint** | Walk pathfinding (BFS), 3 new maps, fishing/bug-catch/contest minigames, fun layer | ✓ |
 
 ## Optional polish (future)
 

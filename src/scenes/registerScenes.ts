@@ -22,6 +22,9 @@ const LAZY_SCENES: { key: string; load: () => Promise<Record<string, SceneCtor>>
   { key: 'HallOfFame', load: () => import('./HallOfFameScene').then(m => ({ HallOfFameScene: m.HallOfFameScene })) },
   { key: 'LearnMove', load: () => import('./LearnMoveScene').then(m => ({ LearnMoveScene: m.LearnMoveScene })) },
   { key: 'Nickname', load: () => import('./LearnMoveScene').then(m => ({ NicknameScene: m.NicknameScene })) },
+  { key: 'Fishing', load: () => import('./FishingScene').then(m => ({ FishingScene: m.FishingScene })) },
+  { key: 'BugCatch', load: () => import('./BugCatchScene').then(m => ({ BugCatchScene: m.BugCatchScene })) },
+  { key: 'CritterContest', load: () => import('./CritterContestScene').then(m => ({ CritterContestScene: m.CritterContestScene })) },
 ];
 
 const loading = new Map<string, Promise<void>>();

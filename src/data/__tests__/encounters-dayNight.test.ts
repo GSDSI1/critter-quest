@@ -16,17 +16,20 @@ describe('resolveEncounterTable', () => {
     const nightTime = 264; // mid-night window in 480s cycle
     expect(isNight(nightTime)).toBe(true);
     expect(resolveEncounterTable('forest', nightTime)).toBe('forest_night');
+    expect(resolveEncounterTable('route1', nightTime)).toBe('route1_night');
+    expect(resolveEncounterTable('route2', nightTime)).toBe('route2_night');
     expect(resolveEncounterTable('route3', nightTime)).toBe('route3_night');
+    expect(resolveEncounterTable('route4', nightTime)).toBe('route4_night');
     expect(resolveEncounterTable('route5', nightTime)).toBe('route5_night');
   });
 
   it('falls back to day table when no night variant exists', () => {
-    expect(resolveEncounterTable('route1', 264)).toBe('route1');
+    expect(resolveEncounterTable('crystal_cave', 264)).toBe('crystal_cave');
     expect(resolveEncounterTable('route1', 0)).toBe('route1');
   });
 
   it('night tables are registered', () => {
-    for (const id of ['forest_night', 'route3_night', 'route5_night']) {
+    for (const id of ['forest_night', 'route1_night', 'route2_night', 'route3_night', 'route4_night', 'route5_night']) {
       expect(ENCOUNTER_TABLES[id]?.length).toBeGreaterThan(0);
     }
   });

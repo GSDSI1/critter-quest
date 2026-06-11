@@ -121,6 +121,14 @@ export const ITEMS: Record<string, ItemDef> = {
     id: 'shadow_cloth', name: 'Shadow Cloth', description: 'Held: boosts Shadow moves 20%.',
     price: 9800, category: 'battle', usableInBattle: false, usableOverworld: false,
   },
+  old_rod: {
+    id: 'old_rod', name: 'Old Rod', description: 'A worn fishing rod for tide pools.',
+    price: 0, category: 'battle', usableInBattle: false, usableOverworld: false,
+  },
+  contest_ribbon: {
+    id: 'contest_ribbon', name: 'Contest Ribbon', description: 'Proof of contest victory.',
+    price: 0, category: 'battle', usableInBattle: false, usableOverworld: false,
+  },
 };
 
 export const SHOP_STOCK = [
@@ -167,6 +175,8 @@ export function emptyBag(): ItemBag {
     magnet: 0,
     shadow_cloth: 0,
     scope_lens: 0,
+    old_rod: 0,
+    contest_ribbon: 0,
   };
 }
 

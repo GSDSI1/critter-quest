@@ -10,6 +10,7 @@ import {
   shade, rgbFromHex, hashSeed,
 } from './png-utils.mjs';
 import { drawStarterOverride } from './critter-art/starters.mjs';
+import { drawBatch5Override } from './critter-art/batch5.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
@@ -64,6 +65,7 @@ function drawTypeDetail(rgba, w, h, type, cx, cy, s, frame) {
 
 function drawCreature(rgba, w, h, { id, color, shape, types }, opts = {}) {
   const { frame = 0, back = false } = opts;
+  if (id && drawBatch5Override(rgba, w, id, { frame, back })) return;
   if (id && drawStarterOverride(rgba, w, id, { frame, back })) return;
   const rgb = rgbFromHex(color);
   const dark = shade(rgb, -45);

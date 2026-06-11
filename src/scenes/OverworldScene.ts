@@ -19,12 +19,15 @@ import { isOutdoorMap, nightTintAlpha, tileNightTint } from '../systems/dayNight
 import { MapRenderer } from './overworld/MapRenderer';
 import { NpcManager } from './overworld/NpcManager';
 import { buildSkyLayer } from './overworld/SkyLayer';
-import { buildCityAtmosphere } from './overworld/CityAtmosphere';
+import { buildCityAtmosphere, buildPierSeagulls } from './overworld/CityAtmosphere';
 import { buildCaveSparkles } from './overworld/CaveSparkles';
+import { buildForestFireflies } from './overworld/ForestFireflies';
 import { buildHealInterior } from '../ui/sceneBackdrops';
 import { fadeInOnStart, wipeInOnStart } from '../ui/transitions';
 import { markTouchPreferred, shouldShowOverworldTouchPad } from '../ui/touchMenuNav';
 import { focusGameCanvas } from '../utils/focusCanvas';
+import { resolveOverworldPointer } from '../ui/overworldPointer';
+import { findPath, npcBlockedTiles, type TileCoord } from '../systems/walkPath';
 
 export class OverworldScene extends Phaser.Scene {
   private player!: Phaser.GameObjects.Sprite;
@@ -42,7 +45,14 @@ export class OverworldScene extends Phaser.Scene {
   private padToast?: Phaser.GameObjects.Text;
   private touchPad?: OverworldTouchPad;
   private nightOverlay?: Phaser.GameObjects.Graphics;
+  private forestFireflies?: { update: (playTime: number) => void };
   private hasMoved = false;
+  private pointerStepCooldown = 0;
+  private pointerHold: 'move' | null = null;
+  private pointerHoldDir = { dx: 0, dy: 0 };
+  private walkQueue: TileCoord[] = [];
+  private walkTarget: TileCoord | null = null;
+  private walkMarker?: Phaser.GameObjects.Graphics;
 
   constructor() {
     super('Overworld');
@@ -70,6 +80,15 @@ export class OverworldScene extends Phaser.Scene {
     if (isOutdoorMap(this.map.id)) buildSkyLayer(this, this.map.id);
     buildCityAtmosphere(this, this.map.id);
     if (this.map.id === 'crystal_cave') buildCaveSparkles(this);
+    if (this.map.id === 'forest') {
+      this.forestFireflies = buildForestFireflies(this);
+    }
+    if (this.map.id === 'secret_grove') {
+      this.forestFireflies = buildForestFireflies(this);
+    }
+    if (this.map.id === 'route3' || this.map.id === 'fishing_pier') {
+      buildPierSeagulls(this);
+    }
     if (this.map.id === 'heal_center') buildHealInterior(this);
 
     this.mapRenderer = new MapRenderer(this);
@@ -81,19 +100,28 @@ export class OverworldScene extends Phaser.Scene {
       getPlayerShadow: () => this.playerShadow,
     });
 
-    this.touchPad = new OverworldTouchPad(
-      this,
-      (dx, dy) => this.onPlayerMove(dx, dy),
-      () => this.npcManager.tryInteract(),
-      () => { this.scene.launch('PauseMenu'); this.scene.pause(); },
-    );
+    this.touchPad = new OverworldTouchPad(this);
     this.touchPad.setVisible(shouldShowOverworldTouchPad());
     this.hud.setTouchHints(true);
     this.hud.showMoveHint(true);
-    this.input.on('pointerdown', () => {
+    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
       markTouchPreferred();
       focusGameCanvas();
+      if (this.dialog.isShowing()) {
+        this.dialog.advance();
+        return;
+      }
+      if (this.controlsPanel.isShowing()) {
+        this.controlsPanel.advance();
+        return;
+      }
+      this.handlePointerDown(pointer);
     });
+    this.input.on('pointerup', () => {
+      this.pointerHold = null;
+      this.pointerStepCooldown = 0;
+    });
+    this.events.on('wake', () => focusGameCanvas());
     this.time.delayedCall(100, () => focusGameCanvas());
 
     this.mapRenderer.render(this.map);
@@ -108,15 +136,15 @@ export class OverworldScene extends Phaser.Scene {
       this.syncTouchPadModal();
       this.dialog.show([
         'Welcome to Verdant Town!',
-        'Use the D-pad or WASD to move. Tap Talk near people.',
-        'Walk into tall grass to find wild critters!',
+        'Tap anywhere or press Z to continue.',
+        'Tap the map or D-pad to move. Walk in tall grass for wild critters!',
       ], () => { this.inputLocked = false; this.syncTouchPadModal(); });
     } else if (data.showIntro) {
       this.inputLocked = true;
       this.dialog.show([
         'Welcome to Verdant Town!',
-        'Walk into tall grass to find wild critters.',
-        'Hold Shift or L1 to run (after beating Kai).',
+        'Tap the map or D-pad to move. Tall grass hides wild critters.',
+        'Hold Shift or L1 to run after beating Kai.',
       ], () => { this.inputLocked = false; this.syncTouchPadModal(); });
     }
 
@@ -153,16 +181,113 @@ export class OverworldScene extends Phaser.Scene {
     pinToScreen(g, 850);
   }
 
-  private onPlayerMove(dx: number, dy: number): void {
-    if (this.npcManager.tryMove(dx, dy) && !this.hasMoved) {
+  private onPlayerMove(dx: number, dy: number): boolean {
+    const moved = this.npcManager.tryMove(dx, dy);
+    if (moved && !this.hasMoved) {
       this.hasMoved = true;
       this.hud.clearMoveHint();
     }
+    if (!moved) this.clearWalkPath();
+    return moved;
+  }
+
+  /** Dev/test bridge: queue auto-walk to a map tile (same path as map tap). */
+  requestWalkTo(tx: number, ty: number, opts?: { force?: boolean }): void {
+    if (!opts?.force && (this.inputLocked || this.dialog.isShowing())) return;
+    this.setWalkDestination(tx, ty);
+  }
+
+  private clearWalkPath(): void {
+    this.walkQueue = [];
+    this.walkTarget = null;
+    this.walkMarker?.destroy();
+    this.walkMarker = undefined;
+  }
+
+  private showWalkMarker(tx: number, ty: number): void {
+    this.walkMarker?.destroy();
+    const g = this.add.graphics().setDepth(12);
+    const cx = tx * TILE_SIZE + TILE_SIZE / 2;
+    const cy = ty * TILE_SIZE + TILE_SIZE / 2;
+    g.lineStyle(2, 0xf5c542, 0.9);
+    g.strokeCircle(cx, cy, 6);
+    g.fillStyle(0xf5c542, 0.25);
+    g.fillCircle(cx, cy, 4);
+    this.walkMarker = g;
+    this.tweens.add({
+      targets: g,
+      alpha: 0.35,
+      duration: 500,
+      yoyo: true,
+      repeat: -1,
+    });
+  }
+
+  private setWalkDestination(tx: number, ty: number): void {
+    const px = GameState.player.x;
+    const py = GameState.player.y;
+    if (tx === px && ty === py) {
+      this.clearWalkPath();
+      return;
+    }
+    const path = findPath(this.map, px, py, tx, ty, npcBlockedTiles(this.map));
+    if (!path || path.length === 0) return;
+    this.walkQueue = path;
+    this.walkTarget = { x: tx, y: ty };
+    this.showWalkMarker(tx, ty);
+    this.processWalkQueue();
+  }
+
+  private processWalkQueue(): void {
+    if (this.moving || this.walkQueue.length === 0) return;
+    if (this.inputLocked || this.dialog.isShowing() || this.scene.isPaused()) return;
+    const next = this.walkQueue[0];
+    const px = GameState.player.x;
+    const py = GameState.player.y;
+    const dx = next.x - px;
+    const dy = next.y - py;
+    if (Math.abs(dx) + Math.abs(dy) !== 1) {
+      this.clearWalkPath();
+      return;
+    }
+    if (this.onPlayerMove(dx, dy)) {
+      this.walkQueue.shift();
+      if (this.walkQueue.length === 0) this.clearWalkPath();
+    }
+  }
+
+  private handlePointerDown(pointer: Phaser.Input.Pointer): void {
+    if (this.dialog.isShowing() || this.controlsPanel.isShowing()) return;
+    if (this.inputLocked || this.scene.isPaused()) return;
+
+    const action = resolveOverworldPointer(this, pointer);
+    if (!action) return;
+
+    if (action.type === 'talk') {
+      this.clearWalkPath();
+      this.npcManager.tryInteract();
+      return;
+    }
+    if (action.type === 'menu') {
+      this.clearWalkPath();
+      this.scene.launch('PauseMenu');
+      this.scene.pause();
+      return;
+    }
+    if (action.type === 'move') {
+      this.clearWalkPath();
+      this.pointerHold = 'move';
+      this.pointerHoldDir = { dx: action.dx, dy: action.dy };
+      this.pointerStepCooldown = 0;
+      this.onPlayerMove(action.dx, action.dy);
+      return;
+    }
+    this.setWalkDestination(action.tx, action.ty);
   }
 
   private syncTouchPadModal(): void {
-    const modal = this.inputLocked || this.dialog.isShowing() || this.controlsPanel.isShowing();
-    this.touchPad?.setVisible(!modal && shouldShowOverworldTouchPad());
+    const hidePad = this.controlsPanel.isShowing();
+    this.touchPad?.setVisible(!hidePad && shouldShowOverworldTouchPad());
   }
 
   private updateInputHint(): void {
@@ -198,7 +323,10 @@ export class OverworldScene extends Phaser.Scene {
 
     if (this.dialog.isShowing()) {
       this.syncTouchPadModal();
-      if (Input.justPressed('confirm') || Input.justPressed('cancel')) this.dialog.advance();
+      if (Input.justPressed('confirm') || Input.justPressed('cancel')) {
+        this.clearWalkPath();
+        this.dialog.advance();
+      }
       this.updateInputHint();
       return;
     }
@@ -212,15 +340,29 @@ export class OverworldScene extends Phaser.Scene {
     this.mapRenderer.update(delta);
     this.updateDayNightTint();
 
+    if (!blocked && this.pointerHold === 'move' && this.input.activePointer.isDown) {
+      this.pointerStepCooldown -= delta;
+      if (this.pointerStepCooldown <= 0) {
+        this.onPlayerMove(this.pointerHoldDir.dx, this.pointerHoldDir.dy);
+        this.pointerStepCooldown = this.moveDuration;
+      }
+    }
+
+    if (!blocked && this.walkQueue.length > 0 && !this.moving) {
+      this.processWalkQueue();
+    }
+
     if (blocked) return;
     GameState.player.playTime += delta / 1000;
 
     if (Input.justPressed('party')) {
+      this.clearWalkPath();
       this.scene.launch('Party');
       this.scene.pause();
       return;
     }
     if (Input.justPressed('pause')) {
+      this.clearWalkPath();
       this.scene.launch('PauseMenu');
       this.scene.pause();
       return;
@@ -250,6 +392,7 @@ export class OverworldScene extends Phaser.Scene {
     if (outdoor) {
       this.mapRenderer.setDayNightTint(tileNightTint(GameState.player.playTime));
     }
+    this.forestFireflies?.update(GameState.player.playTime);
   }
 
   private showPadToast(msg: string): void {

@@ -7,7 +7,7 @@ An original creature-collecting RPG inspired by classic monster-taming games. Ph
 ```bash
 npm install
 npm run dev        # http://localhost:5180 (auto-frees port if stale)
-npm run verify     # static completeness audit (93 checks)
+npm run verify     # static completeness audit (100+ checks)
 npm run build      # production build → dist/
 npm run check      # verify + build
 ```
@@ -19,6 +19,7 @@ npm run check      # verify + build
 | Key | Action |
 |-----|--------|
 | Arrow keys / WASD | Move |
+| Tap map | Auto-walk to destination |
 | Z / Enter / Space | Confirm / talk |
 | ESC / B | Back / close |
 | P | Menu (Critterdex, Party, Save) |
@@ -48,14 +49,14 @@ Boot (loading) → Intro splash → Title menu
 
 ## Features
 
-### World (14 maps)
+### World (25 maps)
 
-Verdant Town, Route 1, Forest, Route 2, Mossgrove City, Gym 1, Crystal Cave, Route 3, Ember City, Gym 2, Volcanic Path — plus Healing Center, Mart, and Research Lab interiors.
+Verdant Town through Victory Road — 22 core zones plus **Fishing Pier**, **Secret Grove**, and **Contest Hall**. Interiors: Healing Center, Mart, Research Lab.
 
 ### Critters & battle
 
-- **27 species** with evolution chains, abilities, natures, and IVs
-- **6 types** with effectiveness chart
+- **70 species** with evolution chains, abilities, natures, and IVs
+- **55+ moves** with type effectiveness chart
 - **Status effects** — burn, paralyze, poison, sleep, freeze, confusion
 - **Learn-move UI** when leveling up with a full moveset
 - **Nickname prompt** on capture
@@ -64,8 +65,9 @@ Verdant Town, Route 1, Forest, Route 2, Mossgrove City, Gym 1, Crystal Cave, Rou
 
 - Potions, Revive, Capture Orbs, held items (Mart)
 - **Critterdex** — habitat, footprints, type icons
-- **2 Gym badges** — Verdant (Leader Ivy) and Ember (Leader Cole)
+- **4 Gym badges** — Verdant, Ember, Frost, Psyche
 - **Rival arc** — 3 battles with Kai (type counter to your starter)
+- **Minigames** — fishing (Route 3 pier), bug catch (forest night), critter contest (Frostvale)
 - **PC storage** at Healing Centers
 
 ### Trainer

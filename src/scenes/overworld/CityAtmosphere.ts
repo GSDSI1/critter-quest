@@ -25,3 +25,34 @@ export function buildCityAtmosphere(scene: Phaser.Scene, mapId: string, depth = 
   pinToScreen(g, depth);
   return g;
 }
+
+/** Drifting seagull silhouettes over Route 3 water. */
+export function buildPierSeagulls(scene: Phaser.Scene, depth = 4): Phaser.GameObjects.Graphics {
+  const g = scene.add.graphics().setDepth(depth);
+  const birds: { x: number; y: number; vx: number }[] = [
+    { x: 80, y: 40, vx: 22 },
+    { x: 200, y: 55, vx: -18 },
+    { x: 360, y: 35, vx: 25 },
+  ];
+  const draw = () => {
+    g.clear();
+    g.fillStyle(0xffffff, 0.35);
+    for (const b of birds) {
+      g.fillTriangle(b.x - 6, b.y, b.x, b.y - 3, b.x + 6, b.y);
+    }
+  };
+  draw();
+  scene.time.addEvent({
+    delay: 50,
+    loop: true,
+    callback: () => {
+      for (const b of birds) {
+        b.x += b.vx * 0.05;
+        if (b.x < -20) b.x = GAME_WIDTH + 20;
+        if (b.x > GAME_WIDTH + 20) b.x = -20;
+      }
+      draw();
+    },
+  });
+  return g;
+}
