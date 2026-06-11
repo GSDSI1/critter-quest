@@ -72,6 +72,8 @@ export function migrateSaveData(data: Record<string, unknown>): PlayerState {
     signsRead: typeof data.signsRead === 'number' ? data.signsRead : 0,
     lastMomGiftDay: typeof data.lastMomGiftDay === 'number' ? data.lastMomGiftDay : -1,
     lastContestDay: typeof data.lastContestDay === 'number' ? data.lastContestDay : -1,
+    fishingBest: typeof data.fishingBest === 'number' ? data.fishingBest : 0,
+    bugBest: typeof data.bugBest === 'number' ? data.bugBest : 0,
     storage: Array.isArray(data.storage) ? data.storage as CritterInstance[] : [],
     party: Array.isArray(data.party) ? data.party as CritterInstance[] : [],
   };

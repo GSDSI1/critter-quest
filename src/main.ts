@@ -12,6 +12,8 @@ import { installLazySceneLoader } from './scenes/registerScenes';
 import { installCanvasFocusOnBoot } from './utils/focusCanvas';
 import type { BattleScene } from './scenes/BattleScene';
 import type { OverworldScene } from './scenes/OverworldScene';
+import type { FishingScene } from './scenes/FishingScene';
+import type { BugCatchScene } from './scenes/BugCatchScene';
 
 const config = {
   type: Phaser.AUTO,
@@ -78,6 +80,8 @@ declare global {
       openBugCatch: () => void;
       openContest: () => void;
       setNight: () => void;
+      resolveFishing: (hits: number) => void;
+      resolveBugCatch: (score: number) => void;
     };
   }
 }
@@ -242,6 +246,12 @@ if (import.meta.env.DEV) {
     setNight() {
       GameState.player.playTime = 264;
       saveGame();
+    },
+    resolveFishing(hits) {
+      (game.scene.getScene('Fishing') as FishingScene | null)?.devFinish(hits);
+    },
+    resolveBugCatch(score) {
+      (game.scene.getScene('BugCatch') as BugCatchScene | null)?.devFinish(score);
     },
   };
 }

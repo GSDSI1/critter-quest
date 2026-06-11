@@ -32,6 +32,22 @@ export function applyChestReward(chestId: string): string[] {
       addItem(GameState.player.items, 'ultra_orb', 1);
       return ['You found $500 and an Ultra Orb!'];
     },
+    chest_route4: () => {
+      GameState.player.money += 200;
+      addItem(GameState.player.items, 'great_orb', 1);
+      return ['You found $200 and a Great Orb!'];
+    },
+    chest_glacier: () => {
+      GameState.player.money += 150;
+      addItem(GameState.player.items, 'hyper_potion', 1);
+      addItem(GameState.player.items, 'oran_berry', 2);
+      return ['You found $150, a Hyper Potion, and 2 Oran Berries!'];
+    },
+    chest_contest: () => {
+      GameState.player.money += 250;
+      addItem(GameState.player.items, 'oran_berry', 3);
+      return ['You found $250 and 3 Oran Berries behind the stage!'];
+    },
   };
   const fn = table[chestId] ?? (() => {
     GameState.player.money += 200;

@@ -5,6 +5,7 @@ import { trySave } from '../../utils/saveFeedback';
 import { DialogBox } from '../../ui/DialogBox';
 import { isNight } from '../../systems/dayNight';
 import { applyChestReward } from './ChestRewards';
+import { playDayIndex } from '../../ui/minigameShell';
 
 export interface MinigameNpcContext {
   scene: Phaser.Scene;
@@ -55,6 +56,10 @@ export function tryHandleMinigameNpc(npc: MapNpc, ctx: MinigameNpcContext): bool
 
   if (npc.lines.includes('CONTEST')) {
     const intro = npc.lines.filter(l => l !== 'CONTEST');
+    const day = playDayIndex(GameState.player.playTime);
+    if (GameState.player.lastContestDay === day) {
+      intro.unshift('You already entered today — come back tomorrow!');
+    }
     ctx.dialog.show(intro, () => {
       ctx.unlockInput();
       ctx.scene.scene.launch('CritterContest');

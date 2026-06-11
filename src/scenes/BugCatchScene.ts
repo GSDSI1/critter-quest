@@ -8,6 +8,7 @@ import { addItem } from '../data/items';
 import { createCritter, registerSeen } from '../systems/stats';
 import { registerCaughtWithMilestone } from '../systems/dexNotify';
 import { DialogBox } from '../ui/DialogBox';
+import { tryMinigameBest } from '../systems/minigameScores';
 import { GAME_WIDTH, GAME_HEIGHT } from '../data/types';
 
 interface Firefly {
@@ -104,10 +105,19 @@ export class BugCatchScene extends Phaser.Scene {
     }
   }
 
+  /** DEV test bridge — end run with a fixed firefly score. */
+  devFinish(score: number): void {
+    this.score = Math.max(0, score);
+    this.timeLeft = 0;
+    this.finish(false);
+  }
+
   private finish(early: boolean): void {
     if (!this.active) return;
     this.active = false;
+    const improved = tryMinigameBest('bugBest', this.score);
     const lines: string[] = [`You caught ${this.score} fireflies!`];
+    if (improved && this.score > 0) lines.unshift(`New bug-catch best: ${this.score}!`);
     if (this.score >= 30) {
       addItem(GameState.player.items, 'great_orb', 1);
       const c = createCritter('nightmoth', 12);

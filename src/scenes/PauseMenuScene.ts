@@ -12,6 +12,7 @@ import { canFastTravel } from '../systems/healTravel';
 import { loadAudioSettings, saveAudioSettings } from '../systems/audioSettings';
 import { refreshMusicVolume } from '../utils/music';
 import { TouchMenuNav } from '../ui/touchMenuNav';
+import { formatMinigameBests } from '../systems/minigameScores';
 
 export class PauseMenuScene extends Phaser.Scene {
   private selected = 0;
@@ -47,7 +48,14 @@ export class PauseMenuScene extends Phaser.Scene {
       fontFamily: FONT, fontSize: '9px', color: '#667788',
     }).setOrigin(0.5);
 
-    this.add.text(GAME_WIDTH / 2, 176, `v${import.meta.env.VITE_APP_VERSION ?? '1.0.0'}`, {
+    const bests = formatMinigameBests();
+    if (bests) {
+      this.add.text(GAME_WIDTH / 2, 176, bests, {
+        fontFamily: FONT, fontSize: '9px', color: '#8899aa',
+      }).setOrigin(0.5);
+    }
+
+    this.add.text(GAME_WIDTH / 2, bests ? 188 : 176, `v${import.meta.env.VITE_APP_VERSION ?? '1.0.0'}`, {
       fontFamily: FONT, fontSize: '9px', color: '#556677',
     }).setOrigin(0.5);
 

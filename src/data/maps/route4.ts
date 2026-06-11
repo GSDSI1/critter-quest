@@ -15,6 +15,7 @@ export const route4: GameMap = {
     { id: 'skier', x: 8, y: 6, name: 'Skier Pam', role: 'trainer_f', lines: ['Ice types thrive in the snow!', 'Let\'s go!'],
       trainer: { party: [{ creatureId: 'snowpuff', level: 19 }, { creatureId: 'frostmoss', level: 20 }], reward: 480 } },
     { id: 'sign10', x: 12, y: 16, name: 'Sign', role: 'sign', lines: ['Route 4', '← Route 3  |  ↑ Glacier Pass  |  → Ember City'] },
+    { id: 'chest_route4', x: 4, y: 14, name: 'Chest', role: 'chest', lines: ['CHEST', 'chest_route4'] },
   ],
   tiles: t([
     'TTTTTTTTTTTTTTTTTTTTTTTT',

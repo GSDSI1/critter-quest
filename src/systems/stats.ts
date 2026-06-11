@@ -62,6 +62,8 @@ export interface PlayerState {
   signsRead: number;
   lastMomGiftDay: number;
   lastContestDay: number;
+  fishingBest: number;
+  bugBest: number;
   started: boolean;
 }
 
@@ -236,6 +238,8 @@ export function defaultPlayer(): PlayerState {
     signsRead: 0,
     lastMomGiftDay: -1,
     lastContestDay: -1,
+    fishingBest: 0,
+    bugBest: 0,
     started: false,
   };
 }

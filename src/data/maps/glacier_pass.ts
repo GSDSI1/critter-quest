@@ -16,6 +16,7 @@ export const glacier_pass: GameMap = {
     { id: 'frost_scout', x: 18, y: 6, name: 'Scout Nina', role: 'trainer_f', lines: ['Frostnips hide under every snowdrift!', 'Let\'s battle!'],
       trainer: { party: [{ creatureId: 'frostnip', level: 22 }, { creatureId: 'frosthorn', level: 24 }], reward: 580 } },
     { id: 'sign11', x: 12, y: 16, name: 'Sign', role: 'sign', lines: ['Glacier Pass', '↓ Route 4  |  ↑ Frostvale City'] },
+    { id: 'chest_glacier', x: 10, y: 12, name: 'Chest', role: 'chest', lines: ['CHEST', 'chest_glacier'] },
   ],
   tiles: t([
     'KKKKKKKKKKKKKKKKKKKKKKKK',

@@ -2,7 +2,7 @@
 
 Audit date: 2026-06-11 · Repo: github.com/GSDSI1/critter-quest · Phaser 3.88 + TS strict + Vite 6
 
-**Current snapshot:** 87 species · 25 maps · 4 gyms + Victory Road · 3 minigames (fishing, bug catch, contest) · 49 unit tests · 10+ e2e specs · ~100 verify checks. See `docs/BUILD_QUEUE.md` for live counts.
+**Current snapshot:** 90 species · 25 maps · 4 gyms + Victory Road · 3 minigames (fishing, bug catch, contest) · 49 unit tests · 10+ e2e specs · ~100 verify checks. See `docs/BUILD_QUEUE.md` for live counts.
 
 ---
 

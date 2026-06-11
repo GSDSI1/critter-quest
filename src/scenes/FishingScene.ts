@@ -11,6 +11,7 @@ import { createCritter, registerSeen } from '../systems/stats';
 import { registerCaughtWithMilestone } from '../systems/dexNotify';
 import { addItem } from '../data/items';
 import { DialogBox } from '../ui/DialogBox';
+import { tryMinigameBest } from '../systems/minigameScores';
 
 export class FishingScene extends Phaser.Scene {
   private round = 0;
@@ -109,9 +110,18 @@ export class FishingScene extends Phaser.Scene {
     this.barDir = Math.random() > 0.5 ? 1 : -1;
   }
 
+  /** DEV test bridge — skip timing and finish with N green-zone hits (0–3). */
+  devFinish(hits: number): void {
+    this.hits = Math.max(0, Math.min(3, hits));
+    this.round = 3;
+    this.finish();
+  }
+
   private finish(): void {
     this.active = false;
+    const improved = tryMinigameBest('fishingBest', this.hits);
     const lines: string[] = [];
+    if (improved && this.hits > 0) lines.push(`New fishing best: ${this.hits}/3!`);
     if (this.hits >= 2) {
       const { def, level } = pickWildFromTable('fishing_catch');
       const c = createCritter(def.id, level);

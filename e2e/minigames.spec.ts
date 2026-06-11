@@ -1,5 +1,22 @@
 import { expect, test } from '@playwright/test';
-import { gotoFresh, sceneKeys, startNewGameToOverworld, teleport, waitForScene } from './helpers';
+import { gotoFresh, pressConfirm, sceneKeys, startNewGameToOverworld, teleport, waitForScene } from './helpers';
+
+test('fishing minigame completes a catch', async ({ page }) => {
+  await gotoFresh(page);
+  await startNewGameToOverworld(page);
+  await waitForScene(page, 'Overworld');
+  const beforeDex = (await page.evaluate(() => window.__cq?.player()?.dexCaught.length)) ?? 0;
+  await teleport(page, 'fishing_pier', 6, 8);
+  await waitForScene(page, 'Overworld');
+  await page.evaluate(() => window.__cq?.openFishing());
+  await waitForScene(page, 'Fishing', 12_000);
+  await page.evaluate(() => window.__cq?.resolveFishing(2));
+  await page.waitForTimeout(400);
+  await pressConfirm(page);
+  await waitForScene(page, 'Overworld', 12_000);
+  const afterDex = await page.evaluate(() => window.__cq?.player()?.dexCaught.length);
+  expect(afterDex).toBeGreaterThan(beforeDex);
+});
 
 test('fishing minigame opens from pier', async ({ page }) => {
   await gotoFresh(page);
