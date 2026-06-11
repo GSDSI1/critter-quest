@@ -3,10 +3,14 @@ import { GAME_WIDTH, GAME_HEIGHT } from '../../data/types';
 import { pinToScreen } from '../../ui/screenUi';
 
 const CITY_TINTS: Record<string, { color: number; alpha: number }> = {
+  town: { color: 0x86efac, alpha: 0.05 },
   mossgrove: { color: 0x4ade80, alpha: 0.06 },
   ember_city: { color: 0xff6b35, alpha: 0.09 },
   frostvale: { color: 0x93c5fd, alpha: 0.11 },
   mindspire: { color: 0xc084fc, alpha: 0.1 },
+  volcanic_path: { color: 0xef4444, alpha: 0.07 },
+  glacier_pass: { color: 0xbfdbfe, alpha: 0.08 },
+  victory_road: { color: 0x818cf8, alpha: 0.09 },
 };
 
 /** Subtle full-screen color wash for hub cities. */

@@ -187,6 +187,26 @@ export const LEARNSETS: Record<string, LearnEntry[]> = {
     { level: 1, move: 'tackle' }, { level: 1, move: 'leer' },
     { level: 10, move: 'spark' }, { level: 18, move: 'volt_ram' },
   ],
+  embershell: [
+    { level: 1, move: 'coalsurge' }, { level: 1, move: 'ember' },
+    { level: 28, move: 'magma_crush' }, { level: 32, move: 'boulder' },
+  ],
+  murkfox: [
+    { level: 1, move: 'tackle' }, { level: 1, move: 'leer' },
+    { level: 8, move: 'murk_fang' }, { level: 14, move: 'shadowclaw' },
+  ],
+  frostnip: [
+    { level: 1, move: 'tackle' }, { level: 1, move: 'growl' },
+    { level: 6, move: 'frostbite' }, { level: 12, move: 'frost_shatter' },
+  ],
+  psychora: [
+    { level: 1, move: 'tackle' }, { level: 1, move: 'psybeam' },
+    { level: 12, move: 'calm_mind' }, { level: 20, move: 'psy_burst' },
+  ],
+  galesprite: [
+    { level: 1, move: 'psybeam' }, { level: 1, move: 'spark' },
+    { level: 16, move: 'gale_dash' }, { level: 24, move: 'calm_mind' },
+  ],
 };
 
 export function movesKnownAtLevel(speciesId: string, level: number): string[] {

@@ -12,6 +12,8 @@ export const town: GameMap = {
   ],
   npcs: [
     { id: 'mom', x: 10, y: 10, name: 'Mom', role: 'generic', lines: ['Be careful out there!', 'Visit the Mart for supplies, and the Healing Center to rest.'] },
+    { id: 'youngster', x: 18, y: 11, name: 'Youngster Tim', role: 'trainer_m', lines: ['I just got my first critter!', 'Wanna practice?'],
+      trainer: { party: [{ creatureId: 'mossling', level: 4 }, { creatureId: 'pebblite', level: 5 }], reward: 120 } },
     { id: 'oldman', x: 4, y: 12, name: 'Old Timer', role: 'generic', lines: ['Press P for the menu. X for party. Z to talk.', 'Tall grass hides wild critters — walk in to find them!'] },
     { id: 'sign1', x: 12, y: 2, name: 'Sign', role: 'sign', lines: ['Verdant Town', '↑ Route 1  |  W: Healing Center  M: Mart  E: Lab'] },
   ],

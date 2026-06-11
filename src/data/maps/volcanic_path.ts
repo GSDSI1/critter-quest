@@ -13,6 +13,8 @@ export const volcanic_path: GameMap = {
       trainer: { party: [{ creatureId: '__RIVAL_EVO2__', level: 18 }, { creatureId: 'flamewyrm', level: 17 }, { creatureId: 'voltwing', level: 16 }], reward: 700 } },
     { id: 'volcano_hiker', x: 16, y: 10, name: 'Volcano Hiker', role: 'trainer_m', lines: ['Grimlets lurk in the lava rocks!', 'Battle me!'],
       trainer: { party: [{ creatureId: 'grimlet', level: 20 }, { creatureId: 'rockord', level: 19 }], reward: 550 } },
+    { id: 'lava_ranger', x: 4, y: 8, name: 'Lava Ranger Cole', role: 'trainer_m', lines: ['Coalembs evolve into living furnaces!', 'Feel the heat!'],
+      trainer: { party: [{ creatureId: 'coalemb', level: 21 }, { creatureId: 'embershell', level: 23 }], reward: 620 } },
     { id: 'sign9', x: 12, y: 16, name: 'Sign', role: 'sign', lines: ['Volcanic Path', '↑ Crystal Cave  |  ↓ Ember City'] },
   ],
   tiles: t([

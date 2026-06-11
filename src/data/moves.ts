@@ -51,6 +51,11 @@ export const MOVES: Record<string, MoveDef> = {
   reef_surge: { id: 'reef_surge', name: 'Reef Surge', type: 'tide', power: 75, accuracy: 95, pp: 12, category: 'special' },
   shadow_dust: { id: 'shadow_dust', name: 'Shadow Dust', type: 'shadow', power: 55, accuracy: 100, pp: 20, category: 'special', effect: 'sleep', effectChance: 15 },
   volt_ram: { id: 'volt_ram', name: 'Volt Ram', type: 'volt', power: 75, accuracy: 90, pp: 12, category: 'physical', effect: 'paralyze', effectChance: 20 },
+  magma_crush: { id: 'magma_crush', name: 'Magma Crush', type: 'flame', power: 80, accuracy: 90, pp: 10, category: 'physical', effect: 'burn', effectChance: 15 },
+  murk_fang: { id: 'murk_fang', name: 'Murk Fang', type: 'shadow', power: 65, accuracy: 95, pp: 15, category: 'physical', effect: 'sleep', effectChance: 12 },
+  frost_shatter: { id: 'frost_shatter', name: 'Frost Shatter', type: 'ice', power: 70, accuracy: 100, pp: 15, category: 'special', effect: 'sleep', effectChance: 10 },
+  psy_burst: { id: 'psy_burst', name: 'Psy Burst', type: 'psychic', power: 75, accuracy: 95, pp: 12, category: 'special' },
+  gale_dash: { id: 'gale_dash', name: 'Gale Dash', type: 'volt', power: 70, accuracy: 100, pp: 15, category: 'special', effect: 'paralyze', effectChance: 10 },
 };
 
 export function getMove(id: string): MoveDef {

@@ -64,7 +64,7 @@ export class OverworldScene extends Phaser.Scene {
     this.nightOverlay = this.add.graphics().setDepth(840).setScrollFactor(0);
     pinToScreen(this.nightOverlay, 840);
 
-    if (isOutdoorMap(this.map.id)) buildSkyLayer(this);
+    if (isOutdoorMap(this.map.id)) buildSkyLayer(this, this.map.id);
     buildCityAtmosphere(this, this.map.id);
     if (this.map.id === 'heal_center') buildHealInterior(this);
 

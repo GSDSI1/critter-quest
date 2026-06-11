@@ -402,6 +402,46 @@ export const CREATURES: Record<string, CreatureDef> = {
     description: 'Horns channel lightning when it charges across plains.',
     ability: 'static', habitat: 'Route 5', height: 1.5, weight: 88,
   },
+  embershell: {
+    id: 'embershell', name: 'Embershell', types: ['flame', 'stone'], dexNumber: 51,
+    baseStats: { hp: 88, atk: 72, def: 95, spa: 88, spd: 78, spe: 38 },
+    moves: ['magma_crush', 'coalsurge', 'boulder', 'blaze'],
+    catchRate: 18, expYield: 185, color: 0x78716c, shape: 'blob',
+    description: 'Molten rock hardens into a shell that glows at the seams.',
+    ability: 'flash_fire', habitat: 'Volcanic Path', height: 1.1, weight: 120,
+  },
+  murkfox: {
+    id: 'murkfox', name: 'Murkfox', types: ['shadow'], dexNumber: 52,
+    baseStats: { hp: 55, atk: 68, def: 48, spa: 52, spd: 55, spe: 88 },
+    moves: ['murk_fang', 'shadowclaw', 'leer', 'tackle'],
+    catchRate: 32, expYield: 118, color: 0x3f3f46, shape: 'quadruped',
+    description: 'Slips through underbrush leaving only a whiff of night air.',
+    ability: 'shadow_tag', habitat: 'Forest', height: 0.8, weight: 18,
+  },
+  frostnip: {
+    id: 'frostnip', name: 'Frostnip', types: ['ice'], dexNumber: 53,
+    baseStats: { hp: 46, atk: 42, def: 44, spa: 62, spd: 58, spe: 64 },
+    moves: ['frost_shatter', 'frostbite', 'tackle', 'growl'],
+    catchRate: 38, expYield: 72, color: 0xe0f2fe, shape: 'blob',
+    description: 'Icicle whiskers melt into dew at the first spring thaw.',
+    ability: 'snow_cloak', habitat: 'Route 4', height: 0.35, weight: 6,
+  },
+  psychora: {
+    id: 'psychora', name: 'Psychora', types: ['psychic'], dexNumber: 54,
+    baseStats: { hp: 58, atk: 40, def: 52, spa: 92, spd: 88, spe: 70 },
+    moves: ['psy_burst', 'psybeam', 'calm_mind', 'tackle'],
+    catchRate: 24, expYield: 152, color: 0xa855f7, shape: 'humanoid',
+    description: 'Third eye opens only when it senses a worthy opponent.',
+    ability: 'synchronize', habitat: 'Mindspire', height: 1.0, weight: 22,
+  },
+  galesprite: {
+    id: 'galesprite', name: 'Galesprite', types: ['volt', 'psychic'], dexNumber: 55,
+    baseStats: { hp: 62, atk: 55, def: 50, spa: 85, spd: 72, spe: 98 },
+    moves: ['gale_dash', 'psybeam', 'spark', 'calm_mind'],
+    catchRate: 16, expYield: 178, color: 0x38bdf8, shape: 'avian',
+    description: 'Rides headwinds while broadcasting telepathic chirps.',
+    ability: 'static', habitat: 'Victory Road', height: 0.7, weight: 10,
+  },
 };
 
 export const STARTERS = ['emberpup', 'aqualet', 'leafkit'] as const;

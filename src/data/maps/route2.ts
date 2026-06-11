@@ -11,8 +11,10 @@ export const route2: GameMap = {
   npcs: [
     { id: 'gatekeeper', x: 12, y: 5, name: 'Guard', lines: ['Mossgrove City ahead!'],
       gate: { requiresFlag: 'defeated_ranger', blockLines: ['Halt! Defeat Ranger Mia in the forest first.', 'She\'ll vouch for new trainers.'] } },
-    { id: 'youngster', x: 8, y: 12, name: 'Joey', lines: ['My Pebblite is the strongest!', 'Fight me!'],
+    { id: 'youngster', x: 8, y: 12, name: 'Joey', role: 'trainer_m', lines: ['My Pebblite is the strongest!', 'Fight me!'],
       trainer: { party: [{ creatureId: 'pebblite', level: 11 }, { creatureId: 'rockord', level: 12 }], reward: 280 } },
+    { id: 'ranger', x: 16, y: 8, name: 'Ranger Jess', role: 'trainer_f', lines: ['Murkfoxes dart through the brush here.', 'Catch me if you can!'],
+      trainer: { party: [{ creatureId: 'murkfox', level: 12 }, { creatureId: 'thornling', level: 11 }], reward: 360 } },
     { id: 'sign4', x: 12, y: 15, name: 'Sign', lines: ['Route 2', '↑ Mossgrove City  |  ← Verdant Forest'] },
   ],
   tiles: t([
