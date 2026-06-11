@@ -3,6 +3,7 @@ import Phaser from 'phaser';
 import { COLORS, GAME_WIDTH } from '../data/types';
 import { getBadge } from '../data/badges';
 import { GameState } from '../systems/stats';
+import { totalSpecies } from '../data/creatures';
 import { trySave } from '../utils/saveFeedback';
 import { buildScreenOverlay, buildMenuPanel } from '../ui/sceneBackdrops';
 import { Input } from '../systems/input';
@@ -42,7 +43,7 @@ export class PauseMenuScene extends Phaser.Scene {
       fontFamily: FONT, fontSize: '11px', color: '#8899aa',
     }).setOrigin(0.5);
 
-    this.add.text(GAME_WIDTH / 2, 164, `Maps: ${GameState.player.visitedMaps.length}  Signs: ${GameState.player.signsRead}`, {
+    this.add.text(GAME_WIDTH / 2, 164, `Dex: ${GameState.player.dexCaught.length}/${totalSpecies()}  Maps: ${GameState.player.visitedMaps.length}  Signs: ${GameState.player.signsRead}`, {
       fontFamily: FONT, fontSize: '9px', color: '#667788',
     }).setOrigin(0.5);
 

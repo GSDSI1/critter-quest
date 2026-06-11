@@ -37,6 +37,7 @@ Last updated: 2026-06-09 (graphics sprint). Source: `GAMEPLAN.md`.
 | **Sprint** | Walk pathfinding (BFS), 3 new maps, fishing/bug-catch/contest minigames, fun layer | ✓ |
 | **Sprint+** | visitedMaps + region fog, map drag-retarget, grove dual gate, species 71–75, minigame e2e | ✓ |
 | **Content** | Species 76–80, evo lines (piercrab/brinecrown, nightmoth/moonmoth), night bug-catch, chest variety | ✓ |
+| **Content** | Species 81–87, evo lines (shroomcap/fungloom, sandcrab/bouldercrust, frostwisp/glaciwhisp), dex milestones | ✓ |
 
 ## Optional polish (future)
 

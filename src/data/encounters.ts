@@ -24,6 +24,7 @@ export const ENCOUNTER_TABLES: Record<string, EncounterEntry[]> = {
   forest: [
     { id: 'mossling', minLevel: 5, maxLevel: 8, weight: 14 },
     { id: 'shroomcap', minLevel: 6, maxLevel: 10, weight: 8 },
+    { id: 'fungloom', minLevel: 12, maxLevel: 16, weight: 4 },
     { id: 'shadeling', minLevel: 6, maxLevel: 10, weight: 14 },
     { id: 'murkfox', minLevel: 7, maxLevel: 11, weight: 12 },
     { id: 'thornbud', minLevel: 6, maxLevel: 10, weight: 10 },
@@ -79,6 +80,7 @@ export const ENCOUNTER_TABLES: Record<string, EncounterEntry[]> = {
     { id: 'flamewyrm', minLevel: 16, maxLevel: 20, weight: 12 },
     { id: 'infernox', minLevel: 20, maxLevel: 26, weight: 3 },
     { id: 'rockord', minLevel: 16, maxLevel: 20, weight: 10 },
+    { id: 'embermite', minLevel: 15, maxLevel: 19, weight: 10 },
   ],
   route4: [
     { id: 'frostkit', minLevel: 18, maxLevel: 22, weight: 20 },
@@ -99,6 +101,7 @@ export const ENCOUNTER_TABLES: Record<string, EncounterEntry[]> = {
     { id: 'arctodon', minLevel: 26, maxLevel: 30, weight: 5 },
     { id: 'rockord', minLevel: 22, maxLevel: 26, weight: 10 },
     { id: 'frostwisp', minLevel: 23, maxLevel: 27, weight: 8 },
+    { id: 'glaciwhisp', minLevel: 25, maxLevel: 29, weight: 4 },
   ],
   route5: [
     { id: 'mindling', minLevel: 26, maxLevel: 30, weight: 18 },
@@ -110,6 +113,7 @@ export const ENCOUNTER_TABLES: Record<string, EncounterEntry[]> = {
     { id: 'cerebrain', minLevel: 28, maxLevel: 32, weight: 8 },
     { id: 'psyknight', minLevel: 28, maxLevel: 32, weight: 6 },
     { id: 'somnara', minLevel: 30, maxLevel: 34, weight: 4 },
+    { id: 'psychoglow', minLevel: 27, maxLevel: 31, weight: 10 },
   ],
   route1_night: [
     { id: 'shadeling', minLevel: 3, maxLevel: 6, weight: 20 },
@@ -158,6 +162,7 @@ export const ENCOUNTER_TABLES: Record<string, EncounterEntry[]> = {
     { id: 'brinepup', minLevel: 9, maxLevel: 15, weight: 20 },
     { id: 'tidewisp', minLevel: 11, maxLevel: 17, weight: 14 },
     { id: 'tidefin', minLevel: 12, maxLevel: 18, weight: 10 },
+    { id: 'tidepod', minLevel: 8, maxLevel: 12, weight: 14 },
     { id: 'piercrab', minLevel: 10, maxLevel: 14, weight: 8 },
     { id: 'brinecrown', minLevel: 14, maxLevel: 18, weight: 4 },
     { id: 'sandcrab', minLevel: 11, maxLevel: 15, weight: 10 },
@@ -203,6 +208,7 @@ export const ENCOUNTER_TABLES: Record<string, EncounterEntry[]> = {
     { id: 'infernox', minLevel: 36, maxLevel: 42, weight: 8 },
     { id: 'arctodon', minLevel: 35, maxLevel: 41, weight: 8 },
     { id: 'wraithling', minLevel: 36, maxLevel: 42, weight: 6 },
+    { id: 'abysswisp', minLevel: 38, maxLevel: 42, weight: 3 },
   ],
 };
 

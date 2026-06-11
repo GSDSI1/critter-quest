@@ -40,6 +40,9 @@ export const EVOLUTIONS: EvolutionDef[] = [
   { from: 'piercrab', to: 'brinecrown', level: 26 },
   { from: 'nightmoth', to: 'moonmoth', level: 22 },
   { from: 'kelpling', to: 'gleamfin', level: 14 },
+  { from: 'shroomcap', to: 'fungloom', level: 18 },
+  { from: 'sandcrab', to: 'bouldercrust', level: 24 },
+  { from: 'frostwisp', to: 'glaciwhisp', level: 20 },
 ];
 
 export function getEvolution(speciesId: string, level: number): string | null {

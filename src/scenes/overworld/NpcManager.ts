@@ -25,6 +25,7 @@ import { isNight } from '../../systems/dayNight';
 import { wipeRestartScene } from '../../ui/transitions';
 import { addItem } from '../../data/items';
 import { playDayIndex } from '../../ui/minigameShell';
+import { pendingDexMilestone, claimDexMilestone } from '../../systems/dexMilestones';
 
 type Critter = ReturnType<typeof createCritter>;
 
@@ -458,6 +459,16 @@ export class NpcManager {
       }
       this.dialog.show(lines, () => { this.callbacks.setInputLocked(false); });
       return;
+    }
+
+    if (npc.id === 'prof') {
+      const milestone = pendingDexMilestone(GameState.player);
+      if (milestone) {
+        claimDexMilestone(GameState.player, milestone);
+        trySave(this.scene);
+        this.dialog.show(milestone.lines, () => { this.callbacks.setInputLocked(false); });
+        return;
+      }
     }
 
     if (npc.id === 'prof' && GameState.player.storyFlags.contest_winner) {

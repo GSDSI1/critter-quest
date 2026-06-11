@@ -307,6 +307,34 @@ export const LEARNSETS: Record<string, LearnEntry[]> = {
     { level: 1, move: 'shadowclaw' }, { level: 1, move: 'psybeam' },
     { level: 20, move: 'darkpulse' }, { level: 24, move: 'hypnosis' },
   ],
+  fungloom: [
+    { level: 1, move: 'thorn_lash' }, { level: 1, move: 'rose_strike' },
+    { level: 22, move: 'sleep_powder' }, { level: 26, move: 'photosynthesis' },
+  ],
+  embermite: [
+    { level: 1, move: 'ember' }, { level: 1, move: 'coalsurge' },
+    { level: 12, move: 'scorch_claw' }, { level: 16, move: 'blaze' },
+  ],
+  tidepod: [
+    { level: 1, move: 'splash' }, { level: 1, move: 'brine_splash' },
+    { level: 10, move: 'tidal' }, { level: 14, move: 'tackle' },
+  ],
+  psychoglow: [
+    { level: 1, move: 'psybeam' }, { level: 1, move: 'calm_mind' },
+    { level: 14, move: 'mindblast' }, { level: 18, move: 'hypnosis' },
+  ],
+  abysswisp: [
+    { level: 1, move: 'darkpulse' }, { level: 1, move: 'mindblast' },
+    { level: 24, move: 'shadow_dust' }, { level: 28, move: 'hypnosis' },
+  ],
+  bouldercrust: [
+    { level: 1, move: 'boulder' }, { level: 1, move: 'brine_splash' },
+    { level: 26, move: 'earthquake' }, { level: 30, move: 'tidal_maul' },
+  ],
+  glaciwhisp: [
+    { level: 1, move: 'icebeam' }, { level: 1, move: 'mindblast' },
+    { level: 22, move: 'frostbite' }, { level: 26, move: 'calm_mind' },
+  ],
 };
 
 export function movesKnownAtLevel(speciesId: string, level: number): string[] {
