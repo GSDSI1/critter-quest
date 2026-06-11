@@ -15,6 +15,6 @@ export const lab: GameMap = {
   ],
   tiles: t([
     'WWWWWWWWW', 'WFFFFFFFW', 'WFFFFFFFW', 'WFFFFFFFW',
-    'WFFFFFFFW', 'WFFFFFFFW', 'WFFFFFFFW', 'WFFFDFFFW', 'WWWWWWWWW',
+    'WFFFFFFFW', 'WFFFFFFFW', 'WFFFFFFFW', 'WFFFDFFFW', 'WWWWDWWWW',
   ]),
 };

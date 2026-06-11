@@ -30,6 +30,6 @@ export const contest_hall: GameMap = {
     'W............W',
     'W............W',
     'W.....D......W',
-    'WWWWWWWWWWWWWW',
+    'WWWWWWWDWWWWWW',
   ]),
 };

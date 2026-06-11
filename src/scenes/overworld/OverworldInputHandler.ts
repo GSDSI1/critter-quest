@@ -37,11 +37,34 @@ export class OverworldInputHandler {
   private pointerHold: 'move' | 'walk' | null = null;
   private pointerHoldDir = { dx: 0, dy: 0 };
   private pointerStepCooldown = 0;
+  private boundScene?: Phaser.Scene;
+  private onPointerDown?: (pointer: Phaser.Input.Pointer) => void;
+  private onPointerUp?: () => void;
+  private onPointerMove?: (pointer: Phaser.Input.Pointer) => void;
+  private ctx?: OverworldInputContext;
+
+  unbind(scene: Phaser.Scene): void {
+    if (this.boundScene !== scene) return;
+    if (this.onPointerDown) scene.input.off('pointerdown', this.onPointerDown);
+    if (this.onPointerUp) scene.input.off('pointerup', this.onPointerUp);
+    if (this.onPointerMove) scene.input.off('pointermove', this.onPointerMove);
+    this.pointerHold = null;
+    this.pointerStepCooldown = 0;
+    this.onPointerDown = undefined;
+    this.onPointerUp = undefined;
+    this.onPointerMove = undefined;
+    this.boundScene = undefined;
+    this.ctx = undefined;
+  }
 
   bind(ctx: OverworldInputContext): void {
+    this.unbind(ctx.scene);
+    this.ctx = ctx;
+    this.boundScene = ctx.scene;
     Input.bind(ctx.scene);
+
     const { scene } = ctx;
-    scene.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+    this.onPointerDown = (pointer: Phaser.Input.Pointer) => {
       markTouchPreferred();
       focusGameCanvas();
       if (ctx.dialog.isShowing()) {
@@ -53,17 +76,21 @@ export class OverworldInputHandler {
         return;
       }
       this.handlePointerDown(ctx, pointer);
-    });
-    scene.input.on('pointerup', () => {
+    };
+    this.onPointerUp = () => {
       this.pointerHold = null;
       this.pointerStepCooldown = 0;
-    });
-    scene.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+    };
+    this.onPointerMove = (pointer: Phaser.Input.Pointer) => {
       if (this.pointerHold !== 'walk' || !pointer.isDown) return;
       if (ctx.dialog.isShowing() || ctx.isInputLocked() || ctx.isPaused()) return;
       const action = resolveOverworldPointer(ctx.scene, pointer);
       if (action?.type === 'walk') ctx.walk.setDestination(action.tx, action.ty);
-    });
+    };
+
+    scene.input.on('pointerdown', this.onPointerDown);
+    scene.input.on('pointerup', this.onPointerUp);
+    scene.input.on('pointermove', this.onPointerMove);
     scene.events.on('wake', () => focusGameCanvas());
     scene.time.delayedCall(100, () => focusGameCanvas());
   }

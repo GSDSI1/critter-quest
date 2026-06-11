@@ -104,6 +104,11 @@ export class OverworldScene extends Phaser.Scene {
     this.touchPad.setVisible(shouldShowOverworldTouchPad());
     this.hud.setTouchHints(true);
     this.hud.showMoveHint(true);
+    this.events.once('shutdown', () => {
+      this.inputHandler.unbind(this);
+      this.touchPad?.destroy();
+      this.walk?.clear();
+    });
     this.inputHandler.bind(this.inputCtx());
 
     if (data.showIntro && !GameState.player.storyFlags.saw_controls) {
@@ -220,7 +225,9 @@ export class OverworldScene extends Phaser.Scene {
 
   private skipIntro(): void {
     this.introActive = false;
+    this.inputLocked = false;
     this.dialog.skip();
+    this.syncTouchPadModal();
   }
 
   private syncTouchPadModal(): void {

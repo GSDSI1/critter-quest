@@ -23,6 +23,6 @@ export const fishing_pier: GameMap = {
     'W....~~~...W',
     'W..........W',
     'W....D.....W',
-    'WWWWWWWWWWWW',
+    'WWWWWWDWWWWW',
   ]),
 };

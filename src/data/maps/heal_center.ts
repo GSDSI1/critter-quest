@@ -12,6 +12,6 @@ export const heal_center: GameMap = {
   ],
   tiles: t([
     'WWWWWWWWW', 'WFFFFFFFW', 'WFFFFFFFW', 'WFFHHFFFW',
-    'WFFFFFFFW', 'WFFFFFFFW', 'WFFFFFFFW', 'WFFFDFFFW', 'WWWWWWWWW',
+    'WFFFFFFFW', 'WFFFFFFFW', 'WFFFFFFFW', 'WFFFDFFFW', 'WWWWDWWWW',
   ]),
 };

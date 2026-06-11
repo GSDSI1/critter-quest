@@ -11,6 +11,6 @@ export const mart: GameMap = {
   ],
   tiles: t([
     'WWWWWWWWW', 'WFFFFFFFW', 'WFFFFFFFW', 'WFFMMFFFW',
-    'WFFFFFFFW', 'WFFFFFFFW', 'WFFFFFFFW', 'WFFFDFFFW', 'WWWWWWWWW',
+    'WFFFFFFFW', 'WFFFFFFFW', 'WFFFFFFFW', 'WFFFDFFFW', 'WWWWDWWWW',
   ]),
 };
