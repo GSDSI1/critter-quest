@@ -602,6 +602,46 @@ export const CREATURES: Record<string, CreatureDef> = {
     description: 'Projects illusions of itself to confuse predators.',
     ability: 'shadow_tag', habitat: 'Secret Grove', height: 0.9, weight: 14,
   },
+  shroomcap: {
+    id: 'shroomcap', name: 'Shroomcap', types: ['leaf'], dexNumber: 76,
+    baseStats: { hp: 50, atk: 42, def: 55, spa: 48, spd: 52, spe: 35 },
+    moves: ['vine', 'sleep_powder', 'thorn_lash', 'photosynthesis'],
+    catchRate: 40, expYield: 72, color: 0x84cc16, shape: 'blob',
+    description: 'Sprouts on damp forest floors after rain.',
+    ability: 'overgrow', habitat: 'Forest', height: 0.4, weight: 5,
+  },
+  buzzwing: {
+    id: 'buzzwing', name: 'Buzzwing', types: ['volt'], dexNumber: 77,
+    baseStats: { hp: 48, atk: 55, def: 44, spa: 62, spd: 48, spe: 78 },
+    moves: ['spark', 'tackle', 'thunderbolt', 'thunderwave'],
+    catchRate: 38, expYield: 80, color: 0xfacc15, shape: 'avian',
+    description: 'Wings crackle with static when it takes flight.',
+    ability: 'static', habitat: 'Route 2', height: 0.5, weight: 6,
+  },
+  sandcrab: {
+    id: 'sandcrab', name: 'Sandcrab', types: ['stone', 'tide'], dexNumber: 78,
+    baseStats: { hp: 60, atk: 70, def: 75, spa: 40, spd: 45, spe: 42 },
+    moves: ['splash', 'boulder', 'brine_splash', 'tackle'],
+    catchRate: 32, expYield: 95, color: 0xd97706, shape: 'quadruped',
+    description: 'Burrows into beach sand between tides.',
+    ability: 'sturdy', habitat: 'Route 3', height: 0.6, weight: 18,
+  },
+  frostwisp: {
+    id: 'frostwisp', name: 'Frostwisp', types: ['ice', 'psychic'], dexNumber: 79,
+    baseStats: { hp: 52, atk: 40, def: 48, spa: 78, spd: 65, spe: 70 },
+    moves: ['iceshard', 'psybeam', 'frostbite', 'mindblast'],
+    catchRate: 26, expYield: 125, color: 0xbae6fd, shape: 'blob',
+    description: 'A drifting orb of cold psychic energy.',
+    ability: 'snow_cloak', habitat: 'Glacier Pass', height: 0.5, weight: 2,
+  },
+  wraithling: {
+    id: 'wraithling', name: 'Wraithling', types: ['shadow', 'psychic'], dexNumber: 80,
+    baseStats: { hp: 58, atk: 52, def: 50, spa: 88, spd: 78, spe: 82 },
+    moves: ['shadowclaw', 'psybeam', 'darkpulse', 'hypnosis'],
+    catchRate: 14, expYield: 175, color: 0x4c1d95, shape: 'humanoid',
+    description: 'Phases through walls in Victory Road.',
+    ability: 'shadow_tag', habitat: 'Victory Road', height: 0.8, weight: 0.1,
+  },
 };
 
 export const STARTERS = ['emberpup', 'aqualet', 'leafkit'] as const;

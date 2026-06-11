@@ -10,7 +10,7 @@ export function nightTintAlpha(playTimeSec: number): number {
   return Math.max(0, (0.55 - day) * 0.35);
 }
 
-export const OUTDOOR_MAP_PREFIXES = ['town', 'route', 'forest', 'mossgrove', 'ember', 'glacier', 'frostvale', 'mindspire', 'volcanic', 'victory_road'];
+export const OUTDOOR_MAP_PREFIXES = ['town', 'route', 'forest', 'mossgrove', 'ember', 'glacier', 'frostvale', 'mindspire', 'volcanic', 'victory_road', 'secret_grove'];
 
 export function isOutdoorMap(mapId: string): boolean {
   return OUTDOOR_MAP_PREFIXES.some(p => mapId === p || mapId.startsWith(p));

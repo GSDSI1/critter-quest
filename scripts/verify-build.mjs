@@ -49,8 +49,8 @@ ok(`${critterPngs.length} critter PNGs on disk`);
 // ── Data catalog ──
 const creatures = read('src/data/creatures.ts');
 const speciesIds = [...creatures.matchAll(/^\s{2}[a-z]+: \{/gm)];
-if (speciesIds.length === 75) ok('75 species in creatures.ts');
-else fail(`Expected 75 species, found ${speciesIds.length}`);
+if (speciesIds.length === 80) ok('80 species in creatures.ts');
+else fail(`Expected 80 species, found ${speciesIds.length}`);
 
 const movesSrc = read('src/data/moves.ts');
 const moveCount = (movesSrc.match(/^\s{2}[a-z][a-z0-9_]*: \{ id:/gm) ?? []).length;

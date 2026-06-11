@@ -36,6 +36,7 @@ Last updated: 2026-06-09 (graphics sprint). Source: `GAMEPLAN.md`.
 | **Opt** | 70 species + volt/ash evo lines + tap-move + forest fireflies + batch-5 art | ✓ |
 | **Sprint** | Walk pathfinding (BFS), 3 new maps, fishing/bug-catch/contest minigames, fun layer | ✓ |
 | **Sprint+** | visitedMaps + region fog, map drag-retarget, grove dual gate, species 71–75, minigame e2e | ✓ |
+| **Content** | Species 76–80, evo lines (piercrab/brinecrown, nightmoth/moonmoth), night bug-catch, chest variety | ✓ |
 
 ## Optional polish (future)
 

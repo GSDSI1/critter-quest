@@ -21,6 +21,7 @@ import {
   startEliteGauntlet, findGauntletNpc, buildTrainerBattleData, rematchLevelBonus,
 } from '../../systems/eliteGauntlet';
 import { registerHealVisit } from '../../systems/healTravel';
+import { isNight } from '../../systems/dayNight';
 import { wipeRestartScene } from '../../ui/transitions';
 import { addItem } from '../../data/items';
 import { playDayIndex } from '../../ui/minigameShell';
@@ -358,6 +359,12 @@ export class NpcManager {
         });
         return;
       }
+      if (!isNight(GameState.player.playTime)) {
+        this.dialog.show(['Fireflies only come out at night!', 'Come back when the stars are out.'], () => {
+          this.callbacks.setInputLocked(false);
+        });
+        return;
+      }
       const intro = npc.lines.filter(l => l !== 'BUGCATCH');
       this.dialog.show(intro, () => {
         this.callbacks.setInputLocked(false);
@@ -385,10 +392,9 @@ export class NpcManager {
         return;
       }
       GameState.player.storyFlags[chestId] = true;
-      GameState.player.money += 200;
-      addItem(GameState.player.items, 'potion', 2);
+      const reward = this.chestReward(chestId);
       trySave(this.scene);
-      this.dialog.show(['You found $200 and 2 Potions!'], () => { this.callbacks.setInputLocked(false); });
+      this.dialog.show(reward.lines, () => { this.callbacks.setInputLocked(false); });
       return;
     }
 
@@ -451,6 +457,14 @@ export class NpcManager {
         trySave(this.scene);
       }
       this.dialog.show(lines, () => { this.callbacks.setInputLocked(false); });
+      return;
+    }
+
+    if (npc.id === 'prof' && GameState.player.storyFlags.contest_winner) {
+      this.dialog.show([
+        `${GameState.player.name}! I heard you won the Critter Contest!`,
+        'The whole region is proud of you.',
+      ], () => { this.callbacks.setInputLocked(false); });
       return;
     }
 
@@ -520,6 +534,45 @@ export class NpcManager {
       return ['You beat Kai!', 'Explore Route 1 and the forest.', 'Visit the Mart for supplies!'];
     }
     return ['Be careful out there!', 'Visit the Mart for supplies, and the Healing Center to rest.'];
+  }
+
+  private chestReward(chestId: string): { lines: string[] } {
+    const table: Record<string, () => string[]> = {
+      chest_town: () => {
+        GameState.player.money += 100;
+        addItem(GameState.player.items, 'potion', 1);
+        return ['You found $100 and a Potion!'];
+      },
+      chest_route1: () => {
+        GameState.player.money += 150;
+        addItem(GameState.player.items, 'oran_berry', 2);
+        return ['You found $150 and 2 Oran Berries!'];
+      },
+      chest_moss: () => {
+        addItem(GameState.player.items, 'great_orb', 1);
+        return ['You found a Great Orb!'];
+      },
+      chest_cave: () => {
+        GameState.player.money += 300;
+        addItem(GameState.player.items, 'super_potion', 2);
+        return ['You found $300 and 2 Super Potions!'];
+      },
+      grove_chest: () => {
+        GameState.player.money += 500;
+        if (!GameState.player.storyFlags.contest_winner) {
+          addItem(GameState.player.items, 'hyper_potion', 2);
+          return ['You found $500 and 2 Hyper Potions!'];
+        }
+        addItem(GameState.player.items, 'ultra_orb', 1);
+        return ['You found $500 and an Ultra Orb!'];
+      },
+    };
+    const fn = table[chestId] ?? (() => {
+      GameState.player.money += 200;
+      addItem(GameState.player.items, 'potion', 2);
+      return ['You found $200 and 2 Potions!'];
+    });
+    return { lines: fn() };
   }
 
   private gateOpen(npc: MapNpc): boolean {

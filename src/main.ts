@@ -74,6 +74,9 @@ declare global {
       giveBadge: (id: string) => void;
       requestWalk: (tx: number, ty: number) => void;
       openFishing: () => void;
+      openBugCatch: () => void;
+      openContest: () => void;
+      setNight: () => void;
     };
   }
 }
@@ -219,6 +222,22 @@ if (import.meta.env.DEV) {
       if (!ow) return;
       ow.scene.launch('Fishing', { returnMap: GameState.player.mapId });
       ow.scene.pause();
+    },
+    openBugCatch() {
+      const ow = game.scene.getScene('Overworld');
+      if (!ow) return;
+      ow.scene.launch('BugCatch');
+      ow.scene.pause();
+    },
+    openContest() {
+      const ow = game.scene.getScene('Overworld');
+      if (!ow) return;
+      ow.scene.launch('CritterContest');
+      ow.scene.pause();
+    },
+    setNight() {
+      GameState.player.playTime = 264;
+      saveGame();
     },
   };
 }

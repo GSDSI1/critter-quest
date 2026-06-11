@@ -22,7 +22,8 @@ export const ENCOUNTER_TABLES: Record<string, EncounterEntry[]> = {
     { id: 'aqualet', minLevel: 4, maxLevel: 6, weight: 5 },
   ],
   forest: [
-    { id: 'mossling', minLevel: 5, maxLevel: 8, weight: 16 },
+    { id: 'mossling', minLevel: 5, maxLevel: 8, weight: 14 },
+    { id: 'shroomcap', minLevel: 6, maxLevel: 10, weight: 8 },
     { id: 'shadeling', minLevel: 6, maxLevel: 10, weight: 14 },
     { id: 'murkfox', minLevel: 7, maxLevel: 11, weight: 12 },
     { id: 'thornbud', minLevel: 6, maxLevel: 10, weight: 10 },
@@ -97,6 +98,7 @@ export const ENCOUNTER_TABLES: Record<string, EncounterEntry[]> = {
     { id: 'chillbite', minLevel: 24, maxLevel: 28, weight: 12 },
     { id: 'arctodon', minLevel: 26, maxLevel: 30, weight: 5 },
     { id: 'rockord', minLevel: 22, maxLevel: 26, weight: 10 },
+    { id: 'frostwisp', minLevel: 23, maxLevel: 27, weight: 8 },
   ],
   route5: [
     { id: 'mindling', minLevel: 26, maxLevel: 30, weight: 18 },
@@ -127,6 +129,7 @@ export const ENCOUNTER_TABLES: Record<string, EncounterEntry[]> = {
     { id: 'thornbud', minLevel: 9, maxLevel: 13, weight: 12 },
     { id: 'sparkbit', minLevel: 9, maxLevel: 13, weight: 10 },
     { id: 'mistral', minLevel: 11, maxLevel: 15, weight: 8 },
+    { id: 'buzzwing', minLevel: 10, maxLevel: 14, weight: 10 },
   ],
   route4_night: [
     { id: 'aurorabit', minLevel: 18, maxLevel: 22, weight: 20 },
@@ -157,6 +160,7 @@ export const ENCOUNTER_TABLES: Record<string, EncounterEntry[]> = {
     { id: 'tidefin', minLevel: 12, maxLevel: 18, weight: 10 },
     { id: 'piercrab', minLevel: 10, maxLevel: 14, weight: 8 },
     { id: 'brinecrown', minLevel: 14, maxLevel: 18, weight: 4 },
+    { id: 'sandcrab', minLevel: 11, maxLevel: 15, weight: 10 },
   ],
   /** Night variants — ghost/psychic skew (see dayNight.isNight). */
   forest_night: [
@@ -198,6 +202,7 @@ export const ENCOUNTER_TABLES: Record<string, EncounterEntry[]> = {
     { id: 'shadespecter', minLevel: 34, maxLevel: 40, weight: 12 },
     { id: 'infernox', minLevel: 36, maxLevel: 42, weight: 8 },
     { id: 'arctodon', minLevel: 35, maxLevel: 41, weight: 8 },
+    { id: 'wraithling', minLevel: 36, maxLevel: 42, weight: 6 },
   ],
 };
 

@@ -42,7 +42,11 @@ export class PauseMenuScene extends Phaser.Scene {
       fontFamily: FONT, fontSize: '11px', color: '#8899aa',
     }).setOrigin(0.5);
 
-    this.add.text(GAME_WIDTH / 2, 168, `v${import.meta.env.VITE_APP_VERSION ?? '1.0.0'}`, {
+    this.add.text(GAME_WIDTH / 2, 164, `Maps: ${GameState.player.visitedMaps.length}  Signs: ${GameState.player.signsRead}`, {
+      fontFamily: FONT, fontSize: '9px', color: '#667788',
+    }).setOrigin(0.5);
+
+    this.add.text(GAME_WIDTH / 2, 176, `v${import.meta.env.VITE_APP_VERSION ?? '1.0.0'}`, {
       fontFamily: FONT, fontSize: '9px', color: '#556677',
     }).setOrigin(0.5);
 
