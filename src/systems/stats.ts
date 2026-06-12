@@ -7,6 +7,7 @@ import { randomNature, randomIvs, natureMult } from '../data/natures';
 import type { ElementType } from '../data/types';
 import type { StatusCondition } from './status';
 import { clearStatus } from './status';
+import { defaultRng, type Rng } from './rng';
 
 export interface BattleMove {
   id: string;
@@ -22,6 +23,8 @@ export interface CritterInstance {
   uid: string;
   speciesId: string;
   nickname?: string;
+  /** Rare golden variant (1/512 wild roll). */
+  shiny?: boolean;
   level: number;
   exp: number;
   currentHp: number;
@@ -115,7 +118,12 @@ export interface CreateCritterOpts {
   nature?: string;
   ability?: string;
   perfectIvs?: boolean;
+  /** Probability of rolling shiny (default SHINY_ODDS). Set 0 to disable. */
+  shinyChance?: number;
+  rng?: Rng;
 }
+
+export const SHINY_ODDS = 1 / 512;
 
 export function createCritter(
   speciesId: string,
@@ -128,11 +136,14 @@ export function createCritter(
   const nature = opts.nature ?? randomNature();
   const ability = opts.ability ?? def.ability ?? defaultAbilityForTypes(def.types);
   const moveIds = movesKnownAtLevel(speciesId, level);
+  const rng = opts.rng ?? defaultRng;
+  const shiny = rng.chance(opts.shinyChance ?? SHINY_ODDS);
 
   const c: CritterInstance = {
     uid: nextUid(),
     speciesId,
     nickname,
+    shiny: shiny || undefined,
     level,
     exp: expForLevel(level),
     currentHp: 0,

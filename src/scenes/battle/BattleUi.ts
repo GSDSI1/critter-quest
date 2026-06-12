@@ -103,6 +103,10 @@ export class BattleUi {
 
     this.scene.add.image(180, 340, 'battle_platform').setAlpha(0.9);
     this.playerSprite = addCreatureImage(this.scene, 160, 290, this.host.playerMon.speciesId, false, 'back').setScale(2).setFlipX(true);
+    if (this.host.playerMon.shiny) {
+      this.playerSprite.setTint(0xffd966);
+      this.playerSprite.setData('baseTint', 0xffd966);
+    }
     this.playerIdle = startCritterIdle(this.scene, this.playerSprite, this.host.playerMon.speciesId, 290, 'back');
 
     const pBox = this.scene.add.graphics();
@@ -164,10 +168,19 @@ export class BattleUi {
   syncEnemyUi(animate = true): void {
     const def = getCreature(this.host.wild.speciesId);
     const status = statusLabel(this.host.wild.status);
-    this.enemyNameText.setText(truncateLabel(`${def.name} Lv.${this.host.wild.level}${status ? ` ${status}` : ''}`, 22));
+    const star = this.host.wild.shiny ? '★ ' : '';
+    this.enemyNameText.setText(truncateLabel(`${star}${def.name} Lv.${this.host.wild.level}${status ? ` ${status}` : ''}`, 22));
     this.enemyIdle?.stop();
     applyCreatureTexture(this.enemySprite, this.scene, this.host.wild.speciesId);
     this.enemySprite.setAlpha(1);
+    if (this.host.wild.shiny) {
+      this.enemySprite.setTint(0xffd966);
+      this.enemySprite.setData('baseTint', 0xffd966);
+      this.anims.playShinySparkle(this.enemySprite);
+    } else {
+      this.enemySprite.clearTint();
+      this.enemySprite.setData('baseTint', undefined);
+    }
     this.enemyIdle = startCritterIdle(this.scene, this.enemySprite, this.host.wild.speciesId, 130);
     this.animateHp(this.enemyHpBar, this.host.wild.currentHp, this.host.wild.maxHp, 356, 68, true);
     const old = this.scene.children.getByName('enemyTypes');

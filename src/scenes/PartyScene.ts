@@ -80,8 +80,8 @@ export class PartyScene extends Phaser.Scene {
         this.add.image(x + 80 + ti * 18, y + 42, `type_${t}`).setScale(0.6);
       });
 
-      this.add.text(x + 80, y + 12, displayName(c), {
-        fontFamily: FONT, fontSize: '14px', color: fainted ? '#666' : '#f0f0f0', fontStyle: 'bold',
+      this.add.text(x + 80, y + 12, `${c.shiny ? '★ ' : ''}${displayName(c)}`, {
+        fontFamily: FONT, fontSize: '14px', color: fainted ? '#666' : c.shiny ? '#f5c542' : '#f0f0f0', fontStyle: 'bold',
       });
       this.add.text(x + 80, y + 30, `Lv.${c.level}  ${getNature(c.nature).name}`, {
         fontFamily: FONT, fontSize: '10px', color: '#8899aa',

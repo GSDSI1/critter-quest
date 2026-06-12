@@ -304,6 +304,17 @@ describe('confusion and freeze moves', () => {
   });
 });
 
+describe('shiny roll', () => {
+  it('shinyChance 1 always rolls shiny', () => {
+    const c = createCritter('mossling', 5, undefined, { shinyChance: 1, rng: createSeededRng(1) });
+    expect(c.shiny).toBe(true);
+  });
+  it('shinyChance 0 never rolls shiny', () => {
+    const c = createCritter('mossling', 5, undefined, { shinyChance: 0, rng: createSeededRng(1) });
+    expect(c.shiny).toBeUndefined();
+  });
+});
+
 describe('pickAiSwitch', () => {
   it('switches to a super-effective bench mon when outmatched', () => {
     const current = createCritter('mossling', 20);

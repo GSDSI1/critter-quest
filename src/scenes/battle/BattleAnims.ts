@@ -109,13 +109,20 @@ export class BattleAnims {
     this.scene.cameras.main.flash(180, 255, 255, 255, false, undefined, 0.35);
   }
 
+  /** Reset to the sprite's persistent tint (e.g. shiny gold) or clear. */
+  private restoreBaseTint(sprite: Phaser.GameObjects.Image): void {
+    const base = sprite.getData('baseTint') as number | undefined;
+    if (base) sprite.setTint(base);
+    else sprite.clearTint();
+  }
+
   applyEffectivenessTint(
     sprite: Phaser.GameObjects.Image,
     effectiveness: number | undefined,
   ): void {
     if (!effectiveness || effectiveness === 1) return;
     sprite.setTint(effectiveness > 1 ? 0xff4444 : 0x888888);
-    this.scene.time.delayedCall(350, () => sprite.clearTint());
+    this.scene.time.delayedCall(350, () => this.restoreBaseTint(sprite));
   }
 
   animateMiss(sprite: Phaser.GameObjects.Image, onDone?: () => void): void {
@@ -164,14 +171,29 @@ export class BattleAnims {
       duration: 200,
       yoyo: true,
       ease: 'Quad.easeOut',
-      onComplete: () => sprite.clearTint(),
+      onComplete: () => this.restoreBaseTint(sprite),
     });
+  }
+
+  playShinySparkle(sprite: Phaser.GameObjects.Image): void {
+    const emitter = this.scene.add.particles(sprite.x, sprite.y - 10, this.particleKey, {
+      speed: { min: 30, max: 80 },
+      angle: { min: 0, max: 360 },
+      scale: { start: 0.5, end: 0 },
+      lifespan: 600,
+      tint: [0xffd700, 0xffffff, 0xffe97f],
+      quantity: 16,
+      emitting: false,
+      blendMode: 'ADD',
+    }).setDepth(210);
+    emitter.explode(16);
+    this.scene.time.delayedCall(700, () => emitter.destroy());
   }
 
   animateStatusInflict(sprite: Phaser.GameObjects.Image, moveType?: string): void {
     const color = ELEMENT_COLORS[moveType ?? 'shadow'] ?? 0xffffff;
     sprite.setTint(color);
-    this.scene.time.delayedCall(280, () => sprite.clearTint());
+    this.scene.time.delayedCall(280, () => this.restoreBaseTint(sprite));
   }
 
   fadeIn(sprite: Phaser.GameObjects.Image, duration = 400): void {
