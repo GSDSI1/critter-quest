@@ -16,6 +16,7 @@ const LAZY_SCENES: { key: string; load: () => Promise<Record<string, SceneCtor>>
   { key: 'PC', load: () => import('./PcScene').then(m => ({ PcScene: m.PcScene })) },
   { key: 'Critterdex', load: () => import('./CritterdexScene').then(m => ({ CritterdexScene: m.CritterdexScene })) },
   { key: 'PauseMenu', load: () => import('./PauseMenuScene').then(m => ({ PauseMenuScene: m.PauseMenuScene })) },
+  { key: 'QuestLog', load: () => import('./QuestLogScene').then(m => ({ QuestLogScene: m.QuestLogScene })) },
   { key: 'Options', load: () => import('./OptionsScene').then(m => ({ OptionsScene: m.OptionsScene })) },
   { key: 'FastTravel', load: () => import('./FastTravelScene').then(m => ({ FastTravelScene: m.FastTravelScene })) },
   { key: 'RegionMap', load: () => import('./RegionMapScene').then(m => ({ RegionMapScene: m.RegionMapScene })) },

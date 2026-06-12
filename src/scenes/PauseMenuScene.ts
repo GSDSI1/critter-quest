@@ -13,6 +13,7 @@ import { loadAudioSettings, saveAudioSettings } from '../systems/audioSettings';
 import { refreshMusicVolume } from '../utils/music';
 import { TouchMenuNav } from '../ui/touchMenuNav';
 import { formatMinigameBests } from '../systems/minigameScores';
+import { claimableQuests } from '../data/quests';
 
 export class PauseMenuScene extends Phaser.Scene {
   private selected = 0;
@@ -76,7 +77,8 @@ export class PauseMenuScene extends Phaser.Scene {
   }
 
   private buildOptions(): string[] {
-    const opts = ['Critterdex', 'Party', 'Region Map', 'Options', this.muted ? 'Unmute' : 'Mute'];
+    const questMark = claimableQuests(GameState.player).length > 0 ? ' !' : '';
+    const opts = ['Critterdex', 'Party', `Quests${questMark}`, 'Region Map', 'Options', this.muted ? 'Unmute' : 'Mute'];
     if (canFastTravel()) opts.push('Fly');
     opts.push('Save Game', 'Close');
     return opts;
@@ -119,6 +121,9 @@ export class PauseMenuScene extends Phaser.Scene {
     } else if (opt === 'Party') {
       this.scene.launch('Party', { fromPause: true });
       this.scene.pause();
+    } else if (opt.startsWith('Quests')) {
+      this.scene.launch('QuestLog');
+      this.scene.pause();
     } else if (opt === 'Region Map') {
       this.scene.launch('RegionMap');
       this.scene.pause();
@@ -132,7 +137,7 @@ export class PauseMenuScene extends Phaser.Scene {
       refreshMusicVolume();
       this.muted = settings.muted;
       this.options = this.buildOptions();
-      this.selected = 4;
+      this.selected = this.options.findIndex(o => o === 'Mute' || o === 'Unmute');
       this.renderOptions();
     } else if (opt === 'Fly') {
       this.scene.launch('FastTravel', { fromPause: true });
