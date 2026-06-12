@@ -13,6 +13,7 @@ import {
   contactAbilityEffect, absorbHeal,
 } from '../data/abilities';
 import { defaultRng, type Rng } from './rng';
+import { getBattleWeather, weatherDamageMult, weatherSpeedMult } from './weather';
 
 export interface BattleResult {
   damage?: number;
@@ -113,10 +114,11 @@ export function calcDamage(
   const stab = stabBonus(attacker, move.type);
   const abilityMult = abilityAttackMult(attacker.ability, move.type, hpRatio, attacker.vol?.flashFireActive);
   const heldMult = heldTypeBoost(attacker, move.type);
+  const weatherMult = weatherDamageMult(getBattleWeather(), move.type);
 
   const base = Math.floor(((2 * attacker.level / 5 + 2) * move.power * attack / defense) / 50 + 2);
   const variance = 0.85 + rng.next() * 0.15;
-  let damage = effectiveness <= 0 ? 0 : Math.max(1, Math.floor(base * effectiveness * stab * abilityMult * heldMult * critMult * variance));
+  let damage = effectiveness <= 0 ? 0 : Math.max(1, Math.floor(base * effectiveness * stab * abilityMult * heldMult * weatherMult * critMult * variance));
   if (defender.ability === 'thick_fat' && (move.type === 'flame' || move.type === 'ice') && damage > 0) {
     damage = Math.max(1, Math.floor(damage / 2));
   }
@@ -367,7 +369,7 @@ export function tryRun(playerSpe: number, enemySpe: number, blocked = false, rng
 }
 
 export function effectiveSpeed(c: CritterInstance): number {
-  return Math.floor(c.stats.spe * speedMultiplier(c));
+  return Math.floor(c.stats.spe * speedMultiplier(c) * weatherSpeedMult(getBattleWeather(), c.ability));
 }
 
 /** Returns which side moves first this turn ('player' | 'enemy').

@@ -27,6 +27,12 @@ import {
   isEliteGauntletActive, clearEliteGauntlet, nextGauntletTrainerId,
   findGauntletNpc, buildTrainerBattleData,
 } from '../systems/eliteGauntlet';
+import { getMap } from '../data/maps';
+import {
+  setBattleWeather, weatherLabel, weatherBanner, weatherTint,
+} from '../systems/weather';
+import { GAME_WIDTH, GAME_HEIGHT } from '../data/types';
+import { FONT } from '../ui/theme';
 
 export class BattleScene extends Phaser.Scene implements BattleUiHost, BattleFlowHost {
   enemyParty: CritterInstance[] = [];
@@ -117,7 +123,17 @@ export class BattleScene extends Phaser.Scene implements BattleUiHost, BattleFlo
     this.ui = new BattleUi(this, this, this.battleAnims);
     this.flow = new BattleFlow(this);
 
+    const weather = getMap(this.mapId)?.weather ?? null;
+    setBattleWeather(weather);
+    this.events.once('shutdown', () => setBattleWeather(null));
+
     buildBattleArena(this, this.mapId);
+    if (weather) {
+      this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, weatherTint(weather), 0.1).setDepth(4);
+      this.add.text(GAME_WIDTH / 2, 12, weatherBanner(weather), {
+        fontFamily: FONT, fontSize: '10px', color: '#f5c542', fontStyle: 'bold',
+      }).setOrigin(0.5, 0).setDepth(1100);
+    }
     this.ui.build();
     Input.bind(this);
     this.touchNav = new TouchMenuNav(this, {
@@ -142,6 +158,7 @@ export class BattleScene extends Phaser.Scene implements BattleUiHost, BattleFlo
     } else {
       this.ui.queueMessage(`A wild ${getCreature(this.wild.speciesId).name} appeared!`);
     }
+    if (weather) this.ui.queueMessage(weatherLabel(weather));
     this.ui.queueMessage(`Go, ${displayName(this.playerMon)}!`);
     const playerEnter = applyEnterAbility(this.playerMon, this.wild);
     if (playerEnter) this.ui.queueMessage(playerEnter);

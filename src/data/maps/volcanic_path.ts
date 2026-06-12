@@ -3,7 +3,7 @@ import { t } from './tiles';
 
 export const volcanic_path: GameMap = {
   id: 'volcanic_path', name: 'Volcanic Path', width: 24, height: 20,
-  spawn: { x: 12, y: 18 }, encounterRate: 0.26, encounterTable: 'volcanic_path',
+  spawn: { x: 12, y: 18 }, encounterRate: 0.26, encounterTable: 'volcanic_path', weather: 'sun',
   warps: [
     { x: 12, y: 19, toMap: 'ember_city', toX: 12, toY: 1 },
     { x: 12, y: 0, toMap: 'crystal_cave', toX: 12, toY: 18 },

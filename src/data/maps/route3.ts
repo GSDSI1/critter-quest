@@ -3,7 +3,7 @@ import { t } from './tiles';
 
 export const route3: GameMap = {
   id: 'route3', name: 'Route 3', width: 24, height: 22,
-  spawn: { x: 12, y: 18 }, encounterRate: 0.22, encounterTable: 'route3',
+  spawn: { x: 12, y: 18 }, encounterRate: 0.22, encounterTable: 'route3', weather: 'rain',
   warps: [
     { x: 12, y: 19, toMap: 'mossgrove', toX: 12, toY: 1 },
     { x: 12, y: 0, toMap: 'ember_city', toX: 12, toY: 17 },

@@ -24,6 +24,7 @@ import type { BattlePhase } from './BattleUi';
 import type { BattleUi } from './BattleUi';
 import type { BattleAnims } from './BattleAnims';
 import type { BattleResult } from '../../systems/battle';
+import { applyHailChip } from '../../systems/weather';
 
 export interface BattleFlowHost {
   readonly time: Phaser.Time.Clock;
@@ -235,7 +236,32 @@ export class BattleFlow {
       }
     }
 
-    if (playerBerry || enemyBerry || playerStatus || enemyStatus) {
+    const playerHail = applyHailChip(this.host.playerMon);
+    if (playerHail) {
+      this.host.ui.queueMessage(playerHail);
+      this.host.ui.refreshPlayerUi();
+      if (isFainted(this.host.playerMon)) {
+        this.host.phase = 'message';
+        this.host.showNextMessage();
+        this.host.time.delayedCall(800, () => this.host.onPlayerFainted());
+        return;
+      }
+    }
+    const enemyHail = applyHailChip(this.host.wild);
+    if (enemyHail) {
+      this.host.ui.queueMessage(enemyHail);
+      this.host.ui.animateEnemyHp();
+      if (isFainted(this.host.wild)) {
+        this.host.phase = 'message';
+        this.host.showNextMessage();
+        this.host.time.delayedCall(400, () => {
+          this.host.battleAnims.animateFaint(this.host.ui.enemySprite, () => this.onEnemyFainted());
+        });
+        return;
+      }
+    }
+
+    if (playerBerry || enemyBerry || playerStatus || enemyStatus || playerHail || enemyHail) {
       this.host.phase = 'message';
       this.host.showNextMessage();
       this.host.time.delayedCall(400, () => { this.host.phase = 'menu'; this.host.ui.showMenu(); });

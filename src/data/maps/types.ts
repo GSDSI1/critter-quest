@@ -36,4 +36,6 @@ export interface GameMap {
   encounterTable?: string;
   music?: string;
   mapTheme?: MapTheme;
+  /** Ambient weather active during battles on this map. */
+  weather?: 'rain' | 'sun' | 'hail';
 }
