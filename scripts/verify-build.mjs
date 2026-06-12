@@ -356,10 +356,8 @@ else fail('touchMenuNav.ts missing');
 if (battleScene.includes('TouchMenuNav')) ok('Battle touch menu nav');
 else fail('BattleScene missing touch nav');
 
-if (existsSync(join(root, 'scripts/critter-art/batch9.mjs'))) ok('batch9 hand art');
-else fail('batch9.mjs missing');
-if (existsSync(join(root, 'scripts/critter-art/batch10.mjs'))) ok('batch10 hand art');
-else fail('batch10.mjs missing');
+if (existsSync(join(root, 'scripts/critter-art/shapelib.mjs'))) ok('Shape-based hand art library');
+else fail('shapelib.mjs missing');
 if (existsSync(join(root, 'scripts/fetch-kenney-tileset.mjs'))) ok('Kenney fetch script');
 else fail('fetch-kenney-tileset.mjs missing');
 if (existsSync(join(root, 'CREDITS.md'))) ok('CREDITS.md');
