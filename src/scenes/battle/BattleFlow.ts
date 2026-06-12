@@ -86,7 +86,11 @@ export class BattleFlow {
     this.host.ui.moveContainer.setVisible(false);
     this.host.phase = 'fight';
     const enemyMove = pickAiMove(this.host.wild, this.host.playerMon);
-    const playerFirst = resolveTurnOrder(this.host.playerMon, this.host.wild) === 'player';
+    const playerMoveId = this.host.playerMon.moves[index]?.id;
+    const enemyMoveId = this.host.wild.moves[enemyMove]?.id;
+    const playerFirst = resolveTurnOrder(
+      this.host.playerMon, this.host.wild, undefined, playerMoveId, enemyMoveId,
+    ) === 'player';
 
     if (playerFirst) {
       this.runSide(true, index, () => {

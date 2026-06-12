@@ -163,6 +163,10 @@ export function executeMove(
   moveIndex: number,
   rng: Rng = defaultRng,
 ): BattleResult {
+  if (attacker.vol?.flinched) {
+    attacker.vol.flinched = false;
+    return { message: `${displayName(attacker)} flinched and couldn't move!`, cantMove: true };
+  }
   const actCheck = canAct(attacker, rng);
   if (!actCheck.ok) {
     if (actCheck.attackerFainted) {
@@ -227,7 +231,7 @@ export function executeMove(
   if (move.power === 0 && move.effect) {
     const statusMap: Record<string, StatusCondition> = {
       sleep: 'sleep', paralyze: 'paralyze', burn: 'burn', poison: 'poison',
-      thunderwave: 'paralyze', hypnosis: 'sleep',
+      thunderwave: 'paralyze', hypnosis: 'sleep', confusion: 'confusion', freeze: 'freeze',
     };
     const status = statusMap[move.effect];
     if (status) {
@@ -240,32 +244,72 @@ export function executeMove(
     attacker.vol.flashFireActive = false;
   }
 
-  const { damage, effectiveness, label, critical } = calcDamage(attacker, defender, battleMove.id, false, rng);
-  if (effectiveness <= 0) {
-    return { message: `${displayName(attacker)} used ${move.name}! It doesn't affect ${displayName(defender)}...` };
-  }
-
-  let finalDamage = damage;
+  const hits = move.multiHit ? rng.int(move.multiHit[0], move.multiHit[1]) : 1;
+  let totalDamage = 0;
+  let lastEffectiveness = 1;
+  let lastLabel = '';
+  let anyCritical = false;
   let sturdyMsg = '';
-  if (defender.ability === 'sturdy' && !defender.vol?.sturdyUsed
-    && defender.currentHp === defender.maxHp && damage >= defender.currentHp) {
-    finalDamage = defender.currentHp - 1;
-    defender.vol = defender.vol ?? {};
-    defender.vol.sturdyUsed = true;
-    sturdyMsg = ` ${displayName(defender)} endured the hit!`;
-  }
+  let fainted = false;
+  let hitsLanded = 0;
 
-  defender.currentHp = Math.max(0, defender.currentHp - finalDamage);
-  const fainted = defender.currentHp <= 0;
+  for (let h = 0; h < hits && !fainted; h++) {
+    const { damage, effectiveness, label, critical } = calcDamage(attacker, defender, battleMove.id, false, rng);
+    if (effectiveness <= 0) {
+      return { message: `${displayName(attacker)} used ${move.name}! It doesn't affect ${displayName(defender)}...` };
+    }
+    let hitDamage = damage;
+    if (defender.ability === 'sturdy' && !defender.vol?.sturdyUsed
+      && defender.currentHp === defender.maxHp && damage >= defender.currentHp) {
+      hitDamage = defender.currentHp - 1;
+      defender.vol = defender.vol ?? {};
+      defender.vol.sturdyUsed = true;
+      sturdyMsg = ` ${displayName(defender)} endured the hit!`;
+    }
+    defender.currentHp = Math.max(0, defender.currentHp - hitDamage);
+    totalDamage += hitDamage;
+    lastEffectiveness = effectiveness;
+    lastLabel = label;
+    anyCritical = anyCritical || critical;
+    hitsLanded++;
+    fainted = defender.currentHp <= 0;
+  }
 
   let message = `${displayName(attacker)} used ${move.name}!`;
-  if (critical) message += ' A critical hit!';
-  if (label) message += ` ${label}`;
+  if (move.multiHit && hitsLanded > 1) message += ` Hit ${hitsLanded} times!`;
+  if (anyCritical) message += ' A critical hit!';
+  if (lastLabel) message += ` ${lastLabel}`;
   if (sturdyMsg) message += sturdyMsg;
 
-  if (move.effect && move.effectChance && !fainted) {
+  let healed: number | undefined;
+  if (move.drainPct && totalDamage > 0 && attacker.currentHp > 0) {
+    const heal = Math.max(1, Math.floor(totalDamage * move.drainPct / 100));
+    const before = attacker.currentHp;
+    attacker.currentHp = Math.min(attacker.maxHp, attacker.currentHp + heal);
+    healed = attacker.currentHp - before;
+    if (healed > 0) message += ` ${displayName(attacker)} drained ${healed} HP!`;
+  }
+
+  let attackerFainted = false;
+  if (move.recoilPct && totalDamage > 0 && attacker.ability !== 'rock_head') {
+    const recoil = Math.max(1, Math.floor(totalDamage * move.recoilPct / 100));
+    attacker.currentHp = Math.max(0, attacker.currentHp - recoil);
+    message += ` ${displayName(attacker)} was hurt by recoil!`;
+    if (attacker.currentHp <= 0) {
+      attackerFainted = true;
+      message += ` ${displayName(attacker)} fainted!`;
+    }
+  }
+
+  if (move.effect === 'flinch' && move.effectChance && !fainted) {
+    if (defender.ability !== 'inner_focus' && rng.next() * 100 < move.effectChance) {
+      defender.vol = defender.vol ?? {};
+      defender.vol.flinched = true;
+    }
+  } else if (move.effect && move.effectChance && !fainted) {
     const statusMap: Record<string, StatusCondition> = {
       burn: 'burn', paralyze: 'paralyze', poison: 'poison', sleep: 'sleep',
+      confusion: 'confusion', freeze: 'freeze',
     };
     const status = statusMap[move.effect];
     const statusMsg = status ? applyMoveStatus(defender, status, move.effectChance, rng, attacker) : '';
@@ -282,7 +326,10 @@ export function executeMove(
 
   if (fainted) message += ` ${displayName(defender)} fainted!`;
 
-  return { damage: finalDamage, effectiveness, critical, fainted, message };
+  return {
+    damage: totalDamage, effectiveness: lastEffectiveness, critical: anyCritical,
+    fainted, attackerFainted, healed, message,
+  };
 }
 
 export function applyEnterAbility(defender: CritterInstance, attacker: CritterInstance): string | null {
@@ -323,12 +370,18 @@ export function effectiveSpeed(c: CritterInstance): number {
   return Math.floor(c.stats.spe * speedMultiplier(c));
 }
 
-/** Returns which side moves first this turn ('player' | 'enemy'). */
+/** Returns which side moves first this turn ('player' | 'enemy').
+ * Move priority brackets beat speed; speed breaks ties within a bracket. */
 export function resolveTurnOrder(
   playerMon: CritterInstance,
   enemyMon: CritterInstance,
   rng: Rng = defaultRng,
+  playerMoveId?: string,
+  enemyMoveId?: string,
 ): 'player' | 'enemy' {
+  const playerPrio = playerMoveId ? (getMove(playerMoveId).priority ?? 0) : 0;
+  const enemyPrio = enemyMoveId ? (getMove(enemyMoveId).priority ?? 0) : 0;
+  if (playerPrio !== enemyPrio) return playerPrio > enemyPrio ? 'player' : 'enemy';
   const playerSpe = effectiveSpeed(playerMon);
   const enemySpe = effectiveSpeed(enemyMon);
   if (playerSpe > enemySpe) return 'player';

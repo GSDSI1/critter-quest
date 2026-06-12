@@ -36,7 +36,7 @@ export interface CritterInstance {
   status: StatusCondition;
   statusTurns?: number;
   /** Battle-only volatile state (not persisted across saves). */
-  vol?: { sturdyUsed?: boolean; flashFireActive?: boolean };
+  vol?: { sturdyUsed?: boolean; flashFireActive?: boolean; flinched?: boolean };
 }
 
 export interface PlayerState {

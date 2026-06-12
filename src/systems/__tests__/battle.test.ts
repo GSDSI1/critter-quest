@@ -179,6 +179,131 @@ describe('synchronize', () => {
   });
 });
 
+function withMove(c: ReturnType<typeof createCritter>, moveId: string): number {
+  c.moves[0] = { id: moveId, pp: 20, maxPp: 20 };
+  return 0;
+}
+
+describe('priority moves', () => {
+  it('priority move beats faster mon', () => {
+    const slow = createCritter('pebblite', 20, undefined, { perfectIvs: true, nature: 'brave' });
+    const fast = createCritter('sparkbit', 20, undefined, { perfectIvs: true, nature: 'jolly' });
+    expect(resolveTurnOrder(slow, fast, createSeededRng(1), 'quick_strike', 'spark')).toBe('player');
+    expect(resolveTurnOrder(slow, fast, createSeededRng(1), 'tackle', 'spark')).toBe('enemy');
+  });
+
+  it('equal priority falls back to speed', () => {
+    const fast = createCritter('sparkbit', 20, undefined, { perfectIvs: true, nature: 'jolly' });
+    const slow = createCritter('pebblite', 20, undefined, { perfectIvs: true, nature: 'brave' });
+    expect(resolveTurnOrder(fast, slow, createSeededRng(1), 'quick_strike', 'quick_strike')).toBe('player');
+  });
+});
+
+describe('recoil', () => {
+  it('attacker takes recoil damage', () => {
+    const atk = createCritter('emberpup', 30, undefined, { perfectIvs: true });
+    const def = createCritter('mossling', 30);
+    const idx = withMove(atk, 'take_down');
+    const before = atk.currentHp;
+    const r = executeMove(atk, def, idx, createSeededRng(3));
+    expect(r.damage).toBeGreaterThan(0);
+    expect(atk.currentHp).toBeLessThan(before);
+    expect(r.message).toContain('recoil');
+  });
+
+  it('rock_head blocks recoil', () => {
+    const atk = createCritter('pebblite', 30, undefined, { perfectIvs: true });
+    atk.ability = 'rock_head';
+    const def = createCritter('mossling', 30);
+    const idx = withMove(atk, 'take_down');
+    const before = atk.currentHp;
+    const r = executeMove(atk, def, idx, createSeededRng(3));
+    expect(r.damage).toBeGreaterThan(0);
+    expect(atk.currentHp).toBe(before);
+  });
+});
+
+describe('drain', () => {
+  it('heals attacker from damage dealt', () => {
+    const atk = createCritter('leafkit', 25, undefined, { perfectIvs: true });
+    atk.currentHp = Math.floor(atk.maxHp / 2);
+    const def = createCritter('pebblite', 25);
+    const idx = withMove(atk, 'absorb');
+    const before = atk.currentHp;
+    const r = executeMove(atk, def, idx, createSeededRng(5));
+    expect(r.damage).toBeGreaterThan(0);
+    expect(atk.currentHp).toBeGreaterThan(before);
+    expect(r.message).toContain('drained');
+  });
+});
+
+describe('multi-hit', () => {
+  it('double_kick hits exactly twice', () => {
+    const atk = createCritter('emberpup', 25, undefined, { perfectIvs: true });
+    const def = createCritter('voltchick', 25, undefined, { perfectIvs: true });
+    const idx = withMove(atk, 'double_kick');
+    const r = executeMove(atk, def, idx, createSeededRng(7));
+    expect(r.message).toContain('Hit 2 times!');
+  });
+});
+
+describe('flinch', () => {
+  it('sets flinched volatile and skips defender turn', () => {
+    const atk = createCritter('pebblite', 25, undefined, { perfectIvs: true });
+    const def = createCritter('mossling', 25);
+    const idx = withMove(atk, 'headbutt');
+    let flinched = false;
+    for (let seed = 0; seed < 30 && !flinched; seed++) {
+      const d = createCritter('mossling', 25);
+      const r = executeMove(atk, d, idx, createSeededRng(seed));
+      if (r.missed || d.currentHp <= 0) continue;
+      flinched = d.vol?.flinched === true;
+      if (flinched) {
+        const skip = executeMove(d, atk, 0, createSeededRng(seed));
+        expect(skip.cantMove).toBe(true);
+        expect(skip.message).toContain('flinched');
+        expect(d.vol?.flinched).toBe(false);
+      }
+    }
+    expect(flinched).toBe(true);
+    void def;
+  });
+
+  it('inner_focus prevents flinch', () => {
+    const atk = createCritter('pebblite', 25, undefined, { perfectIvs: true });
+    const idx = withMove(atk, 'headbutt');
+    for (let seed = 0; seed < 30; seed++) {
+      const d = createCritter('mossling', 25);
+      d.ability = 'inner_focus';
+      executeMove(atk, d, idx, createSeededRng(seed));
+      expect(d.vol?.flinched ?? false).toBe(false);
+    }
+  });
+});
+
+describe('confusion and freeze moves', () => {
+  it('confuse_ray inflicts confusion', () => {
+    const atk = createCritter('murkfox', 20);
+    const def = createCritter('mossling', 20);
+    const idx = withMove(atk, 'confuse_ray');
+    const r = executeMove(atk, def, idx, createSeededRng(2));
+    expect(def.status).toBe('confusion');
+    expect(r.message).toContain('confused');
+  });
+
+  it('freeze does not affect flame types', () => {
+    const atk = createCritter('frostkit', 20);
+    const def = createCritter('emberpup', 20);
+    const idx = withMove(atk, 'icy_gale');
+    for (let seed = 0; seed < 20; seed++) {
+      const d = createCritter('emberpup', 20);
+      executeMove(atk, d, idx, createSeededRng(seed));
+      expect(d.status).not.toBe('freeze');
+    }
+    void def;
+  });
+});
+
 describe('insomnia', () => {
   it('blocks sleep status', () => {
     const def = createCritter('dreamwisp', 15);

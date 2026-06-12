@@ -7,18 +7,22 @@ export const LEARNSETS: Record<string, LearnEntry[]> = {
   emberpup: [
     { level: 1, move: 'scratch' }, { level: 1, move: 'growl' },
     { level: 5, move: 'ember' }, { level: 9, move: 'blaze' },
+    { level: 13, move: 'bite' },
   ],
   flamewyrm: [
     { level: 1, move: 'ember' }, { level: 1, move: 'blaze' },
     { level: 20, move: 'inferno' }, { level: 26, move: 'shadowclaw' },
+    { level: 30, move: 'take_down' },
   ],
   infernox: [
     { level: 1, move: 'blaze' }, { level: 1, move: 'inferno' },
     { level: 40, move: 'darkpulse' }, { level: 46, move: 'thunderbolt' },
+    { level: 50, move: 'flare_blitz' },
   ],
   aqualet: [
     { level: 1, move: 'tackle' }, { level: 1, move: 'growl' },
     { level: 5, move: 'splash' }, { level: 9, move: 'tidal' },
+    { level: 13, move: 'quick_strike' },
   ],
   tidefin: [
     { level: 1, move: 'splash' }, { level: 1, move: 'tidal' },
@@ -31,14 +35,17 @@ export const LEARNSETS: Record<string, LearnEntry[]> = {
   leafkit: [
     { level: 1, move: 'scratch' }, { level: 1, move: 'vine' },
     { level: 6, move: 'leafblade' }, { level: 10, move: 'photosynthesis' },
+    { level: 14, move: 'absorb' },
   ],
   vineclaw: [
     { level: 1, move: 'vine' }, { level: 1, move: 'leafblade' },
     { level: 19, move: 'rockthrow' }, { level: 22, move: 'sleep_powder' },
+    { level: 26, move: 'pin_barrage' },
   ],
   thornbeast: [
     { level: 1, move: 'leafblade' }, { level: 1, move: 'boulder' },
     { level: 38, move: 'earthquake' }, { level: 42, move: 'photosynthesis' },
+    { level: 46, move: 'leech_life' },
   ],
   sparkbit: [
     { level: 1, move: 'tackle' }, { level: 1, move: 'spark' },
@@ -50,7 +57,7 @@ export const LEARNSETS: Record<string, LearnEntry[]> = {
   ],
   mossling: [
     { level: 1, move: 'tackle' }, { level: 4, move: 'vine' },
-    { level: 8, move: 'photosynthesis' },
+    { level: 8, move: 'photosynthesis' }, { level: 12, move: 'absorb' },
   ],
   bloomoss: [
     { level: 1, move: 'vine' }, { level: 1, move: 'leafblade' },
@@ -58,6 +65,7 @@ export const LEARNSETS: Record<string, LearnEntry[]> = {
   ],
   pebblite: [
     { level: 1, move: 'tackle' }, { level: 5, move: 'rockthrow' },
+    { level: 9, move: 'headbutt' },
     { level: 10, move: 'boulder' },
   ],
   rockord: [
@@ -66,7 +74,7 @@ export const LEARNSETS: Record<string, LearnEntry[]> = {
   ],
   shadeling: [
     { level: 1, move: 'scratch' }, { level: 6, move: 'shadowclaw' },
-    { level: 12, move: 'darkpulse' },
+    { level: 12, move: 'darkpulse' }, { level: 16, move: 'shadow_sneak' },
   ],
   shadespecter: [
     { level: 1, move: 'shadowclaw' }, { level: 1, move: 'darkpulse' },
@@ -106,10 +114,12 @@ export const LEARNSETS: Record<string, LearnEntry[]> = {
   frostkit: [
     { level: 1, move: 'scratch' }, { level: 1, move: 'growl' },
     { level: 5, move: 'frostbite' }, { level: 9, move: 'iceshard' },
+    { level: 13, move: 'icy_gale' },
   ],
   glacetail: [
     { level: 1, move: 'frostbite' }, { level: 1, move: 'iceshard' },
     { level: 20, move: 'icebeam' }, { level: 26, move: 'blizzard' },
+    { level: 30, move: 'agility' },
   ],
   arctodon: [
     { level: 1, move: 'iceshard' }, { level: 1, move: 'icebeam' },
@@ -136,6 +146,7 @@ export const LEARNSETS: Record<string, LearnEntry[]> = {
   ],
   dreamwisp: [
     { level: 1, move: 'tackle' }, { level: 6, move: 'psybeam' }, { level: 12, move: 'hypnosis' },
+    { level: 16, move: 'supersonic' },
   ],
   somnara: [
     { level: 1, move: 'psybeam' }, { level: 1, move: 'hypnosis' },
@@ -150,12 +161,14 @@ export const LEARNSETS: Record<string, LearnEntry[]> = {
   ],
   chillbite: [
     { level: 1, move: 'frostbite' }, { level: 1, move: 'shadowclaw' }, { level: 18, move: 'darkpulse' },
+    { level: 22, move: 'bite' }, { level: 28, move: 'icy_gale' },
   ],
   frostmoss: [
     { level: 1, move: 'frostbite' }, { level: 1, move: 'vine' }, { level: 12, move: 'photosynthesis' },
   ],
   psyknight: [
     { level: 1, move: 'psybeam' }, { level: 1, move: 'scratch' }, { level: 20, move: 'calm_mind' },
+    { level: 24, move: 'double_kick' }, { level: 30, move: 'agility' },
   ],
   voidseer: [
     { level: 1, move: 'mindblast' }, { level: 1, move: 'darkpulse' }, { level: 24, move: 'hypnosis' },
@@ -182,10 +195,12 @@ export const LEARNSETS: Record<string, LearnEntry[]> = {
   nightmoth: [
     { level: 1, move: 'shadow_dust' }, { level: 1, move: 'tackle' },
     { level: 10, move: 'shadowclaw' }, { level: 16, move: 'hypnosis' },
+    { level: 20, move: 'confuse_ray' },
   ],
   stormhorn: [
     { level: 1, move: 'tackle' }, { level: 1, move: 'leer' },
     { level: 10, move: 'spark' }, { level: 18, move: 'volt_ram' },
+    { level: 24, move: 'take_down' },
   ],
   embershell: [
     { level: 1, move: 'coalsurge' }, { level: 1, move: 'ember' },
@@ -194,6 +209,7 @@ export const LEARNSETS: Record<string, LearnEntry[]> = {
   murkfox: [
     { level: 1, move: 'tackle' }, { level: 1, move: 'leer' },
     { level: 8, move: 'murk_fang' }, { level: 14, move: 'shadowclaw' },
+    { level: 18, move: 'shadow_sneak' }, { level: 24, move: 'confuse_ray' },
   ],
   frostnip: [
     { level: 1, move: 'tackle' }, { level: 1, move: 'growl' },
@@ -214,6 +230,7 @@ export const LEARNSETS: Record<string, LearnEntry[]> = {
   shadeprowl: [
     { level: 1, move: 'murk_fang' }, { level: 1, move: 'shadowclaw' },
     { level: 24, move: 'night_stalk' }, { level: 30, move: 'darkpulse' },
+    { level: 34, move: 'bite' },
   ],
   crystmite: [
     { level: 1, move: 'psybeam' }, { level: 1, move: 'tackle' },
@@ -254,6 +271,7 @@ export const LEARNSETS: Record<string, LearnEntry[]> = {
   thunderhawk: [
     { level: 1, move: 'thunder_dive' }, { level: 1, move: 'thunderbolt' },
     { level: 34, move: 'volt_ram' }, { level: 38, move: 'storm_beak' },
+    { level: 42, move: 'agility' },
   ],
   ashlynx: [
     { level: 1, move: 'cinder_swipe' }, { level: 1, move: 'ember' },
@@ -294,10 +312,12 @@ export const LEARNSETS: Record<string, LearnEntry[]> = {
   buzzwing: [
     { level: 1, move: 'spark' }, { level: 1, move: 'tackle' },
     { level: 12, move: 'thunderbolt' }, { level: 16, move: 'thunderwave' },
+    { level: 20, move: 'pin_barrage' },
   ],
   sandcrab: [
     { level: 1, move: 'splash' }, { level: 1, move: 'tackle' },
     { level: 12, move: 'boulder' }, { level: 16, move: 'brine_splash' },
+    { level: 20, move: 'double_kick' },
   ],
   frostwisp: [
     { level: 1, move: 'iceshard' }, { level: 1, move: 'psybeam' },
