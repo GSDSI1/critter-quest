@@ -4,7 +4,7 @@ import { getItem, removeItem } from '../../data/items';
 import { getMove } from '../../data/moves';
 import { getBadge } from '../../data/badges';
 import {
-  executeMove, tryCatchWithItem, tryRun, pickAiMove, expGain,
+  executeMove, tryCatchWithItem, tryRun, pickAiMove, pickAiSwitch, expGain,
   endOfTurnStatus, effectiveSpeed, applyEnterAbility, tryHeldBerry, isRunBlocked,
   resolveTurnOrder,
 } from '../../systems/battle';
@@ -86,6 +86,20 @@ export class BattleFlow {
     if (this.host.phase !== 'moves') return;
     this.host.ui.moveContainer.setVisible(false);
     this.host.phase = 'fight';
+
+    if (this.host.isTrainer) {
+      const switchIdx = pickAiSwitch(
+        this.host.wild, this.host.enemyParty, this.host.enemyIndex, this.host.playerMon,
+      );
+      if (switchIdx >= 0) {
+        this.runEnemySwitch(switchIdx, () => {
+          if (this.turnEnded()) return;
+          this.runSide(true, index, () => this.finishTurn());
+        });
+        return;
+      }
+    }
+
     const enemyMove = pickAiMove(this.host.wild, this.host.playerMon);
     const playerMoveId = this.host.playerMon.moves[index]?.id;
     const enemyMoveId = this.host.wild.moves[enemyMove]?.id;
@@ -108,6 +122,26 @@ export class BattleFlow {
 
   private turnEnded(): boolean {
     return isFainted(this.host.wild) || isFainted(this.host.playerMon);
+  }
+
+  /** Trainer AI withdraws the active mon for a better matchup (costs its turn). */
+  private runEnemySwitch(targetIdx: number, onComplete: () => void): void {
+    const outgoing = structuredClone(this.host.wild);
+    outgoing.vol = { ...outgoing.vol, aiSwitched: true };
+    this.host.enemyParty[this.host.enemyIndex] = outgoing;
+    this.host.enemyIndex = targetIdx;
+    this.host.wild = structuredClone(this.host.enemyParty[targetIdx]);
+    registerSeen(GameState.player.dexSeen, this.host.wild.speciesId);
+    this.host.ui.enemySprite.setAlpha(0);
+    this.host.ui.syncEnemyUi(true);
+    this.host.ui.queueMessage(
+      `${this.host.trainerName} withdrew ${getCreature(outgoing.speciesId).name} and sent out ${getCreature(this.host.wild.speciesId).name}!`,
+    );
+    const enterMsg = applyEnterAbility(this.host.wild, this.host.playerMon);
+    if (enterMsg) this.host.ui.queueMessage(enterMsg);
+    this.host.phase = 'message';
+    this.host.showNextMessage();
+    this.host.time.delayedCall(600, onComplete);
   }
 
   private runSide(isPlayer: boolean, moveIndex: number, onComplete: () => void): void {
@@ -281,8 +315,12 @@ export class BattleFlow {
   }
 
   onEnemyFainted(): void {
-    if (this.host.enemyIndex < this.host.enemyParty.length - 1) {
-      this.host.enemyIndex++;
+    this.host.enemyParty[this.host.enemyIndex] = structuredClone(this.host.wild);
+    const nextIdx = this.host.enemyParty.findIndex(
+      (m, i) => i !== this.host.enemyIndex && m.currentHp > 0,
+    );
+    if (nextIdx >= 0) {
+      this.host.enemyIndex = nextIdx;
       this.host.wild = structuredClone(this.host.enemyParty[this.host.enemyIndex]);
       registerSeen(GameState.player.dexSeen, this.host.wild.speciesId);
       this.host.ui.enemySprite.setAlpha(0);

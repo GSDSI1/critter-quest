@@ -429,9 +429,10 @@ export class NpcManager {
     const map = this.getMap();
     const baseTable = map.encounterTable ?? map.id;
     const tableId = resolveEncounterTable(baseTable, GameState.player.playTime);
-    const { def, level } = pickWildFromTable(tableId);
+    const { def, level, heldItem } = pickWildFromTable(tableId);
     registerSeen(GameState.player.dexSeen, def.id);
     const wild = createCritter(def.id, level);
+    if (heldItem) wild.heldItem = heldItem;
     this.trainerBattles.launchBattle([wild], false, '', '', 0, '');
   }
 

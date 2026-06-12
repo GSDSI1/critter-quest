@@ -7,12 +7,15 @@ export interface EncounterEntry {
   minLevel: number;
   maxLevel: number;
   weight: number;
+  /** Item this wild critter may hold (rolled at heldChance, 0–1). */
+  heldItem?: string;
+  heldChance?: number;
 }
 
 export const ENCOUNTER_TABLES: Record<string, EncounterEntry[]> = {
   route1: [
-    { id: 'mossling', minLevel: 2, maxLevel: 5, weight: 28 },
-    { id: 'pebblite', minLevel: 3, maxLevel: 6, weight: 22 },
+    { id: 'mossling', minLevel: 2, maxLevel: 5, weight: 28, heldItem: 'oran_berry', heldChance: 0.1 },
+    { id: 'pebblite', minLevel: 3, maxLevel: 6, weight: 22, heldItem: 'hard_stone', heldChance: 0.05 },
     { id: 'voltchick', minLevel: 3, maxLevel: 6, weight: 12 },
     { id: 'voltail', minLevel: 6, maxLevel: 9, weight: 4 },
     { id: 'sparkbit', minLevel: 4, maxLevel: 7, weight: 12 },
@@ -22,8 +25,8 @@ export const ENCOUNTER_TABLES: Record<string, EncounterEntry[]> = {
     { id: 'aqualet', minLevel: 4, maxLevel: 6, weight: 5 },
   ],
   forest: [
-    { id: 'mossling', minLevel: 5, maxLevel: 8, weight: 14 },
-    { id: 'shroomcap', minLevel: 6, maxLevel: 10, weight: 8 },
+    { id: 'mossling', minLevel: 5, maxLevel: 8, weight: 14, heldItem: 'oran_berry', heldChance: 0.1 },
+    { id: 'shroomcap', minLevel: 6, maxLevel: 10, weight: 8, heldItem: 'lum_berry', heldChance: 0.08 },
     { id: 'fungloom', minLevel: 12, maxLevel: 16, weight: 4 },
     { id: 'shadeling', minLevel: 6, maxLevel: 10, weight: 14 },
     { id: 'murkfox', minLevel: 7, maxLevel: 11, weight: 12 },
@@ -46,9 +49,9 @@ export const ENCOUNTER_TABLES: Record<string, EncounterEntry[]> = {
     { id: 'mistral', minLevel: 11, maxLevel: 15, weight: 12 },
   ],
   route3: [
-    { id: 'cinderkit', minLevel: 12, maxLevel: 16, weight: 20 },
-    { id: 'voltite', minLevel: 11, maxLevel: 15, weight: 18 },
-    { id: 'tidewisp', minLevel: 12, maxLevel: 16, weight: 16 },
+    { id: 'cinderkit', minLevel: 12, maxLevel: 16, weight: 20, heldItem: 'charcoal', heldChance: 0.05 },
+    { id: 'voltite', minLevel: 11, maxLevel: 15, weight: 18, heldItem: 'magnet', heldChance: 0.05 },
+    { id: 'tidewisp', minLevel: 12, maxLevel: 16, weight: 16, heldItem: 'mystic_water', heldChance: 0.05 },
     { id: 'kelpling', minLevel: 11, maxLevel: 15, weight: 12 },
     { id: 'gleamfin', minLevel: 12, maxLevel: 16, weight: 8 },
     { id: 'brinepup', minLevel: 11, maxLevel: 15, weight: 10 },
@@ -61,8 +64,8 @@ export const ENCOUNTER_TABLES: Record<string, EncounterEntry[]> = {
     { id: 'tidewrack', minLevel: 18, maxLevel: 22, weight: 3 },
   ],
   crystal_cave: [
-    { id: 'pebblite', minLevel: 12, maxLevel: 16, weight: 14 },
-    { id: 'crystmite', minLevel: 13, maxLevel: 17, weight: 12 },
+    { id: 'pebblite', minLevel: 12, maxLevel: 16, weight: 14, heldItem: 'hard_stone', heldChance: 0.08 },
+    { id: 'crystmite', minLevel: 13, maxLevel: 17, weight: 12, heldItem: 'scope_lens', heldChance: 0.03 },
     { id: 'prismdon', minLevel: 17, maxLevel: 21, weight: 4 },
     { id: 'rockord', minLevel: 14, maxLevel: 18, weight: 16 },
     { id: 'shadeling', minLevel: 14, maxLevel: 18, weight: 14 },
@@ -72,9 +75,9 @@ export const ENCOUNTER_TABLES: Record<string, EncounterEntry[]> = {
     { id: 'geodeon', minLevel: 15, maxLevel: 20, weight: 8 },
   ],
   volcanic_path: [
-    { id: 'cinderkit', minLevel: 16, maxLevel: 20, weight: 14 },
+    { id: 'cinderkit', minLevel: 16, maxLevel: 20, weight: 14, heldItem: 'charcoal', heldChance: 0.08 },
     { id: 'grimlet', minLevel: 17, maxLevel: 22, weight: 16 },
-    { id: 'coalemb', minLevel: 16, maxLevel: 21, weight: 12 },
+    { id: 'coalemb', minLevel: 16, maxLevel: 21, weight: 12, heldItem: 'charcoal', heldChance: 0.08 },
     { id: 'ashpuff', minLevel: 15, maxLevel: 19, weight: 8 },
     { id: 'ashlynx', minLevel: 18, maxLevel: 22, weight: 5 },
     { id: 'scorchmane', minLevel: 22, maxLevel: 26, weight: 3 },
@@ -97,8 +100,8 @@ export const ENCOUNTER_TABLES: Record<string, EncounterEntry[]> = {
     { id: 'glacetail', minLevel: 20, maxLevel: 24, weight: 6 },
   ],
   glacier_pass: [
-    { id: 'glacetail', minLevel: 22, maxLevel: 26, weight: 16 },
-    { id: 'glaciara', minLevel: 22, maxLevel: 26, weight: 10 },
+    { id: 'glacetail', minLevel: 22, maxLevel: 26, weight: 16, heldItem: 'never_melt_ice', heldChance: 0.05 },
+    { id: 'glaciara', minLevel: 22, maxLevel: 26, weight: 10, heldItem: 'sitrus_berry', heldChance: 0.1 },
     { id: 'blizzhound', minLevel: 23, maxLevel: 27, weight: 14 },
     { id: 'frosthorn', minLevel: 22, maxLevel: 26, weight: 15 },
     { id: 'chillbite', minLevel: 24, maxLevel: 28, weight: 12 },
@@ -108,8 +111,8 @@ export const ENCOUNTER_TABLES: Record<string, EncounterEntry[]> = {
     { id: 'glaciwhisp', minLevel: 25, maxLevel: 29, weight: 4 },
   ],
   route5: [
-    { id: 'mindling', minLevel: 26, maxLevel: 30, weight: 18 },
-    { id: 'psychora', minLevel: 27, maxLevel: 31, weight: 12 },
+    { id: 'mindling', minLevel: 26, maxLevel: 30, weight: 18, heldItem: 'twisted_spoon', heldChance: 0.05 },
+    { id: 'psychora', minLevel: 27, maxLevel: 31, weight: 12, heldItem: 'sitrus_berry', heldChance: 0.1 },
     { id: 'thunderhawk', minLevel: 30, maxLevel: 34, weight: 4 },
     { id: 'stormhorn', minLevel: 27, maxLevel: 31, weight: 12 },
     { id: 'dreamwisp', minLevel: 25, maxLevel: 29, weight: 16 },
@@ -231,7 +234,10 @@ export function resolveEncounterTable(tableId: string, playTimeSec = 0): string 
   return ENCOUNTER_TABLES[nightId] ? nightId : tableId;
 }
 
-export function pickWildFromTable(tableId: string, rng: Rng = defaultRng): { def: ReturnType<typeof getCreature>; level: number } {
+export function pickWildFromTable(
+  tableId: string,
+  rng: Rng = defaultRng,
+): { def: ReturnType<typeof getCreature>; level: number; heldItem?: string } {
   const table = ENCOUNTER_TABLES[tableId] ?? ENCOUNTER_TABLES.route1;
   const total = table.reduce((s, e) => s + e.weight, 0);
   let roll = rng.next() * total;
@@ -239,7 +245,10 @@ export function pickWildFromTable(tableId: string, rng: Rng = defaultRng): { def
     roll -= entry.weight;
     if (roll <= 0) {
       const level = rng.int(entry.minLevel, entry.maxLevel);
-      return { def: getCreature(entry.id), level };
+      const heldItem = entry.heldItem && rng.chance(entry.heldChance ?? 0.1)
+        ? entry.heldItem
+        : undefined;
+      return { def: getCreature(entry.id), level, heldItem };
     }
   }
   const fb = table[0];

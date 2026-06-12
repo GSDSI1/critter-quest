@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { calcDamage, stageMult, expGain, tryRun, tryCatchWithItem, applyMoveStatus, tryHeldBerry, executeMove, resolveTurnOrder } from '../battle';
+import { calcDamage, stageMult, expGain, tryRun, tryCatchWithItem, applyMoveStatus, tryHeldBerry, executeMove, resolveTurnOrder, pickAiSwitch } from '../battle';
 import { createCritter } from '../stats';
 import { createSeededRng } from '../rng';
 import { typeMultiplier } from '../../data/types';
@@ -301,6 +301,42 @@ describe('confusion and freeze moves', () => {
       expect(d.status).not.toBe('freeze');
     }
     void def;
+  });
+});
+
+describe('pickAiSwitch', () => {
+  it('switches to a super-effective bench mon when outmatched', () => {
+    const current = createCritter('mossling', 20);
+    current.moves = [{ id: 'vine', pp: 20, maxPp: 20 }]; // leaf vs flame = 0.5x
+    const bench = createCritter('aqualet', 20); // tide vs flame = 2x
+    const player = createCritter('emberpup', 20);
+    const idx = pickAiSwitch(current, [current, bench], 0, player);
+    expect(idx).toBe(1);
+  });
+
+  it('stays in when current matchup is acceptable', () => {
+    const current = createCritter('emberpup', 20); // flame vs leaf = 2x
+    const bench = createCritter('aqualet', 20);
+    const player = createCritter('leafkit', 20);
+    expect(pickAiSwitch(current, [current, bench], 0, player)).toBe(-1);
+  });
+
+  it('never switches the same mon twice', () => {
+    const current = createCritter('mossling', 20);
+    current.moves = [{ id: 'vine', pp: 20, maxPp: 20 }];
+    current.vol = { aiSwitched: true };
+    const bench = createCritter('aqualet', 20);
+    const player = createCritter('emberpup', 20);
+    expect(pickAiSwitch(current, [current, bench], 0, player)).toBe(-1);
+  });
+
+  it('ignores fainted bench mons', () => {
+    const current = createCritter('mossling', 20);
+    current.moves = [{ id: 'vine', pp: 20, maxPp: 20 }];
+    const bench = createCritter('aqualet', 20);
+    bench.currentHp = 0;
+    const player = createCritter('emberpup', 20);
+    expect(pickAiSwitch(current, [current, bench], 0, player)).toBe(-1);
   });
 });
 

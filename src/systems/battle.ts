@@ -391,6 +391,42 @@ export function resolveTurnOrder(
   return rng.chance(0.5) ? 'player' : 'enemy';
 }
 
+/** Best type effectiveness among a mon's usable damaging moves vs the player. */
+function bestOffensiveEffectiveness(mon: CritterInstance, player: CritterInstance): number {
+  let best = 0;
+  for (const m of mon.moves) {
+    const move = getMove(m.id);
+    if (move.power === 0 || m.pp <= 0) continue;
+    let eff = 1;
+    for (const t of typesOf(player)) eff *= typeMultiplier(move.type, t);
+    if (eff > best) best = eff;
+  }
+  return best;
+}
+
+/**
+ * Trainer AI: returns the party index to switch to, or -1 to stay in.
+ * Switches when the active mon has no effective move (≤0.5×) and a benched
+ * mon has a super-effective option. Each mon only gets switched out once.
+ */
+export function pickAiSwitch(
+  current: CritterInstance,
+  party: CritterInstance[],
+  currentIndex: number,
+  player: CritterInstance,
+): number {
+  if (current.vol?.aiSwitched) return -1;
+  if (bestOffensiveEffectiveness(current, player) > 0.5) return -1;
+  let best = -1;
+  let bestEff = 1;
+  party.forEach((m, i) => {
+    if (i === currentIndex || m.currentHp <= 0) return;
+    const eff = bestOffensiveEffectiveness(m, player);
+    if (eff > bestEff) { bestEff = eff; best = i; }
+  });
+  return best;
+}
+
 export function pickAiMove(enemy: CritterInstance, player: CritterInstance, rng: Rng = defaultRng): number {
   const available = enemy.moves.map((m, i) => ({ i, move: getMove(m.id), pp: m.pp })).filter(m => m.pp > 0);
   if (!available.length) return 0;
