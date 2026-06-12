@@ -1,5 +1,6 @@
 import { hasBadge } from '../data/badges';
 import type { PlayerState } from './stats';
+import { featuredHintLine } from './dailyFeature';
 
 export type RegionVisibility = 'hidden' | 'hinted' | 'known';
 
@@ -48,5 +49,5 @@ export function profDiscoverabilityLine(player: PlayerState): string | null {
   if (hasBadge(player.badges, 'frost') && !player.visitedMaps.includes('contest_hall')) {
     return 'The Frostvale Contest Hall tests beauty and battle stats.';
   }
-  return null;
+  return featuredHintLine();
 }

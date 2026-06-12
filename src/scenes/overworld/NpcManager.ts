@@ -5,6 +5,7 @@ import {
   type MapNpc, type GameMap,
 } from '../../data/maps';
 import { pickWildFromTable, resolveEncounterTable } from '../../data/encounters';
+import { featuredSpeciesOfDay, shinyOddsFor } from '../../systems/dailyFeature';
 import { hasBadge } from '../../data/badges';
 import {
   GameState, healParty, firstAlive, createCritter, registerSeen, registerMapVisit,
@@ -429,9 +430,9 @@ export class NpcManager {
     const map = this.getMap();
     const baseTable = map.encounterTable ?? map.id;
     const tableId = resolveEncounterTable(baseTable, GameState.player.playTime);
-    const { def, level, heldItem } = pickWildFromTable(tableId);
+    const { def, level, heldItem } = pickWildFromTable(tableId, undefined, featuredSpeciesOfDay());
     registerSeen(GameState.player.dexSeen, def.id);
-    const wild = createCritter(def.id, level);
+    const wild = createCritter(def.id, level, undefined, { shinyChance: shinyOddsFor(def.id) });
     if (heldItem) wild.heldItem = heldItem;
     this.trainerBattles.launchBattle([wild], false, '', '', 0, '');
   }

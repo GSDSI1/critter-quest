@@ -237,8 +237,12 @@ export function resolveEncounterTable(tableId: string, playTimeSec = 0): string 
 export function pickWildFromTable(
   tableId: string,
   rng: Rng = defaultRng,
+  featuredId?: string,
 ): { def: ReturnType<typeof getCreature>; level: number; heldItem?: string } {
-  const table = ENCOUNTER_TABLES[tableId] ?? ENCOUNTER_TABLES.route1;
+  const base = ENCOUNTER_TABLES[tableId] ?? ENCOUNTER_TABLES.route1;
+  const table = featuredId
+    ? base.map(e => (e.id === featuredId ? { ...e, weight: e.weight * 2 } : e))
+    : base;
   const total = table.reduce((s, e) => s + e.weight, 0);
   let roll = rng.next() * total;
   for (const entry of table) {
