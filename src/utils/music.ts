@@ -13,6 +13,9 @@ const OSC_THEMES: Record<string, number[]> = {
   overworld: [262, 330, 392, 523],
   battle: [196, 247, 294, 349],
   town: [294, 370, 440, 494],
+  gym: [220, 262, 330, 392],
+  cave: [165, 220, 262, 330],
+  victory: [262, 392, 523, 659],
 };
 
 let musicCtx: AudioContext | null = null;
@@ -90,7 +93,9 @@ export function refreshMusicVolume(): void {
 }
 
 export function setMusicThemeForMap(mapId: string): void {
-  if (mapId.includes('gym') || mapId === 'victory_road') startMusic('battle');
+  if (mapId.includes('gym')) startMusic('gym');
+  else if (mapId === 'victory_road') startMusic('victory');
+  else if (mapId.includes('cave') || mapId === 'volcanic_path') startMusic('cave');
   else if (mapId === 'town' || mapId.includes('city') || mapId.includes('vale') || mapId === 'mindspire') startMusic('town');
   else startMusic('overworld');
 }

@@ -18,7 +18,7 @@ export const SFX_KEYS = [
   'footstep_grass', 'footstep_path',
 ] as const;
 
-export const BGM_KEYS = ['overworld', 'battle', 'town'] as const;
+export const BGM_KEYS = ['overworld', 'battle', 'town', 'gym', 'cave', 'victory'] as const;
 
 export interface AssetMeta {
   placeholder: boolean;
