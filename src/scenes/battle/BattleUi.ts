@@ -28,7 +28,13 @@ import { formatStatCompact } from '../../ui/statDisplay';
 import type { BattleAnims } from './BattleAnims';
 
 export const MENU_ITEMS = ['Fight', 'Bag', 'Switch', 'Run'] as const;
-const MENU_POS: [number, number][] = [[380, 350], [510, 350], [380, 390], [510, 390]];
+const TRAINER_MENU_ITEMS = ['Fight', 'Bag', 'Switch'] as const;
+const MENU_POS_4: [number, number][] = [[380, 350], [510, 350], [380, 390], [510, 390]];
+const MENU_POS_3: [number, number][] = [[380, 350], [510, 350], [445, 390]];
+
+export function battleMenuItems(isTrainer: boolean): readonly string[] {
+  return isTrainer ? TRAINER_MENU_ITEMS : MENU_ITEMS;
+}
 
 function truncateLabel(s: string, max: number): string {
   return s.length > max ? `${s.slice(0, max - 1)}…` : s;
@@ -69,6 +75,9 @@ export class BattleUi {
   private messageQueue: string[] = [];
   private enemyIdle?: CritterIdleHandle;
   private playerIdle?: CritterIdleHandle;
+  private enemyDisplayedHp = 0;
+  private playerDisplayedHp = 0;
+  private menuLabels: string[] = [];
 
   constructor(
     private scene: Phaser.Scene,
@@ -147,6 +156,8 @@ export class BattleUi {
       { width: 110, height: 34, depth: 1101, fontSize: '11px' },
     );
     this.continueBtn.setVisible(false);
+    this.enemyDisplayedHp = this.host.wild.currentHp;
+    this.playerDisplayedHp = this.host.playerMon.currentHp;
     this.refreshPlayerUi();
   }
 
@@ -158,7 +169,7 @@ export class BattleUi {
     applyCreatureTexture(this.enemySprite, this.scene, this.host.wild.speciesId);
     this.enemySprite.setAlpha(1);
     this.enemyIdle = startCritterIdle(this.scene, this.enemySprite, this.host.wild.speciesId, 130);
-    this.animateHp(this.enemyHpBar, this.host.wild.currentHp, this.host.wild.maxHp, 356, 68);
+    this.animateHp(this.enemyHpBar, this.host.wild.currentHp, this.host.wild.maxHp, 356, 68, true);
     const old = this.scene.children.getByName('enemyTypes');
     if (old) old.destroy();
     def.types.forEach((t, i) => {
@@ -176,7 +187,7 @@ export class BattleUi {
   refreshPlayerUi(): void {
     const mon = this.host.playerMon;
     this.playerHpText.setText(`${mon.currentHp}/${mon.maxHp} ${statusLabel(mon.status)}`);
-    this.animateHp(this.playerHpBar, mon.currentHp, mon.maxHp, 56, 300);
+    this.animateHp(this.playerHpBar, mon.currentHp, mon.maxHp, 56, 300, false);
     this.expBar.clear();
     const prog = expProgress(mon);
     const expG = drawHpBar(this.scene, 56, 316, 180, 6, prog * 180, 180, 50);
@@ -187,7 +198,7 @@ export class BattleUi {
   }
 
   animateEnemyHp(): void {
-    this.animateHp(this.enemyHpBar, this.host.wild.currentHp, this.host.wild.maxHp, 356, 68);
+    this.animateHp(this.enemyHpBar, this.host.wild.currentHp, this.host.wild.maxHp, 356, 68, true);
   }
 
   setContinueVisible(phase: BattlePhase): void {
@@ -218,8 +229,10 @@ export class BattleUi {
     this.menuContainer = this.scene.add.container(0, 0).setDepth(1100);
     pinContainerChildren(this.menuContainer, 1100);
     this.menuHighlights = [];
-    MENU_ITEMS.forEach((label, i) => {
-      const [x, y] = MENU_POS[i];
+    this.menuLabels = [...battleMenuItems(this.host.isTrainer)];
+    const positions = this.menuLabels.length === 3 ? MENU_POS_3 : MENU_POS_4;
+    this.menuLabels.forEach((label, i) => {
+      const [x, y] = positions[i];
       const bg = this.scene.add.graphics();
       bg.fillStyle(COLORS.panelBorder, 0.8);
       bg.fillRoundedRect(x - 8, y - 8, 126, 44, 6);
@@ -239,7 +252,8 @@ export class BattleUi {
     this.menuHighlights.forEach((hi, i) => {
       hi.clear();
       if (i !== this.host.menuIndex) return;
-      const [x, y] = MENU_POS[i];
+      const positions = this.menuLabels.length === 3 ? MENU_POS_3 : MENU_POS_4;
+      const [x, y] = positions[i];
       hi.lineStyle(2, COLORS.accent, 1);
       hi.strokeRoundedRect(x - 4, y - 4, 110, 32, 6);
     });
@@ -247,8 +261,14 @@ export class BattleUi {
 
   onNav(phase: BattlePhase, dy: number, dx: number): void {
     if (phase === 'menu') {
-      if (dx !== 0) this.host.menuIndex = (this.host.menuIndex + (dx > 0 ? 1 : -1) + 4) % 4;
-      if (dy !== 0) this.host.menuIndex = (this.host.menuIndex + (dy > 0 ? 2 : -2) + 4) % 4;
+      const count = this.menuLabels.length;
+      if (count === 3) {
+        if (dx !== 0) this.host.menuIndex = (this.host.menuIndex + (dx > 0 ? 1 : -1) + count) % count;
+        if (dy !== 0) this.host.menuIndex = this.host.menuIndex === 2 ? 0 : 2;
+      } else {
+        if (dx !== 0) this.host.menuIndex = (this.host.menuIndex + (dx > 0 ? 1 : -1) + 4) % 4;
+        if (dy !== 0) this.host.menuIndex = (this.host.menuIndex + (dy > 0 ? 2 : -2) + 4) % 4;
+      }
       this.updateMenuHighlight();
     } else if (phase === 'moves') {
       if (dx !== 0) this.host.moveIndex = Phaser.Math.Clamp(this.host.moveIndex + dx, 0, this.host.playerMon.moves.length - 1);
@@ -345,11 +365,40 @@ export class BattleUi {
     return true;
   }
 
-  private animateHp(bar: Phaser.GameObjects.Graphics, current: number, max: number, x: number, y: number): void {
-    bar.clear();
-    const newBar = drawHpBar(this.scene, x, y, 180, 10, current, max, bar.depth);
-    bar.destroy();
-    if (bar === this.enemyHpBar) this.enemyHpBar = newBar;
-    else this.playerHpBar = newBar;
+  private animateHp(
+    bar: Phaser.GameObjects.Graphics,
+    targetCurrent: number,
+    max: number,
+    x: number,
+    y: number,
+    isEnemy: boolean,
+  ): void {
+    const key = isEnemy ? 'enemyDisplayedHp' : 'playerDisplayedHp';
+    const start = this[key];
+    if (start === targetCurrent) {
+      bar.clear();
+      const newBar = drawHpBar(this.scene, x, y, 180, 10, targetCurrent, max, bar.depth);
+      bar.destroy();
+      if (isEnemy) this.enemyHpBar = newBar;
+      else this.playerHpBar = newBar;
+      return;
+    }
+    this.scene.tweens.addCounter({
+      from: start,
+      to: targetCurrent,
+      duration: 300,
+      ease: 'Quad.easeOut',
+      onUpdate: tween => {
+        const val = Math.round(tween.getValue() ?? targetCurrent);
+        this[key] = val;
+        bar.clear();
+        const newBar = drawHpBar(this.scene, x, y, 180, 10, val, max, bar.depth);
+        bar.destroy();
+        if (isEnemy) this.enemyHpBar = newBar;
+        else this.playerHpBar = newBar;
+        bar = newBar;
+      },
+      onComplete: () => { this[key] = targetCurrent; },
+    });
   }
 }

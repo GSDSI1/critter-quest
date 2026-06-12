@@ -65,7 +65,7 @@ export class NpcManager {
     const player = this.scene.add.sprite(
       GameState.player.x * TILE_SIZE + TILE_SIZE / 2,
       GameState.player.y * TILE_SIZE + TILE_SIZE / 2,
-      playerTextureKey(GameState.player.characterId, GameState.player.facing, 0),
+      playerTextureKey(this.scene, GameState.player.characterId, GameState.player.facing, 0),
     ).setDepth(10);
     return { player, shadow };
   }
@@ -118,13 +118,13 @@ export class NpcManager {
     const tile = getTile(map, nx, ny);
 
     if (!isWalkable(tile)) {
-      player.setTexture(playerTextureKey(GameState.player.characterId, facing, 0));
+      player.setTexture(playerTextureKey(this.scene, GameState.player.characterId, facing, 0));
       return false;
     }
 
     const npc = map.npcs.find(n => n.x === nx && n.y === ny);
     if (npc) {
-      player.setTexture(playerTextureKey(GameState.player.characterId, facing, 0));
+      player.setTexture(playerTextureKey(this.scene, GameState.player.characterId, facing, 0));
       this.interactNpc(npc);
       return false;
     }
@@ -133,7 +133,7 @@ export class NpcManager {
     let frame = 0;
     const walkAnim = this.scene.time.addEvent({
       delay: moveDuration / 2, repeat: 3,
-      callback: () => { frame = 1 - frame; player.setTexture(playerTextureKey(GameState.player.characterId, facing, frame)); },
+      callback: () => { frame = 1 - frame; player.setTexture(playerTextureKey(this.scene, GameState.player.characterId, facing, frame)); },
     });
 
     this.scene.tweens.add({
@@ -147,7 +147,7 @@ export class NpcManager {
       },
       onComplete: () => {
         walkAnim.destroy();
-        player.setTexture(playerTextureKey(GameState.player.characterId, facing, 0));
+        player.setTexture(playerTextureKey(this.scene, GameState.player.characterId, facing, 0));
         playerShadow.x = player.x;
         playerShadow.y = player.y + 6;
         GameState.player.x = nx;

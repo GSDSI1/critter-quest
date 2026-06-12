@@ -4,7 +4,7 @@ import { COLORS, GAME_WIDTH } from '../data/types';
 import { generateAssets, ensureAllCreatureTextures } from '../utils/sprites';
 import { CREATURES } from '../data/creatures';
 import {
-  preloadAssetMeta, preloadBootArt, applyLoadedAssetMeta, isPlaceholderAssets,
+  preloadAssetMeta, preloadBootArt, applyLoadedAssetMeta, isPlaceholderAssets, setAssetMeta,
 } from '../utils/assetLoader';
 import { initOptions } from '../systems/options';
 import { bindAudioScene } from '../utils/audio';
@@ -14,6 +14,7 @@ export class BootScene extends Phaser.Scene {
   private progressBar!: Phaser.GameObjects.Graphics;
   private progressBox!: Phaser.GameObjects.Graphics;
   private loadText!: Phaser.GameObjects.Text;
+  private artLoadFailed = false;
 
   constructor() {
     super('Boot');
@@ -52,12 +53,20 @@ export class BootScene extends Phaser.Scene {
       this.loadText.setText(`${Math.floor(v * 100)}%`);
     });
 
-    this.load.on('loaderror', () => { /* fall back to procedural */ });
+    this.load.on('loaderror', (file: Phaser.Loader.File) => {
+      if (['critters_atlas', 'critters_sm_atlas', 'ext_tileset'].includes(file.key)) {
+        this.artLoadFailed = true;
+      }
+    });
     preloadAssetMeta(this);
   }
 
   create(): void {
     applyLoadedAssetMeta(this);
+
+    if (this.artLoadFailed) {
+      setAssetMeta({ placeholder: true, version: 3, atlas: false });
+    }
 
     if (isPlaceholderAssets()) {
       void this.finishBoot();

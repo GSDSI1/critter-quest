@@ -71,9 +71,14 @@ export function creatureTexRef(
   const frame = creatureFrameName(speciesId, small, variant);
   if (usesCreatureAtlas(scene)) {
     const atlasKey = small ? SM_ATLAS : LG_ATLAS;
-    if (scene.textures.exists(atlasKey)) return { key: atlasKey, frame };
+    if (hasAtlasFrame(scene, frame, small)) return { key: atlasKey, frame };
   }
-  return { key: creatureTextureKey(scene, speciesId, small, variant) };
+  let suffix = small ? '_sm' : '';
+  if (variant === 'f2') suffix += '_f2';
+  if (variant === 'back') suffix += '_back';
+  const extKey = `ext_creature_${speciesId}${suffix}`;
+  if (isRealExternalTexture(scene, extKey)) return { key: extKey };
+  return { key: `creature_${speciesId}${small ? '_sm' : ''}` };
 }
 
 export function addCreatureImage(
@@ -140,6 +145,15 @@ export function preloadBootArt(scene: Phaser.Scene): void {
   }
   for (const role of NPC_ROLES) {
     scene.load.image(`ext_npc_${role}`, `assets/npcs/${role}.png`);
+  }
+  const playerIds = ['scout', 'ranger', 'scholar', 'ace'] as const;
+  for (const id of playerIds) {
+    for (const dir of ['down', 'up', 'left', 'right'] as const) {
+      for (let f = 0; f < 2; f++) {
+        scene.load.image(`ext_player_${id}_${dir}_${f}`, `assets/players/${id}_${dir}_${f}.png`);
+      }
+    }
+    scene.load.image(`ext_player_${id}_back`, `assets/players/${id}_back.png`);
   }
   for (const key of SFX_KEYS) {
     scene.load.audio(`sfx_${key}`, `assets/audio/${key}.wav`);

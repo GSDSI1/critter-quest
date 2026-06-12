@@ -44,7 +44,7 @@ export class TrainerIntroScene extends Phaser.Scene {
       const trainerSprite = this.add.image(100, 230, npcTextureKey(this, 'trainer_m')).setScale(2).setAlpha(0).setDepth(5);
       const playerSprite = this.add.image(
         GAME_WIDTH - 100, 280,
-        playerBackTextureKey(GameState.player.characterId),
+        playerBackTextureKey(this,GameState.player.characterId),
       ).setScale(2).setFlipX(true).setAlpha(0).setDepth(5);
 
       const trainerName = this.add.text(GAME_WIDTH / 4, 340, data.trainerName, {

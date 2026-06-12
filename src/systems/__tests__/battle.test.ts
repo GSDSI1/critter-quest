@@ -1,8 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { calcDamage, stageMult, expGain, tryRun, tryCatchWithItem, applyMoveStatus, tryHeldBerry } from '../battle';
+import { calcDamage, stageMult, expGain, tryRun, tryCatchWithItem, applyMoveStatus, tryHeldBerry, executeMove, resolveTurnOrder } from '../battle';
 import { createCritter } from '../stats';
 import { createSeededRng } from '../rng';
 import { typeMultiplier } from '../../data/types';
+import { getMove } from '../../data/moves';
 
 describe('stageMult', () => {
   it('applies positive and negative stages', () => {
@@ -94,5 +95,86 @@ describe('sitrus berry', () => {
     c.currentHp = Math.floor(c.maxHp / 4) + 1;
     expect(tryHeldBerry(c)).toBeNull();
     expect(c.heldItem).toBe('sitrus_berry');
+  });
+});
+
+describe('resolveTurnOrder', () => {
+  it('faster mon moves first', () => {
+    const fast = createCritter('sparkbit', 20, undefined, { perfectIvs: true, nature: 'jolly' });
+    const slow = createCritter('pebblite', 20, undefined, { perfectIvs: true, nature: 'brave' });
+    expect(resolveTurnOrder(fast, slow, createSeededRng(1))).toBe('player');
+    expect(resolveTurnOrder(slow, fast, createSeededRng(1))).toBe('enemy');
+  });
+
+  it('breaks speed ties with rng', () => {
+    const a = createCritter('mossling', 10);
+    const b = createCritter('mossling', 10);
+    const order = resolveTurnOrder(a, b, createSeededRng(42));
+    expect(['player', 'enemy']).toContain(order);
+  });
+});
+
+describe('calm_mind', () => {
+  it('raises Sp. Atk not Attack', () => {
+    const mon = createCritter('psychomyst', 20);
+    const foe = createCritter('mossling', 20);
+    const moveIdx = mon.moves.findIndex(m => m.id === 'calm_mind');
+    if (moveIdx < 0) {
+      mon.moves[0] = { id: 'calm_mind', pp: 20, maxPp: 20 };
+    }
+    const idx = moveIdx >= 0 ? moveIdx : 0;
+    const beforeAtk = mon.statStages.atk;
+    const beforeSpa = mon.statStages.spa;
+    executeMove(mon, foe, idx, createSeededRng(1));
+    expect(mon.statStages.spa).toBeGreaterThan(beforeSpa);
+    expect(mon.statStages.atk).toBe(beforeAtk);
+  });
+});
+
+describe('sturdy', () => {
+  it('survives OHKO from full HP once', () => {
+    const atk = createCritter('emberlord', 50, undefined, { perfectIvs: true, nature: 'modest' });
+    const def = createCritter('pebblite', 50);
+    def.ability = 'sturdy';
+    def.currentHp = def.maxHp;
+    const moveIdx = atk.moves.findIndex(m => getMove(m.id).power > 0);
+    const result = executeMove(atk, def, moveIdx >= 0 ? moveIdx : 0, createSeededRng(7));
+    expect(def.currentHp).toBe(1);
+    expect(result.message).toContain('endured');
+  });
+});
+
+describe('thick_fat', () => {
+  it('halves flame damage', () => {
+    const atk = createCritter('emberpup', 30, undefined, { perfectIvs: true, nature: 'modest' });
+    const def = createCritter('mossling', 30);
+    def.ability = 'thick_fat';
+    const rng = createSeededRng(55);
+    const normal = calcDamage(atk, { ...def, ability: 'inner_focus' }, 'ember', true, rng);
+    const thick = calcDamage(atk, def, 'ember', true, createSeededRng(55));
+    expect(thick.damage).toBeLessThanOrEqual(Math.ceil(normal.damage / 2));
+  });
+});
+
+describe('flash_fire', () => {
+  it('absorbs flame and boosts next fire move', () => {
+    const atk = createCritter('emberpup', 20);
+    const def = createCritter('cinderkit', 20);
+    def.ability = 'flash_fire';
+    const emberIdx = atk.moves.findIndex(m => m.id === 'ember');
+    const absorb = executeMove(atk, def, emberIdx >= 0 ? emberIdx : 0, createSeededRng(1));
+    expect(absorb.message).toContain('absorbed the flames');
+    expect(def.vol?.flashFireActive).toBe(true);
+  });
+});
+
+describe('synchronize', () => {
+  it('passes burn to attacker', () => {
+    const atk = createCritter('leafkit', 15);
+    const def = createCritter('psychomyst', 15);
+    def.ability = 'synchronize';
+    const msg = applyMoveStatus(def, 'burn', 100, createSeededRng(1), atk);
+    expect(msg).toContain('synchronized');
+    expect(atk.status).toBe('burn');
   });
 });

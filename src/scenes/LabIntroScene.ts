@@ -43,7 +43,7 @@ export class LabIntroScene extends Phaser.Scene {
       fontFamily: FONT, fontSize: '15px', color: '#f0f0f0',
     });
 
-    this.playerSprite = this.add.sprite(500, 260, playerTextureKey(GameState.player.characterId, 'down', 0)).setScale(2.5);
+    this.playerSprite = this.add.sprite(500, 260, playerTextureKey(this,GameState.player.characterId, 'down', 0)).setScale(2.5);
     this.tweens.add({
       targets: [this.profSprite, this.playerSprite],
       y: '-=4',

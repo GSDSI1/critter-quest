@@ -6,6 +6,7 @@ import { getBadge } from '../../data/badges';
 import {
   executeMove, tryCatchWithItem, tryRun, pickAiMove, expGain,
   endOfTurnStatus, effectiveSpeed, applyEnterAbility, tryHeldBerry, isRunBlocked,
+  resolveTurnOrder,
 } from '../../systems/battle';
 import { isEliteGauntletActive } from '../../systems/eliteGauntlet';
 import {
@@ -22,6 +23,7 @@ import { Sfx } from '../../utils/audio';
 import type { BattlePhase } from './BattleUi';
 import type { BattleUi } from './BattleUi';
 import type { BattleAnims } from './BattleAnims';
+import type { BattleResult } from '../../systems/battle';
 
 export interface BattleFlowHost {
   readonly time: Phaser.Time.Clock;
@@ -72,9 +74,10 @@ export class BattleFlow {
     const result = useItemOnCritter(GameState.player.items, itemId, this.host.playerMon);
     this.host.ui.queueMessage(result.message);
     this.host.phase = 'message';
+    if (result.ok) this.host.battleAnims.animateHeal(this.host.ui.playerSprite);
     this.host.ui.refreshPlayerUi();
     this.host.showNextMessage();
-    if (result.ok) this.host.time.delayedCall(600, () => this.enemyTurn());
+    if (result.ok) this.host.time.delayedCall(600, () => this.enemyTurnOnly());
     else this.host.time.delayedCall(400, () => { this.host.phase = 'menu'; this.host.ui.showMenu(); });
   }
 
@@ -82,51 +85,129 @@ export class BattleFlow {
     if (this.host.phase !== 'moves') return;
     this.host.ui.moveContainer.setVisible(false);
     this.host.phase = 'fight';
-    const result = executeMove(this.host.playerMon, this.host.wild, index);
-    this.host.ui.queueMessage(result.message);
-    if (result.cantMove) {
-      this.host.ui.refreshPlayerUi();
-      this.host.phase = 'message';
-      this.host.showNextMessage();
-      if (result.attackerFainted || isFainted(this.host.playerMon)) {
-        this.host.time.delayedCall(800, () => this.host.onPlayerFainted());
-      } else {
-        this.host.time.delayedCall(600, () => this.enemyTurn());
-      }
-      return;
-    }
-    if (result.damage && result.damage > 0) {
-      const moveType = getMove(this.host.playerMon.moves[index].id).type;
-      this.host.battleAnims.animateAttackLunge(this.host.ui.playerSprite, true, () => {
-        this.host.battleAnims.playHitOnEnemy(this.host.ui.enemySprite, moveType, result.effectiveness);
-        this.host.ui.animateEnemyHp();
-        this.host.battleAnims.applyEffectivenessTint(this.host.ui.enemySprite, result.effectiveness);
+    const enemyMove = pickAiMove(this.host.wild, this.host.playerMon);
+    const playerFirst = resolveTurnOrder(this.host.playerMon, this.host.wild) === 'player';
+
+    if (playerFirst) {
+      this.runSide(true, index, () => {
+        if (this.turnEnded()) return;
+        this.runSide(false, enemyMove, () => this.finishTurn());
       });
-    } else if (result.statChange) {
-      this.host.ui.animateEnemyHp();
-    }
-    if (result.fainted) {
-      this.host.phase = 'message';
-      this.host.showNextMessage();
-      this.host.time.delayedCall(400, () => {
-        this.host.battleAnims.animateFaint(this.host.ui.enemySprite, () => this.onEnemyFainted());
+    } else {
+      this.runSide(false, enemyMove, () => {
+        if (this.turnEnded()) return;
+        this.runSide(true, index, () => this.finishTurn());
       });
-      return;
     }
-    this.host.phase = 'message';
-    this.host.showNextMessage();
-    this.host.time.delayedCall(600, () => this.enemyTurn());
   }
 
-  enemyTurn(): void {
-    if (isFainted(this.host.wild) || isFainted(this.host.playerMon)) return;
-    const berryMsg = tryHeldBerry(this.host.playerMon);
-    if (berryMsg) { this.host.ui.queueMessage(berryMsg); this.host.ui.refreshPlayerUi(); }
+  private turnEnded(): boolean {
+    return isFainted(this.host.wild) || isFainted(this.host.playerMon);
+  }
+
+  private runSide(isPlayer: boolean, moveIndex: number, onComplete: () => void): void {
+    const attacker = isPlayer ? this.host.playerMon : this.host.wild;
+    const defender = isPlayer ? this.host.wild : this.host.playerMon;
+    const attackerSprite = isPlayer ? this.host.ui.playerSprite : this.host.ui.enemySprite;
+    const defenderSprite = isPlayer ? this.host.ui.enemySprite : this.host.ui.playerSprite;
+    const towardEnemy = isPlayer;
+
+    const result = executeMove(attacker, defender, moveIndex);
+    this.host.ui.queueMessage(result.message);
+    this.host.phase = 'message';
+
+    const afterMessages = () => {
+      this.host.showNextMessage();
+      this.host.time.delayedCall(400, onComplete);
+    };
+
+    if (result.cantMove) {
+      if (isPlayer) this.host.ui.refreshPlayerUi();
+      if (result.attackerFainted || isFainted(this.host.playerMon)) {
+        this.host.time.delayedCall(800, () => this.host.onPlayerFainted());
+        return;
+      }
+      afterMessages();
+      return;
+    }
+
+    if (result.missed) {
+      this.host.battleAnims.animateMiss(attackerSprite, afterMessages);
+      return;
+    }
+
+    if (result.healed) {
+      this.host.battleAnims.animateHeal(attackerSprite);
+      if (isPlayer) this.host.ui.refreshPlayerUi();
+      else this.host.ui.animateEnemyHp();
+      afterMessages();
+      return;
+    }
+
+    if (result.statChange) {
+      const targetSprite = result.statChange.target === 'attacker' ? attackerSprite : defenderSprite;
+      this.host.battleAnims.animateStatBoost(targetSprite, result.statChange.stages > 0);
+      if (!isPlayer && result.statChange.target === 'defender') this.host.ui.animateEnemyHp();
+      if (isPlayer) this.host.ui.refreshPlayerUi();
+      afterMessages();
+      return;
+    }
+
+    if (result.damage && result.damage > 0) {
+      const moveType = getMove((isPlayer ? this.host.playerMon : this.host.wild).moves[moveIndex].id).type;
+      this.host.battleAnims.animateAttackLunge(attackerSprite, towardEnemy, () => {
+        if (towardEnemy) {
+          this.host.battleAnims.playHitOnEnemy(defenderSprite, moveType, result.effectiveness);
+          this.host.ui.animateEnemyHp();
+          this.host.battleAnims.applyEffectivenessTint(defenderSprite, result.effectiveness);
+        } else {
+          this.host.battleAnims.playHitOnPlayer(defenderSprite, moveType);
+          this.host.ui.refreshPlayerUi();
+        }
+        this.handleFaintOrContinue(result, isPlayer, defenderSprite, afterMessages);
+      });
+      return;
+    }
+
+    this.handleFaintOrContinue(result, isPlayer, defenderSprite, afterMessages);
+  }
+
+  private handleFaintOrContinue(
+    result: BattleResult,
+    playerWasAttacker: boolean,
+    defenderSprite: Phaser.GameObjects.Image,
+    onContinue: () => void,
+  ): void {
+    if (result.fainted) {
+      this.host.showNextMessage();
+      this.host.time.delayedCall(400, () => {
+        this.host.battleAnims.animateFaint(defenderSprite, () => {
+          if (playerWasAttacker) this.onEnemyFainted();
+          else this.host.onPlayerFainted();
+        });
+      });
+      return;
+    }
+    onContinue();
+  }
+
+  private finishTurn(): void {
+    if (this.turnEnded()) return;
+
+    const playerBerry = tryHeldBerry(this.host.playerMon);
+    if (playerBerry) {
+      this.host.ui.queueMessage(playerBerry);
+      this.host.ui.refreshPlayerUi();
+    }
     const enemyBerry = tryHeldBerry(this.host.wild);
-    if (enemyBerry) { this.host.ui.queueMessage(enemyBerry); this.host.ui.animateEnemyHp(); }
-    const statusMsg = endOfTurnStatus(this.host.playerMon);
-    if (statusMsg) {
-      this.host.ui.queueMessage(statusMsg);
+    if (enemyBerry) {
+      this.host.ui.queueMessage(enemyBerry);
+      this.host.ui.animateEnemyHp();
+    }
+
+    const playerStatus = endOfTurnStatus(this.host.playerMon);
+    if (playerStatus) {
+      this.host.ui.queueMessage(playerStatus);
       this.host.ui.refreshPlayerUi();
       if (isFainted(this.host.playerMon)) {
         this.host.phase = 'message';
@@ -135,17 +216,7 @@ export class BattleFlow {
         return;
       }
     }
-    this.host.phase = 'enemy';
-    const aiMove = pickAiMove(this.host.wild, this.host.playerMon);
-    const result = executeMove(this.host.wild, this.host.playerMon, aiMove);
-    this.host.ui.queueMessage(result.message);
-    if (result.damage && result.damage > 0) {
-      const moveType = getMove(this.host.wild.moves[aiMove].id).type;
-      this.host.battleAnims.animateAttackLunge(this.host.ui.enemySprite, false, () => {
-        this.host.battleAnims.playHitOnPlayer(this.host.ui.playerSprite, moveType);
-        this.host.ui.refreshPlayerUi();
-      });
-    }
+
     const enemyStatus = endOfTurnStatus(this.host.wild);
     if (enemyStatus) {
       this.host.ui.queueMessage(enemyStatus);
@@ -159,9 +230,24 @@ export class BattleFlow {
         return;
       }
     }
-    this.host.phase = 'message';
-    this.host.showNextMessage();
-    if (isFainted(this.host.playerMon)) this.host.time.delayedCall(800, () => this.host.onPlayerFainted());
+
+    if (playerBerry || enemyBerry || playerStatus || enemyStatus) {
+      this.host.phase = 'message';
+      this.host.showNextMessage();
+      this.host.time.delayedCall(400, () => { this.host.phase = 'menu'; this.host.ui.showMenu(); });
+      return;
+    }
+
+    this.host.phase = 'menu';
+    this.host.ui.showMenu();
+  }
+
+  /** Enemy acts alone (after bag item, failed run, etc.). */
+  enemyTurnOnly(): void {
+    if (this.turnEnded()) return;
+    const aiMove = pickAiMove(this.host.wild, this.host.playerMon);
+    this.host.phase = 'enemy';
+    this.runSide(false, aiMove, () => this.finishTurn());
   }
 
   onEnemyFainted(): void {
@@ -209,7 +295,7 @@ export class BattleFlow {
     this.host.phase = 'message';
     this.host.showNextMessage();
     if (fled) this.host.time.delayedCall(600, () => this.host.endBattle(false));
-    else this.host.time.delayedCall(600, () => this.enemyTurn());
+    else this.host.time.delayedCall(600, () => this.enemyTurnOnly());
   }
 
   onVictory(): void {

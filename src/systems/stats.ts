@@ -35,6 +35,8 @@ export interface CritterInstance {
   statStages: { atk: number; def: number; spa: number; spd: number; spe: number };
   status: StatusCondition;
   statusTurns?: number;
+  /** Battle-only volatile state (not persisted across saves). */
+  vol?: { sturdyUsed?: boolean; flashFireActive?: boolean };
 }
 
 export interface PlayerState {

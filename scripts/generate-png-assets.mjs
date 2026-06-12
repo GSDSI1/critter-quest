@@ -12,16 +12,20 @@ import {
 import { drawStarterOverride } from './critter-art/starters.mjs';
 import { drawBatch5Override } from './critter-art/batch5.mjs';
 import { drawBatch6Override } from './critter-art/batch6.mjs';
+import { drawBatch7Override } from './critter-art/batch7.mjs';
+import { generatePlayerPngs } from './critter-art/players.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
 const assetsDir = join(root, 'public/assets');
 const critterDir = join(assetsDir, 'critters');
 const npcDir = join(assetsDir, 'npcs');
+const playerDir = join(assetsDir, 'players');
 const audioDir = join(assetsDir, 'audio');
 
 mkdirSync(critterDir, { recursive: true });
 mkdirSync(npcDir, { recursive: true });
+mkdirSync(playerDir, { recursive: true });
 mkdirSync(audioDir, { recursive: true });
 
 function parseCreatures(ts) {
@@ -66,12 +70,15 @@ function drawTypeDetail(rgba, w, h, type, cx, cy, s, frame) {
 
 function drawCreature(rgba, w, h, { id, color, shape, types }, opts = {}) {
   const { frame = 0, back = false } = opts;
+  if (id && drawBatch7Override(rgba, w, id, { frame, back })) return;
   if (id && drawBatch6Override(rgba, w, id, { frame, back })) return;
   if (id && drawBatch5Override(rgba, w, id, { frame, back })) return;
   if (id && drawStarterOverride(rgba, w, id, { frame, back })) return;
   const rgb = rgbFromHex(color);
   const dark = shade(rgb, -45);
+  const mid = shade(rgb, -12);
   const light = shade(rgb, 45);
+  const highlight = shade(rgb, 65);
   const cx = w / 2 + frame;
   const cy = h / 2 + (frame ? 1 : 0);
   const s = w;
@@ -90,7 +97,9 @@ function drawCreature(rgba, w, h, { id, color, shape, types }, opts = {}) {
   switch (shape) {
     case 'blob':
       fillCircle(rgba, w, h, cx, cy, s * 0.32, [...rgb, 255]);
+      fillCircle(rgba, w, h, cx - s * 0.06, cy + s * 0.04, s * 0.22, [...mid, 255]);
       fillCircle(rgba, w, h, cx - s * 0.1, cy - s * 0.12, s * 0.1, [...light, 200]);
+      fillCircle(rgba, w, h, cx + s * 0.04, cy - s * 0.14, s * 0.06, [...highlight, 160]);
       if (frame === 0) {
         fillCircle(rgba, w, h, cx - s * 0.08, cy - s * 0.04, s * 0.05, [255, 255, 255, 255]);
         fillCircle(rgba, w, h, cx + s * 0.1, cy - s * 0.04, s * 0.05, [255, 255, 255, 255]);
@@ -207,8 +216,11 @@ for (const [role, rgb] of Object.entries(NPCS)) {
   writePng(join(npcDir, `${role}.png`), 32, 32, rgba);
 }
 
-writeFileSync(join(assetsDir, 'meta.json'), JSON.stringify({ placeholder: false, version: 2 }, null, 2) + '\n');
-console.log('Generated critters + NPCs. meta.json → placeholder:false');
+generatePlayerPngs(playerDir);
+console.log('Generated player trainer sprites.');
+
+writeFileSync(join(assetsDir, 'meta.json'), JSON.stringify({ placeholder: false, version: 3, atlas: true }, null, 2) + '\n');
+console.log('Generated critters + NPCs + players. meta.json → placeholder:false, atlas:true');
 
 import { spawnSync } from 'child_process';
 spawnSync('node', ['scripts/pack-tileset.mjs'], { cwd: root, stdio: 'inherit' });

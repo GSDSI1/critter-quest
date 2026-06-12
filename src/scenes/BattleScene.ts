@@ -20,7 +20,7 @@ import { Sfx } from '../utils/audio';
 import { startMusic, stopMusic } from '../utils/music';
 import { Input } from '../systems/input';
 import { BattleAnims } from './battle/BattleAnims';
-import { BattleUi, MENU_ITEMS, type BattlePhase, type BattleUiHost } from './battle/BattleUi';
+import { BattleUi, battleMenuItems, type BattlePhase, type BattleUiHost } from './battle/BattleUi';
 import { BattleFlow, type BattleFlowHost } from './battle/BattleFlow';
 import { autoAdvanceMs, shouldAutoAdvanceText } from '../systems/options';
 import {
@@ -180,7 +180,7 @@ export class BattleScene extends Phaser.Scene implements BattleUiHost, BattleFlo
       return;
     }
     else if (this.phase === 'evolve') this.flow.doEvolution();
-    else if (this.phase === 'menu') this.menuChoice(MENU_ITEMS[this.menuIndex]);
+    else if (this.phase === 'menu') this.menuChoice(battleMenuItems(this.isTrainer)[this.menuIndex]);
     else if (this.phase === 'moves') this.useMove(this.moveIndex);
     else if (this.phase === 'bag') {
       const items = getBattleUsableItems(GameState.player.items, !this.isTrainer);
@@ -390,7 +390,7 @@ export class BattleScene extends Phaser.Scene implements BattleUiHost, BattleFlo
     this.showNextMessage();
     this.scene.resume();
     const after = voluntary
-      ? () => this.flow.enemyTurn()
+      ? () => this.flow.enemyTurnOnly()
       : () => { this.phase = 'menu'; this.ui.showMenu(); };
     this.time.delayedCall(600, after);
   }

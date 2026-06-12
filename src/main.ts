@@ -13,6 +13,7 @@ import { MenuScene } from './scenes/MenuScene';
 import { installLazySceneLoader } from './scenes/registerScenes';
 import { installCanvasFocusOnBoot } from './utils/focusCanvas';
 import type { BattleScene } from './scenes/BattleScene';
+import { battleMenuItems } from './scenes/battle/BattleUi';
 import type { OverworldScene } from './scenes/OverworldScene';
 import { applyChestReward } from './scenes/overworld/ChestRewards';
 import type { FishingScene } from './scenes/FishingScene';
@@ -73,6 +74,10 @@ declare global {
       startWildBattle: (speciesId?: string) => void;
       startTrainerBattle: (npcId: string, mapId?: string) => void;
       resolveBattle: (outcome: 'win' | 'lose' | 'catch') => void;
+      battleState: () => { phase: string; enemyHp: number; enemyMaxHp: number } | null;
+      battleTapContinue: () => boolean;
+      battlePickMove: (index?: number) => boolean;
+      battleMenuForTrainer: () => string[];
       openShop: () => void;
       buyShopItem: (itemId?: string) => boolean;
       sellShopItem: (itemId?: string) => boolean;
@@ -187,6 +192,27 @@ if (import.meta.env.DEV) {
     resolveBattle(outcome) {
       const battle = game.scene.getScene('Battle') as BattleScene | undefined;
       battle?.resolveBattle(outcome);
+    },
+    battleState() {
+      const battle = game.scene.getScene('Battle') as BattleScene | undefined;
+      if (!battle?.scene.isActive()) return null;
+      return { phase: battle.phase, enemyHp: battle.wild.currentHp, enemyMaxHp: battle.wild.maxHp };
+    },
+    battleTapContinue() {
+      const battle = game.scene.getScene('Battle') as BattleScene | undefined;
+      if (!battle) return false;
+      battle.onConfirm();
+      return true;
+    },
+    battlePickMove(index = 0) {
+      const battle = game.scene.getScene('Battle') as BattleScene | undefined;
+      if (!battle || battle.phase !== 'menu') return false;
+      battle.menuChoice('Fight');
+      battle.useMove(index);
+      return true;
+    },
+    battleMenuForTrainer() {
+      return [...battleMenuItems(true)];
     },
     openShop() {
       const ow = game.scene.getScene('Overworld');

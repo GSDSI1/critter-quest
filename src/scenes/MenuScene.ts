@@ -117,7 +117,7 @@ export class MenuScene extends Phaser.Scene {
       `Leader: ${leader}  ·  Badges: ${badges}  ·  $${p.money}`,
     ]);
 
-    this.add.sprite(520, 210, playerTextureKey(p.characterId, 'down', 0)).setScale(3);
+    this.add.sprite(520, 210, playerTextureKey(this,p.characterId, 'down', 0)).setScale(3);
     const preset = getTrainer(p.characterId);
     this.add.text(520, 248, preset.label, {
       fontFamily: FONT, fontSize: '10px', color: '#8899aa',

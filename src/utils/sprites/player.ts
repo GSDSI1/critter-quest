@@ -2,13 +2,17 @@ import Phaser from 'phaser';
 import { TRAINER_PRESETS, getTrainer, type TrainerPreset } from '../../data/characters';
 import { darken, lighten } from './colors';
 
-export function playerTextureKey(characterId: string, facing: string, frame: number): string {
+export function playerTextureKey(scene: Phaser.Scene, characterId: string, facing: string, frame: number): string {
   const id = getTrainer(characterId).id;
+  const ext = `ext_player_${id}_${facing}_${frame}`;
+  if (scene.textures.exists(ext)) return ext;
   return `player_${id}_${facing}_${frame}`;
 }
 
-export function playerBackTextureKey(characterId: string): string {
+export function playerBackTextureKey(scene: Phaser.Scene, characterId: string): string {
   const id = getTrainer(characterId).id;
+  const ext = `ext_player_${id}_back`;
+  if (scene.textures.exists(ext)) return ext;
   return `player_back_${id}`;
 }
 

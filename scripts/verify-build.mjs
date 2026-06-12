@@ -32,6 +32,10 @@ const metaPath = join(root, 'public/assets/meta.json');
   const meta = JSON.parse(readFileSync(metaPath, 'utf8'));
   if (meta.placeholder === true) ok('meta.json placeholder mode (procedural art active)');
   else ok('meta.json custom art mode');
+  if (meta.atlas === true) {
+    if (existsSync(join(root, 'public/assets/critters/atlas.png'))) ok('Critter atlas PNG (meta.atlas)');
+    else fail('public/assets/critters/atlas.png missing — run npm run gen-assets');
+  }
 } else fail('public/assets/meta.json missing');
 
 if (existsSync(join(root, 'public/assets/tiles/tileset.png'))) ok('tileset.png present');

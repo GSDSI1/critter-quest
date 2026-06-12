@@ -118,6 +118,62 @@ export class BattleAnims {
     this.scene.time.delayedCall(350, () => sprite.clearTint());
   }
 
+  animateMiss(sprite: Phaser.GameObjects.Image, onDone?: () => void): void {
+    const baseX = sprite.x;
+    this.scene.tweens.add({
+      targets: sprite,
+      x: baseX + (isPlayerSprite(sprite) ? -18 : 18),
+      alpha: 0.6,
+      duration: 120,
+      yoyo: true,
+      ease: 'Sine.easeOut',
+      onComplete: () => { sprite.x = baseX; sprite.setAlpha(1); onDone?.(); },
+    });
+  }
+
+  animateHeal(sprite: Phaser.GameObjects.Image): void {
+    this.scene.tweens.add({
+      targets: sprite,
+      scaleX: sprite.scaleX * 1.08,
+      scaleY: sprite.scaleY * 1.08,
+      duration: 180,
+      yoyo: true,
+      ease: 'Sine.easeInOut',
+    });
+    const emitter = this.scene.add.particles(sprite.x, sprite.y, this.particleKey, {
+      speed: { min: 20, max: 50 },
+      angle: { min: 240, max: 300 },
+      scale: { start: 0.4, end: 0 },
+      lifespan: 400,
+      gravityY: -40,
+      tint: 0x22c55e,
+      quantity: 8,
+      emitting: false,
+      blendMode: 'ADD',
+    }).setDepth(200);
+    emitter.explode(8);
+    this.scene.time.delayedCall(480, () => emitter.destroy());
+  }
+
+  animateStatBoost(sprite: Phaser.GameObjects.Image, up: boolean): void {
+    const tint = up ? 0x44ff88 : 0xff6644;
+    sprite.setTint(tint);
+    this.scene.tweens.add({
+      targets: sprite,
+      y: sprite.y - (up ? 6 : 0),
+      duration: 200,
+      yoyo: true,
+      ease: 'Quad.easeOut',
+      onComplete: () => sprite.clearTint(),
+    });
+  }
+
+  animateStatusInflict(sprite: Phaser.GameObjects.Image, moveType?: string): void {
+    const color = ELEMENT_COLORS[moveType ?? 'shadow'] ?? 0xffffff;
+    sprite.setTint(color);
+    this.scene.time.delayedCall(280, () => sprite.clearTint());
+  }
+
   fadeIn(sprite: Phaser.GameObjects.Image, duration = 400): void {
     this.scene.tweens.add({ targets: sprite, alpha: 1, duration });
   }

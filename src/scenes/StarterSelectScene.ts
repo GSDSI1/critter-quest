@@ -338,7 +338,7 @@ function buildTrainerChip(scene: Phaser.Scene): Phaser.GameObjects.Container {
   const name = scene.add.text(0, -8, GameState.player.name, {
     fontFamily: FONT, fontSize: '9px', color: '#f5c542',
   }).setOrigin(0.5);
-  const spr = scene.add.sprite(0, 12, playerTextureKey(GameState.player.characterId, 'down', 0))
+  const spr = scene.add.sprite(0, 12, playerTextureKey(scene, GameState.player.characterId, 'down', 0))
     .setScale(1.75);
   c.add([g, name, spr]);
   return c;

@@ -45,7 +45,13 @@ export function defaultAbilityForTypes(types: string[]): string {
 }
 
 /** Returns damage multiplier from ability on attack */
-export function abilityAttackMult(abilityId: string, moveType: string, hpRatio: number): number {
+export function abilityAttackMult(
+  abilityId: string,
+  moveType: string,
+  hpRatio: number,
+  flashFireActive = false,
+): number {
+  if (flashFireActive && abilityId === 'flash_fire' && moveType === 'flame') return 1.5;
   if (hpRatio <= 0.33) {
     if (abilityId === 'blaze' && moveType === 'flame') return 1.5;
     if (abilityId === 'torrent' && moveType === 'tide') return 1.5;

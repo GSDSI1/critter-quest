@@ -51,7 +51,7 @@ export class CharacterSelectScene extends Phaser.Scene {
     previewBox.lineStyle(2, COLORS.panelBorder, 1);
     previewBox.strokeRoundedRect(GAME_WIDTH / 2 - 90, 100, 180, 180, 10);
 
-    this.preview = this.add.sprite(GAME_WIDTH / 2, 195, playerTextureKey('scout', 'down', 0)).setScale(5).setDepth(11);
+    this.preview = this.add.sprite(GAME_WIDTH / 2, 195, playerTextureKey(this,'scout', 'down', 0)).setScale(5).setDepth(11);
 
     this.leftArrow = this.add.text(GAME_WIDTH / 2 - 130, 195, '◀', {
       fontFamily: 'Arial', fontSize: '22px', color: '#667788',
@@ -123,7 +123,7 @@ export class CharacterSelectScene extends Phaser.Scene {
       this.walkTimer = 0;
       this.walkFrame = 1 - this.walkFrame;
       const preset = TRAINER_PRESETS[this.selected];
-      this.preview.setTexture(playerTextureKey(preset.id, 'down', this.walkFrame));
+      this.preview.setTexture(playerTextureKey(this,preset.id, 'down', this.walkFrame));
     }
   }
 
@@ -138,7 +138,7 @@ export class CharacterSelectScene extends Phaser.Scene {
 
   private refresh(): void {
     const preset = TRAINER_PRESETS[this.selected];
-    this.preview.setTexture(playerTextureKey(preset.id, 'down', this.walkFrame));
+    this.preview.setTexture(playerTextureKey(this,preset.id, 'down', this.walkFrame));
     this.labelText.setText(preset.label);
     this.dots.forEach((d, i) => d.setColor(i === this.selected ? '#f5c542' : '#667788'));
     this.leftArrow.setColor('#f5c542');

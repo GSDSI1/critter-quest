@@ -8,7 +8,7 @@ export interface MoveDef {
   accuracy: number;
   pp: number;
   category: 'physical' | 'special' | 'status';
-  effect?: 'heal' | 'sleep' | 'boost-atk' | 'boost-def' | 'burn' | 'paralyze' | 'poison' | 'thunderwave' | 'hypnosis';
+  effect?: 'heal' | 'sleep' | 'boost-atk' | 'boost-def' | 'boost-spa' | 'boost-spd' | 'burn' | 'paralyze' | 'poison' | 'thunderwave' | 'hypnosis';
   effectChance?: number;
   effectValue?: number;
   /** Who receives stat-stage changes from boost-* moves. Defaults to 'foe'. */
@@ -30,7 +30,7 @@ export const MOVES: Record<string, MoveDef> = {
   blizzard: { id: 'blizzard', name: 'Blizzard', type: 'ice', power: 100, accuracy: 85, pp: 5, category: 'special', effect: 'sleep', effectChance: 10 },
   psybeam: { id: 'psybeam', name: 'Psybeam', type: 'psychic', power: 65, accuracy: 100, pp: 20, category: 'special' },
   mindblast: { id: 'mindblast', name: 'Mind Blast', type: 'psychic', power: 90, accuracy: 95, pp: 10, category: 'special' },
-  calm_mind: { id: 'calm_mind', name: 'Calm Mind', type: 'psychic', power: 0, accuracy: 100, pp: 20, category: 'status', effect: 'boost-atk', effectValue: 1, effectTarget: 'self' },
+  calm_mind: { id: 'calm_mind', name: 'Calm Mind', type: 'psychic', power: 0, accuracy: 100, pp: 20, category: 'status', effect: 'boost-spa', effectValue: 1, effectTarget: 'self' },
   vine: { id: 'vine', name: 'Vine Whip', type: 'leaf', power: 40, accuracy: 100, pp: 25, category: 'physical' },
   leafblade: { id: 'leafblade', name: 'Leaf Blade', type: 'leaf', power: 70, accuracy: 95, pp: 15, category: 'physical' },
   photosynthesis: { id: 'photosynthesis', name: 'Photosynthesis', type: 'leaf', power: 0, accuracy: 100, pp: 10, category: 'status', effect: 'heal', effectValue: 0.5 },

@@ -110,17 +110,26 @@ export function calcDamage(
   const critical = forceCrit || rng.chance(heldCritBoost(attacker));
   const critMult = critical ? 1.5 : 1;
   const stab = stabBonus(attacker, move.type);
-  const abilityMult = abilityAttackMult(attacker.ability, move.type, hpRatio);
+  const abilityMult = abilityAttackMult(attacker.ability, move.type, hpRatio, attacker.vol?.flashFireActive);
   const heldMult = heldTypeBoost(attacker, move.type);
 
   const base = Math.floor(((2 * attacker.level / 5 + 2) * move.power * attack / defense) / 50 + 2);
   const variance = 0.85 + rng.next() * 0.15;
-  const damage = effectiveness <= 0 ? 0 : Math.max(1, Math.floor(base * effectiveness * stab * abilityMult * heldMult * critMult * variance));
+  let damage = effectiveness <= 0 ? 0 : Math.max(1, Math.floor(base * effectiveness * stab * abilityMult * heldMult * critMult * variance));
+  if (defender.ability === 'thick_fat' && (move.type === 'flame' || move.type === 'ice') && damage > 0) {
+    damage = Math.max(1, Math.floor(damage / 2));
+  }
 
   return { damage, effectiveness, label: typeLabel(effectiveness), critical };
 }
 
-export function applyMoveStatus(defender: CritterInstance, status: StatusCondition, chance: number, rng: Rng): string {
+export function applyMoveStatus(
+  defender: CritterInstance,
+  status: StatusCondition,
+  chance: number,
+  rng: Rng,
+  attacker?: CritterInstance,
+): string {
   if (!status || defender.status) return '';
   if (isStatusImmune(defender, status)) return '';
   if (rng.next() * 100 >= chance) return '';
@@ -135,7 +144,14 @@ export function applyMoveStatus(defender: CritterInstance, status: StatusConditi
       burn: 'was burned!', paralyze: 'is paralyzed!', poison: 'was poisoned!',
       sleep: 'fell asleep!', freeze: 'was frozen solid!', confusion: 'became confused!',
     };
-    return `${displayName(defender)} ${labels[status] ?? 'was affected!'}`;
+    let msg = `${displayName(defender)} ${labels[status] ?? 'was affected!'}`;
+    if (attacker && defender.ability === 'synchronize' && ['burn', 'poison', 'paralyze'].includes(status ?? '')) {
+      if (!attacker.status && !isStatusImmune(attacker, status)) {
+        applyStatus(attacker, status, 2 + rng.int(0, 2));
+        msg += ` ${displayName(attacker)} was synchronized!`;
+      }
+    }
+    return msg;
   }
   return '';
 }
@@ -173,6 +189,15 @@ export function executeMove(
     return { healed: heal, message: `${displayName(defender)} absorbed the attack!` };
   }
 
+  if (move.power > 0 && isTypeImmune(defender.ability, move.type)) {
+    if (defender.ability === 'flash_fire' && move.type === 'flame') {
+      defender.vol = defender.vol ?? {};
+      defender.vol.flashFireActive = true;
+      return { message: `${displayName(defender)} absorbed the flames! Its Fire power rose!` };
+    }
+    return { message: `${displayName(attacker)} used ${move.name}! It doesn't affect ${displayName(defender)}...` };
+  }
+
   if (move.effect === 'heal') {
     const heal = Math.floor(attacker.maxHp * (move.effectValue ?? 0.5));
     const before = attacker.currentHp;
@@ -180,8 +205,11 @@ export function executeMove(
     return { healed: attacker.currentHp - before, message: `${displayName(attacker)} recovered ${attacker.currentHp - before} HP!` };
   }
 
-  if (move.effect === 'boost-atk' || move.effect === 'boost-def') {
-    const stat: StatKey = move.effect === 'boost-atk' ? 'atk' : 'def';
+  if (move.effect === 'boost-atk' || move.effect === 'boost-def' || move.effect === 'boost-spa' || move.effect === 'boost-spd') {
+    const statMap: Record<string, StatKey> = {
+      'boost-atk': 'atk', 'boost-def': 'def', 'boost-spa': 'spa', 'boost-spd': 'spd',
+    };
+    const stat = statMap[move.effect];
     const intended = move.effectValue ?? -1;
     const targetSide = move.effectTarget ?? 'foe';
     const target = targetSide === 'self' ? attacker : defender;
@@ -199,9 +227,13 @@ export function executeMove(
     };
     const status = statusMap[move.effect];
     if (status) {
-      const msg = applyMoveStatus(defender, status, move.effectChance ?? 100, rng);
+      const msg = applyMoveStatus(defender, status, move.effectChance ?? 100, rng, attacker);
       return { message: msg || `${displayName(attacker)} used ${move.name}! It had no effect.` };
     }
+  }
+
+  if (attacker.vol?.flashFireActive && move.type === 'flame') {
+    attacker.vol.flashFireActive = false;
   }
 
   const { damage, effectiveness, label, critical } = calcDamage(attacker, defender, battleMove.id, false, rng);
@@ -209,19 +241,30 @@ export function executeMove(
     return { message: `${displayName(attacker)} used ${move.name}! It doesn't affect ${displayName(defender)}...` };
   }
 
-  defender.currentHp = Math.max(0, defender.currentHp - damage);
+  let finalDamage = damage;
+  let sturdyMsg = '';
+  if (defender.ability === 'sturdy' && !defender.vol?.sturdyUsed
+    && defender.currentHp === defender.maxHp && damage >= defender.currentHp) {
+    finalDamage = defender.currentHp - 1;
+    defender.vol = defender.vol ?? {};
+    defender.vol.sturdyUsed = true;
+    sturdyMsg = ` ${displayName(defender)} endured the hit!`;
+  }
+
+  defender.currentHp = Math.max(0, defender.currentHp - finalDamage);
   const fainted = defender.currentHp <= 0;
 
   let message = `${displayName(attacker)} used ${move.name}!`;
   if (critical) message += ' A critical hit!';
   if (label) message += ` ${label}`;
+  if (sturdyMsg) message += sturdyMsg;
 
   if (move.effect && move.effectChance && !fainted) {
     const statusMap: Record<string, StatusCondition> = {
       burn: 'burn', paralyze: 'paralyze', poison: 'poison', sleep: 'sleep',
     };
     const status = statusMap[move.effect];
-    const statusMsg = status ? applyMoveStatus(defender, status, move.effectChance, rng) : '';
+    const statusMsg = status ? applyMoveStatus(defender, status, move.effectChance, rng, attacker) : '';
     if (statusMsg) message += ` ${statusMsg}`;
   }
 
@@ -235,7 +278,7 @@ export function executeMove(
 
   if (fainted) message += ` ${displayName(defender)} fainted!`;
 
-  return { damage, effectiveness, critical, fainted, message };
+  return { damage: finalDamage, effectiveness, critical, fainted, message };
 }
 
 export function applyEnterAbility(defender: CritterInstance, attacker: CritterInstance): string | null {
@@ -274,6 +317,19 @@ export function tryRun(playerSpe: number, enemySpe: number, blocked = false, rng
 
 export function effectiveSpeed(c: CritterInstance): number {
   return Math.floor(c.stats.spe * speedMultiplier(c));
+}
+
+/** Returns which side moves first this turn ('player' | 'enemy'). */
+export function resolveTurnOrder(
+  playerMon: CritterInstance,
+  enemyMon: CritterInstance,
+  rng: Rng = defaultRng,
+): 'player' | 'enemy' {
+  const playerSpe = effectiveSpeed(playerMon);
+  const enemySpe = effectiveSpeed(enemyMon);
+  if (playerSpe > enemySpe) return 'player';
+  if (enemySpe > playerSpe) return 'enemy';
+  return rng.chance(0.5) ? 'player' : 'enemy';
 }
 
 export function pickAiMove(enemy: CritterInstance, player: CritterInstance, rng: Rng = defaultRng): number {
