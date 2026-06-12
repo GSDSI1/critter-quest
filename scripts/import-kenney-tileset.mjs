@@ -58,6 +58,7 @@ function main() {
 
   let replaced = 0;
   for (const [filename, frameIndex] of Object.entries(mapping)) {
+    if (filename.startsWith('_')) continue;
     const idx = Number(frameIndex);
     if (Number.isNaN(idx) || idx < 0 || idx >= COUNT) {
       console.warn(`Skip ${filename}: invalid frame index ${frameIndex}`);

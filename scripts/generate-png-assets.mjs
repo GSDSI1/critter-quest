@@ -2,7 +2,7 @@
  * Generates pixel-art PNG assets into public/assets/.
  * Run: npm run gen-assets
  */
-import { readFileSync, writeFileSync, mkdirSync } from 'fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import {
@@ -13,6 +13,7 @@ import { drawStarterOverride } from './critter-art/starters.mjs';
 import { drawBatch5Override } from './critter-art/batch5.mjs';
 import { drawBatch6Override } from './critter-art/batch6.mjs';
 import { drawBatch7Override } from './critter-art/batch7.mjs';
+import { drawBatch8Override } from './critter-art/batch8.mjs';
 import { generatePlayerPngs } from './critter-art/players.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -70,6 +71,7 @@ function drawTypeDetail(rgba, w, h, type, cx, cy, s, frame) {
 
 function drawCreature(rgba, w, h, { id, color, shape, types }, opts = {}) {
   const { frame = 0, back = false } = opts;
+  if (id && drawBatch8Override(rgba, w, id, { frame, back })) return;
   if (id && drawBatch7Override(rgba, w, id, { frame, back })) return;
   if (id && drawBatch6Override(rgba, w, id, { frame, back })) return;
   if (id && drawBatch5Override(rgba, w, id, { frame, back })) return;
@@ -228,5 +230,11 @@ spawnSync('node', ['scripts/pack-tileset.mjs'], { cwd: root, stdio: 'inherit' })
 spawnSync('node', ['scripts/generate-audio.mjs'], { cwd: root, stdio: 'inherit' });
 
 spawnSync('node', ['scripts/pack-critter-atlas.mjs'], { cwd: root, stdio: 'inherit' });
+
+const kenneyDir = join(assetsDir, 'tiles/kenney');
+if (existsSync(kenneyDir) && readdirSync(kenneyDir).some(f => f.endsWith('.png'))) {
+  console.log('Re-merging Kenney tiles into tileset...');
+  spawnSync('node', ['scripts/import-kenney-tileset.mjs'], { cwd: root, stdio: 'inherit' });
+}
 
 console.log('Asset pipeline complete.');

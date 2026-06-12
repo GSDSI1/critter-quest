@@ -356,8 +356,10 @@ else fail('touchMenuNav.ts missing');
 if (battleScene.includes('TouchMenuNav')) ok('Battle touch menu nav');
 else fail('BattleScene missing touch nav');
 
-if (existsSync(join(root, 'scripts/import-kenney-tileset.mjs'))) ok('Kenney tileset import script');
-else fail('import-kenney-tileset.mjs missing');
+if (existsSync(join(root, 'scripts/fetch-kenney-tileset.mjs'))) ok('Kenney fetch script');
+else fail('fetch-kenney-tileset.mjs missing');
+if (existsSync(join(root, 'CREDITS.md'))) ok('CREDITS.md');
+else fail('CREDITS.md missing');
 
 const optionsScene = read('src/scenes/OptionsScene.ts');
 if (optionsScene.includes('Master Vol') && optionsScene.includes('audio.master')) ok('Options master volume');

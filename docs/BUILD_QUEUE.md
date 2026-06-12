@@ -31,6 +31,7 @@ Last updated: 2026-06-09 (P9 battle polish + P10 character art). **Source of tru
 | P3 partial | batch6 hand art (10 species: pier/grove/legendaries) |
 | **P9** | Atlas frame fallback, Boot load-error recovery, trainer Run hidden, calm_mind fix, speed turn order, HP tween + battle VFX, Sturdy/Thick Fat/Flash Fire/Synchronize, battle-fight e2e |
 | **P10** | Generator v3 shading + distinct backs, batch7 early-route art (15 species), player trainer PNG pipeline |
+| **P11** | Kenney Tiny Town tile integration (`fetch-kenney`), batch8 mid-route art (15 species), CREDITS.md |
 
 ---
 
@@ -38,8 +39,8 @@ Last updated: 2026-06-09 (P9 battle polish + P10 character art). **Source of tru
 
 | # | Issue | Next |
 |---|-------|------|
-| 1 | Procedural art mid/late roster | Extend hand art beyond batch6/7 |
-| 2 | Kenney tileset | manual import |
+| 1 | Procedural art mid/late roster | batch8 adds 15; extend hand art further |
+| 2 | Kenney tileset | **done** — `npm run fetch-kenney` |
 
 ---
 
@@ -49,8 +50,8 @@ Last updated: 2026-06-09 (P9 battle polish + P10 character art). **Source of tru
 
 | ID | Task | Status |
 |----|------|--------|
-| p0-e2e-full | Full `npm run test:e2e` before release | pending |
-| p0-push | Push after green CI | pending |
+| p0-e2e-full | Full `npm run test:e2e` before release | **done** (2026-06-12) |
+| p0-push | Push after green CI | **done** (P9/P10) |
 
 ### P5 — Graphics & audio
 
@@ -64,7 +65,7 @@ Last updated: 2026-06-09 (P9 battle polish + P10 character art). **Source of tru
 | ID | Task |
 |----|------|
 | p3-batch6-art | Extend hand pixels to remaining late-game species | partial |
-| p3-kenney | Kenney tileset import |
+| p3-kenney | Kenney tileset import | **done** |
 
 ---
 
