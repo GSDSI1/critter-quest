@@ -72,6 +72,7 @@ function heldCritBoost(c: CritterInstance): number {
 
 function isStatusImmune(c: CritterInstance, status: StatusCondition): boolean {
   if (!status) return true;
+  if (status === 'sleep' && c.ability === 'insomnia') return true;
   const types = typesOf(c);
   if (status === 'burn' && types.includes('flame')) return true;
   if (status === 'paralyze' && types.includes('volt')) return true;
@@ -178,7 +179,10 @@ export function executeMove(
   const move = getMove(battleMove.id);
   battleMove.pp--;
 
-  if (rng.next() * 100 > move.accuracy) {
+  let accuracy = move.accuracy;
+  if (defender.ability === 'snow_cloak') accuracy *= 0.85;
+
+  if (rng.next() * 100 > accuracy) {
     return { missed: true, message: `${displayName(attacker)}'s ${move.name} missed!` };
   }
 

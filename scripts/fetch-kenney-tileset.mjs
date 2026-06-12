@@ -31,6 +31,15 @@ const EXTRACT = {
   roof: { col: 0, row: 4, frame: 8 },
   sand: { col: 4, row: 0, frame: 15 },
   water_anim2: { col: 0, row: 1, frame: 20 },
+  flower: { col: 4, row: 0, frame: 11 },
+  sign: { col: 10, row: 9, frame: 10 },
+  fence: { col: 1, row: 7, frame: 14 },
+  bridge: { col: 5, row: 7, frame: 13 },
+  heal_pad: { col: 8, row: 8, frame: 9 },
+  cave_floor: { col: 2, row: 5, frame: 16 },
+  cave_wall: { col: 3, row: 5, frame: 17 },
+  mart_counter: { col: 4, row: 5, frame: 18 },
+  tall_grass_anim: { col: 2, row: 1, frame: 19 },
 };
 
 function downloadZip() {

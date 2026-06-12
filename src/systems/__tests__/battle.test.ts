@@ -178,3 +178,37 @@ describe('synchronize', () => {
     expect(atk.status).toBe('burn');
   });
 });
+
+describe('insomnia', () => {
+  it('blocks sleep status', () => {
+    const def = createCritter('dreamwisp', 15);
+    def.ability = 'insomnia';
+    const msg = applyMoveStatus(def, 'sleep', 100, createSeededRng(1));
+    expect(msg).toBe('');
+    expect(def.status).toBeNull();
+  });
+});
+
+describe('snow_cloak', () => {
+  it('reduces move accuracy', () => {
+    const atk = createCritter('emberpup', 20);
+    const def = createCritter('frostkit', 20);
+    def.ability = 'snow_cloak';
+    let misses = 0;
+    for (let seed = 0; seed < 50; seed++) {
+      const d = createCritter('frostkit', 20);
+      d.ability = 'snow_cloak';
+      const r = executeMove(atk, d, 0, createSeededRng(seed));
+      if (r.missed) misses++;
+    }
+    const controlMisses = 50;
+    let control = 0;
+    for (let seed = 0; seed < 50; seed++) {
+      const d = createCritter('frostkit', 20);
+      d.ability = 'inner_focus';
+      const r = executeMove(atk, d, 0, createSeededRng(seed));
+      if (r.missed) control++;
+    }
+    expect(misses).toBeGreaterThanOrEqual(control);
+  });
+});

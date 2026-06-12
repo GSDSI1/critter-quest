@@ -10,5 +10,14 @@
   "door.png": 7,
   "roof.png": 8,
   "sand.png": 15,
-  "water_anim2.png": 20
+  "water_anim2.png": 20,
+  "flower.png": 11,
+  "sign.png": 10,
+  "fence.png": 14,
+  "bridge.png": 13,
+  "heal_pad.png": 9,
+  "cave_floor.png": 16,
+  "cave_wall.png": 17,
+  "mart_counter.png": 18,
+  "tall_grass_anim.png": 19
 }

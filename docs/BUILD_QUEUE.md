@@ -1,6 +1,6 @@
 # Critter Quest — Build Queue
 
-Last updated: 2026-06-09 (P9 battle polish + P10 character art). **Source of truth for forward work.**
+Last updated: 2026-06-12 (P12 batch9/10 + Kenney interiors + abilities). **Source of truth for forward work.**
 
 ## Snapshot
 
@@ -8,7 +8,7 @@ Last updated: 2026-06-09 (P9 battle polish + P10 character art). **Source of tru
 |--------|-------|
 | Species | **100** |
 | Maps | 25 |
-| Unit tests | 70+ (13 files) |
+| Unit tests | 77+ (13 files) |
 | E2E specs | 16 |
 | Dex milestones | 20 / 40 / 60 / 80 / 90 / **100** |
 | OverworldScene | **267 LOC** (≤350 target) |
@@ -32,6 +32,7 @@ Last updated: 2026-06-09 (P9 battle polish + P10 character art). **Source of tru
 | **P9** | Atlas frame fallback, Boot load-error recovery, trainer Run hidden, calm_mind fix, speed turn order, HP tween + battle VFX, Sturdy/Thick Fat/Flash Fire/Synchronize, battle-fight e2e |
 | **P10** | Generator v3 shading + distinct backs, batch7 early-route art (15 species), player trainer PNG pipeline |
 | **P11** | Kenney Tiny Town tile integration (`fetch-kenney`), batch8 mid-route art (15 species), CREDITS.md |
+| **P12** | batch9/10 art (30 species), Kenney interior tiles, insomnia + snow_cloak abilities |
 
 ---
 
@@ -39,7 +40,7 @@ Last updated: 2026-06-09 (P9 battle polish + P10 character art). **Source of tru
 
 | # | Issue | Next |
 |---|-------|------|
-| 1 | Procedural art mid/late roster | batch8 adds 15; extend hand art further |
+| 1 | Procedural art late roster | batch10 covers dex 54–79; ~21 species remain procedural |
 | 2 | Kenney tileset | **done** — `npm run fetch-kenney` |
 
 ---
