@@ -1,18 +1,18 @@
 # Critter Quest — Build Queue
 
-Last updated: 2026-06-12 (P12 batch9/10 + Kenney interiors + abilities). **Source of truth for forward work.**
+Last updated: 2026-06-12 (P13–P17 advanced build-out). **Source of truth for forward work.**
 
 ## Snapshot
 
 | Metric | Value |
 |--------|-------|
 | Species | **100** |
-| Maps | 25 |
-| Unit tests | 77+ (13 files) |
-| E2E specs | 16 |
+| Maps | 29 |
+| Unit tests | 113 (17 files) |
+| E2E specs | 17 files (36+ tests) |
 | Dex milestones | 20 / 40 / 60 / 80 / 90 / **100** |
-| OverworldScene | **267 LOC** (≤350 target) |
-| Verify | ~103 checks, green |
+| Largest scene file | NpcManager 324 LOC |
+| Verify | ~195 checks, green |
 
 ---
 
@@ -33,6 +33,11 @@ Last updated: 2026-06-12 (P12 batch9/10 + Kenney interiors + abilities). **Sourc
 | **P10** | Generator v3 shading + distinct backs, batch7 early-route art (15 species), player trainer PNG pipeline |
 | **P11** | Kenney Tiny Town tile integration (`fetch-kenney`), batch8 mid-route art (15 species), CREDITS.md |
 | **P12** | batch9/10 art (30 species), Kenney interior tiles, insomnia + snow_cloak abilities |
+| **P13** | Move effects (flinch/recoil/drain/multi-hit/confusion/freeze/priority, 14 moves), weather (rain/sun/hail + chlorophyll/swift_swim), wild held items, AI switching |
+| **P14** | Shape-based pixel-art library (6 body plans, all non-bespoke species) |
+| **P15** | 3-channel chiptune BGM (6 themes), layered SFX |
+| **P16** | Shinies (1/512, featured 1/64), quest log (10 quests), daily featured species |
+| **P17** | PlayerMovement + BattleMenus extracts, champion/quest/weather e2e |
 
 ---
 
@@ -40,8 +45,8 @@ Last updated: 2026-06-12 (P12 batch9/10 + Kenney interiors + abilities). **Sourc
 
 | # | Issue | Next |
 |---|-------|------|
-| 1 | Procedural art late roster | batch10 covers dex 54–79; ~21 species remain procedural |
-| 2 | Kenney tileset | **done** — `npm run fetch-kenney` |
+| 1 | Bespoke art coverage | Shape library covers everyone; bespoke grids for starter finals would still help |
+| 2 | NpcManager 324 LOC | Next extract: NPC dialog table → data file |
 
 ---
 

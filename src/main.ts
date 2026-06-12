@@ -14,6 +14,7 @@ import { installLazySceneLoader } from './scenes/registerScenes';
 import { installCanvasFocusOnBoot } from './utils/focusCanvas';
 import type { BattleScene } from './scenes/BattleScene';
 import { battleMenuItems } from './scenes/battle/BattleUi';
+import { getBattleWeather } from './systems/weather';
 import type { OverworldScene } from './scenes/OverworldScene';
 import { applyChestReward } from './scenes/overworld/ChestRewards';
 import type { FishingScene } from './scenes/FishingScene';
@@ -71,10 +72,11 @@ declare global {
       startStarterSelect: () => void;
       pickStarter: (id?: string) => void;
       completeTutorial: () => void;
-      startWildBattle: (speciesId?: string) => void;
+      startWildBattle: (speciesId?: string, mapId?: string) => void;
+      openQuestLog: () => void;
       startTrainerBattle: (npcId: string, mapId?: string) => void;
       resolveBattle: (outcome: 'win' | 'lose' | 'catch') => void;
-      battleState: () => { phase: string; enemyHp: number; enemyMaxHp: number } | null;
+      battleState: () => { phase: string; enemyHp: number; enemyMaxHp: number; weather: string | null } | null;
       battleTapContinue: () => boolean;
       battlePickMove: (index?: number) => boolean;
       battleMenuForTrainer: () => string[];
@@ -163,12 +165,21 @@ if (import.meta.env.DEV) {
       GameState.player.storyFlags.saw_controls = true;
       saveGame();
     },
-    startWildBattle(speciesId = 'mossling') {
+    startWildBattle(speciesId = 'mossling', mapId = 'route1') {
       if (!GameState.player.party.length) {
         GameState.player.party = [createCritter('emberpup', 10)];
       }
       const wild = createCritter(speciesId, 5);
-      game.scene.start('Battle', { enemyParty: [wild], mapId: 'route1' });
+      game.scene.start('Battle', { enemyParty: [wild], mapId });
+    },
+    openQuestLog() {
+      const ow = game.scene.getScene('Overworld');
+      if (ow?.scene.isActive()) {
+        ow.scene.pause();
+        ow.scene.launch('QuestLog');
+      } else {
+        game.scene.start('QuestLog');
+      }
     },
     startTrainerBattle(npcId, mapId = 'gym1') {
       const map = getMap(mapId);
@@ -196,7 +207,12 @@ if (import.meta.env.DEV) {
     battleState() {
       const battle = game.scene.getScene('Battle') as BattleScene | undefined;
       if (!battle?.scene.isActive()) return null;
-      return { phase: battle.phase, enemyHp: battle.wild.currentHp, enemyMaxHp: battle.wild.maxHp };
+      return {
+        phase: battle.phase,
+        enemyHp: battle.wild.currentHp,
+        enemyMaxHp: battle.wild.maxHp,
+        weather: getBattleWeather(),
+      };
     },
     battleTapContinue() {
       const battle = game.scene.getScene('Battle') as BattleScene | undefined;

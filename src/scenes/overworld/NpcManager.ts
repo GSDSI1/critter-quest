@@ -1,36 +1,25 @@
 import Phaser from 'phaser';
 import { TILE_SIZE } from '../../data/types';
-import {
-  getTile, isWalkable, isEncounterTile, isWarpTile,
-  type MapNpc, type GameMap,
-} from '../../data/maps';
-import { pickWildFromTable, resolveEncounterTable } from '../../data/encounters';
-import { featuredSpeciesOfDay, shinyOddsFor } from '../../systems/dailyFeature';
+import { getTile, type MapNpc, type GameMap } from '../../data/maps';
 import { hasBadge } from '../../data/badges';
-import {
-  GameState, healParty, firstAlive, createCritter, registerSeen, registerMapVisit,
-} from '../../systems/stats';
+import { GameState, healParty } from '../../systems/stats';
 import { trySave } from '../../utils/saveFeedback';
 import { DialogBox } from '../../ui/DialogBox';
 import { showToast } from '../../ui/mapBanner';
 import { npcTextureKey, type NpcRole } from '../../utils/assetLoader';
-import { playerTextureKey } from '../../utils/sprites';
 import { showExclamationBubble } from '../TrainerIntroScene';
 import { Sfx } from '../../utils/audio';
 import { resolveRematch } from '../../data/rematches';
 import {
   startEliteGauntlet, findGauntletNpc,
 } from '../../systems/eliteGauntlet';
-import { registerHealVisit } from '../../systems/healTravel';
-import { wipeRestartScene } from '../../ui/transitions';
 import { addItem } from '../../data/items';
 import { playDayIndex } from '../../ui/minigameShell';
 import { pendingDexMilestone, claimDexMilestone } from '../../systems/dexMilestones';
-import { warpGateAllowed } from '../../systems/warpGates';
 import { tryHandleMinigameNpc } from './MinigameNpcHandlers';
 import { momDiscoverabilityLine, profDiscoverabilityLine } from '../../systems/regionDiscovery';
 import { TrainerBattleHandler } from './TrainerBattleHandler';
-import { showWarpBlocked } from './WarpBlockDialog';
+import { PlayerMovement } from './PlayerMovement';
 
 export interface NpcManagerCallbacks {
   setInputLocked: (locked: boolean) => void;
@@ -43,6 +32,7 @@ export interface NpcManagerCallbacks {
 export class NpcManager {
   private npcSprites: Phaser.GameObjects.Sprite[] = [];
   private trainerBattles: TrainerBattleHandler;
+  private movement: PlayerMovement;
 
   constructor(
     private scene: Phaser.Scene,
@@ -55,20 +45,22 @@ export class NpcManager {
       () => this.getMap(),
       (locked) => this.callbacks.setInputLocked(locked),
     );
+    this.movement = new PlayerMovement({
+      scene,
+      getMap: () => this.getMap(),
+      dialog,
+      callbacks,
+      interactNpc: (npc) => this.interactNpc(npc),
+      launchWildBattle: (party) => this.trainerBattles.launchBattle(party, false, '', '', 0, ''),
+    });
   }
 
   spawnPlayer(): { player: Phaser.GameObjects.Sprite; shadow: Phaser.GameObjects.Ellipse } {
-    const shadow = this.scene.add.ellipse(
-      GameState.player.x * TILE_SIZE + TILE_SIZE / 2,
-      GameState.player.y * TILE_SIZE + TILE_SIZE / 2 + 6,
-      10, 4, 0x000000, 0.25,
-    ).setDepth(9);
-    const player = this.scene.add.sprite(
-      GameState.player.x * TILE_SIZE + TILE_SIZE / 2,
-      GameState.player.y * TILE_SIZE + TILE_SIZE / 2,
-      playerTextureKey(this.scene, GameState.player.characterId, GameState.player.facing, 0),
-    ).setDepth(10);
-    return { player, shadow };
+    return this.movement.spawnPlayer();
+  }
+
+  tryMove(dx: number, dy: number): boolean {
+    return this.movement.tryMove(dx, dy);
   }
 
   spawnNpcs(map: GameMap): void {
@@ -103,108 +95,6 @@ export class NpcManager {
           this.scene.add.image(x * TILE_SIZE + TILE_SIZE / 2, y * TILE_SIZE + TILE_SIZE / 2, 'sign_post').setDepth(8);
         }
       }
-    }
-  }
-
-  tryMove(dx: number, dy: number): boolean {
-    const map = this.getMap();
-    const player = this.callbacks.getPlayer();
-    const playerShadow = this.callbacks.getPlayerShadow();
-    const moveDuration = this.callbacks.getMoveDuration();
-
-    const facing = dx === -1 ? 'left' : dx === 1 ? 'right' : dy === -1 ? 'up' : 'down';
-    GameState.player.facing = facing;
-    const nx = GameState.player.x + dx;
-    const ny = GameState.player.y + dy;
-    const tile = getTile(map, nx, ny);
-
-    if (!isWalkable(tile)) {
-      player.setTexture(playerTextureKey(this.scene, GameState.player.characterId, facing, 0));
-      return false;
-    }
-
-    const npc = map.npcs.find(n => n.x === nx && n.y === ny);
-    if (npc) {
-      player.setTexture(playerTextureKey(this.scene, GameState.player.characterId, facing, 0));
-      this.interactNpc(npc);
-      return false;
-    }
-
-    this.callbacks.setMoving(true);
-    let frame = 0;
-    const walkAnim = this.scene.time.addEvent({
-      delay: moveDuration / 2, repeat: 3,
-      callback: () => { frame = 1 - frame; player.setTexture(playerTextureKey(this.scene, GameState.player.characterId, facing, frame)); },
-    });
-
-    this.scene.tweens.add({
-      targets: player,
-      x: nx * TILE_SIZE + TILE_SIZE / 2,
-      y: ny * TILE_SIZE + TILE_SIZE / 2,
-      duration: moveDuration,
-      onUpdate: () => {
-        playerShadow.x = player.x;
-        playerShadow.y = player.y + 6;
-      },
-      onComplete: () => {
-        walkAnim.destroy();
-        player.setTexture(playerTextureKey(this.scene, GameState.player.characterId, facing, 0));
-        playerShadow.x = player.x;
-        playerShadow.y = player.y + 6;
-        GameState.player.x = nx;
-        GameState.player.y = ny;
-        this.callbacks.setMoving(false);
-
-        const landedTile = getTile(map, nx, ny);
-        if (landedTile === 2) {
-          Sfx.footstepGrass();
-          this.spawnWalkFx(player.x, player.y, 0x4ade80, true);
-        } else if (landedTile === 0 || landedTile === 1) {
-          Sfx.footstepPath();
-          if (landedTile === 1) this.spawnWalkFx(player.x, player.y, 0xc4a574);
-        }
-
-        const warp = isWarpTile(map, nx, ny);
-        if (warp) {
-          if (!warpGateAllowed(warp, GameState.player.badges, GameState.player.storyFlags)) {
-            showWarpBlocked({
-              dialog: this.dialog,
-              getPlayer: () => this.callbacks.getPlayer(),
-              getPlayerShadow: () => this.callbacks.getPlayerShadow(),
-              setInputLocked: (locked) => this.callbacks.setInputLocked(locked),
-            }, warp, dx, dy);
-            return;
-          }
-          this.changeMap(warp.toMap, warp.toX, warp.toY);
-          return;
-        }
-
-        if (isEncounterTile(tile) && Math.random() < map.encounterRate) {
-          this.startWildBattle();
-        }
-      },
-    });
-    return true;
-  }
-
-  private spawnWalkFx(x: number, y: number, color: number, tallGrass = false): void {
-    const count = tallGrass ? 5 : 4;
-    const baseSize = tallGrass ? 4 : 3;
-    for (let i = 0; i < count; i++) {
-      const p = this.scene.add.graphics().setDepth(11);
-      p.fillStyle(color, tallGrass ? 0.55 : 0.45);
-      const ox = (i - count / 2) * 3 + (Math.random() * 2 - 1);
-      p.fillCircle(ox, 4, baseSize - (i % 2));
-      p.setPosition(x + ox, y);
-      this.scene.time.delayedCall(i * 40, () => {
-        this.scene.tweens.add({
-          targets: p,
-          alpha: 0,
-          y: y - (tallGrass ? 10 : 7) - i,
-          duration: tallGrass ? 320 : 280,
-          onComplete: () => p.destroy(),
-        });
-      });
     }
   }
 
@@ -406,35 +296,6 @@ export class NpcManager {
     }
 
     this.dialog.show(npc.lines, () => { this.callbacks.setInputLocked(false); });
-  }
-
-  private changeMap(mapId: string, x: number, y: number): void {
-    if (mapId === 'heal_center') registerHealVisit(this.getMap().id);
-    registerMapVisit(GameState.player.visitedMaps, this.getMap().id);
-    GameState.player.mapId = mapId;
-    GameState.player.x = x;
-    GameState.player.y = y;
-    registerMapVisit(GameState.player.visitedMaps, mapId);
-    trySave(this.scene);
-    wipeRestartScene(this.scene, { fromBattle: false });
-  }
-
-  private startWildBattle(): void {
-    if (!firstAlive(GameState.player.party)) {
-      this.dialog.show('All your critters fainted! Visit the Healing Center.', () => {
-        this.callbacks.setInputLocked(false);
-      });
-      return;
-    }
-
-    const map = this.getMap();
-    const baseTable = map.encounterTable ?? map.id;
-    const tableId = resolveEncounterTable(baseTable, GameState.player.playTime);
-    const { def, level, heldItem } = pickWildFromTable(tableId, undefined, featuredSpeciesOfDay());
-    registerSeen(GameState.player.dexSeen, def.id);
-    const wild = createCritter(def.id, level, undefined, { shinyChance: shinyOddsFor(def.id) });
-    if (heldItem) wild.heldItem = heldItem;
-    this.trainerBattles.launchBattle([wild], false, '', '', 0, '');
   }
 
   private getMomLines(): string[] {

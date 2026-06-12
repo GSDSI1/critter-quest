@@ -226,7 +226,7 @@ else fail('src/ui/touchButtons.ts missing');
 
 const npcMgr = existsSync(join(root, 'src/scenes/overworld/NpcManager.ts'))
   ? read('src/scenes/overworld/NpcManager.ts') : '';
-const owBundle = overworld + npcMgr;
+const owBundle = overworld + npcMgr + read('src/scenes/overworld/PlayerMovement.ts');
 if (overworld.includes('OverworldTouchPad')) ok('Overworld touch D-pad');
 else fail('OverworldScene missing touch pad');
 if (read('src/ui/touchMenuNav.ts').includes('shouldShowOverworldTouchPad')) ok('Overworld touch pad always-on helper');
