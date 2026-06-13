@@ -100,8 +100,8 @@ export class PcScene extends Phaser.Scene {
       const spr = addCreatureImage(this, 60, y + 23, c.speciesId, true).setScale(1.8);
       this.container.add(spr);
 
-      this.container.add(this.add.text(82, y + 6, `${sel ? '▶ ' : ''}${displayName(c)}  Lv.${c.level}`, {
-        fontFamily: FONT, fontSize: '12px', color: '#f0f0f0',
+      this.container.add(this.add.text(82, y + 6, `${sel ? '▶ ' : ''}${c.shiny ? '★ ' : ''}${displayName(c)}  Lv.${c.level}`, {
+        fontFamily: FONT, fontSize: '12px', color: c.shiny ? '#f5c542' : '#f0f0f0',
       }));
       this.container.add(this.add.text(82, y + 22, `${TYPE_NAMES[def.types[0]]}  HP ${c.currentHp}/${c.maxHp}`, {
         fontFamily: FONT, fontSize: '10px', color: '#8899aa',

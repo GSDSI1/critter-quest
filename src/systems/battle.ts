@@ -427,6 +427,21 @@ export function pickAiSwitch(
   return best;
 }
 
+/** Boss trainers (gym leaders, elites, champion) heal once per mon when low. */
+export function shouldAiHealItem(mon: CritterInstance, trainerId: string): boolean {
+  if (mon.vol?.aiHealed) return false;
+  if (mon.currentHp <= 0 || mon.currentHp > mon.maxHp * 0.3) return false;
+  return trainerId.startsWith('gym_leader') || trainerId.startsWith('elite') || trainerId === 'champion';
+}
+
+/** Apply the boss heal (50% max HP). Returns the message. */
+export function applyAiHealItem(mon: CritterInstance, trainerName: string): string {
+  const heal = Math.floor(mon.maxHp / 2);
+  mon.currentHp = Math.min(mon.maxHp, mon.currentHp + heal);
+  mon.vol = { ...mon.vol, aiHealed: true };
+  return `${trainerName} used a Super Potion on ${displayName(mon)}!`;
+}
+
 export function pickAiMove(enemy: CritterInstance, player: CritterInstance, rng: Rng = defaultRng): number {
   const available = enemy.moves.map((m, i) => ({ i, move: getMove(m.id), pp: m.pp })).filter(m => m.pp > 0);
   if (!available.length) return 0;

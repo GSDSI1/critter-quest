@@ -6,7 +6,7 @@ import { getBadge } from '../../data/badges';
 import {
   executeMove, tryCatchWithItem, tryRun, pickAiMove, pickAiSwitch, expGain,
   endOfTurnStatus, effectiveSpeed, applyEnterAbility, tryHeldBerry, isRunBlocked,
-  resolveTurnOrder,
+  resolveTurnOrder, shouldAiHealItem, applyAiHealItem,
 } from '../../systems/battle';
 import { isEliteGauntletActive } from '../../systems/eliteGauntlet';
 import {
@@ -88,6 +88,19 @@ export class BattleFlow {
     this.host.phase = 'fight';
 
     if (this.host.isTrainer) {
+      if (shouldAiHealItem(this.host.wild, this.host.trainerId)) {
+        const msg = applyAiHealItem(this.host.wild, this.host.trainerName);
+        this.host.ui.queueMessage(msg);
+        this.host.battleAnims.animateHeal(this.host.ui.enemySprite);
+        this.host.ui.animateEnemyHp();
+        this.host.phase = 'message';
+        this.host.showNextMessage();
+        this.host.time.delayedCall(600, () => {
+          if (this.turnEnded()) return;
+          this.runSide(true, index, () => this.finishTurn());
+        });
+        return;
+      }
       const switchIdx = pickAiSwitch(
         this.host.wild, this.host.enemyParty, this.host.enemyIndex, this.host.playerMon,
       );

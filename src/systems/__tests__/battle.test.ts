@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { calcDamage, stageMult, expGain, tryRun, tryCatchWithItem, applyMoveStatus, tryHeldBerry, executeMove, resolveTurnOrder, pickAiSwitch } from '../battle';
+import { calcDamage, stageMult, expGain, tryRun, tryCatchWithItem, applyMoveStatus, tryHeldBerry, executeMove, resolveTurnOrder, pickAiSwitch, shouldAiHealItem, applyAiHealItem } from '../battle';
 import { createCritter } from '../stats';
 import { createSeededRng } from '../rng';
 import { typeMultiplier } from '../../data/types';
@@ -312,6 +312,28 @@ describe('shiny roll', () => {
   it('shinyChance 0 never rolls shiny', () => {
     const c = createCritter('mossling', 5, undefined, { shinyChance: 0, rng: createSeededRng(1) });
     expect(c.shiny).toBeUndefined();
+  });
+});
+
+describe('shouldAiHealItem', () => {
+  it('boss trainers heal once below 30% HP', () => {
+    const mon = createCritter('bloomoss', 40);
+    mon.currentHp = Math.floor(mon.maxHp * 0.2);
+    expect(shouldAiHealItem(mon, 'gym_leader')).toBe(true);
+    expect(shouldAiHealItem(mon, 'champion')).toBe(true);
+    expect(shouldAiHealItem(mon, 'elite_trainer2')).toBe(true);
+    expect(shouldAiHealItem(mon, 'youngster')).toBe(false);
+  });
+
+  it('does not heal above 30% or twice', () => {
+    const mon = createCritter('bloomoss', 40);
+    expect(shouldAiHealItem(mon, 'gym_leader')).toBe(false);
+    mon.currentHp = Math.floor(mon.maxHp * 0.2);
+    const msg = applyAiHealItem(mon, 'Leader Ivy');
+    expect(msg).toContain('Super Potion');
+    expect(mon.currentHp).toBeGreaterThan(Math.floor(mon.maxHp * 0.2));
+    mon.currentHp = 1;
+    expect(shouldAiHealItem(mon, 'gym_leader')).toBe(false);
   });
 });
 
