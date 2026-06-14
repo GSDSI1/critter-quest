@@ -69,7 +69,7 @@ Last updated: 2026-06-14 (P26–P29 shipped). **Source of truth for forward work
 | ID | Task | Status |
 |----|------|--------|
 | p0-e2e-full | Full `npm run test:e2e` before release | **done** (2026-06-14) |
-| p0-push | Push after green CI | pending P26–P29 |
+| p0-push | Push after green CI | **done** (2026-06-14, P26–P29) |
 
 ### P5 — Graphics & audio
 
