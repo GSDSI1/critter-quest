@@ -1,6 +1,6 @@
 # Critter Quest — Build Queue
 
-Last updated: 2026-06-14 (P30–P31 art). **Source of truth for forward work.**
+Last updated: 2026-06-14 (P32–P34 upgrades). **Source of truth for forward work.**
 
 ## Snapshot
 
@@ -11,7 +11,7 @@ Last updated: 2026-06-14 (P30–P31 art). **Source of truth for forward work.**
 | Unit tests | 126 (20 files) |
 | E2E specs | 18 files (39 tests) |
 | Dex milestones | 20 / 40 / 60 / 80 / 90 / **100** |
-| Bespoke hand art | **52** (starters 9 + batch5 3 + batch6 10 + batch8 10 + batch9 10 + batch10 10) |
+| Bespoke hand art | **72** (starters 9 + batch5 3 + batch6 10 + batch8–12 ×10) |
 | Largest scene file | npcInteractRouter ~175 LOC |
 | Verify | ~200 checks, green |
 
@@ -52,6 +52,9 @@ Last updated: 2026-06-14 (P30–P31 art). **Source of truth for forward work.**
 | **P29** | `npcInteractRouter.ts` extract (gate/elite/trainer/services), IntroScene idle, faint/evolution SFX, `battleReady` e2e bridge |
 | **P30** | batch9 mid-route hand art (10 species: route2/route3), full e2e 39/39 green |
 | **P31** | batch10 late-game hand art (10 species: cave/volcanic/glacier/psychic routes) |
+| **P32** | Vite 8 + dev dep upgrades (0 npm audit vulns) |
+| **P33** | batch11/12 hand art (20 species: psychic/ice + volcanic/endgame) |
+| **P34** | Enhanced CC0 procedural BGM (2× loops, harmony layer) + `import-cc0-bgm` pipeline |
 
 ---
 
@@ -60,7 +63,8 @@ Last updated: 2026-06-14 (P30–P31 art). **Source of truth for forward work.**
 | # | Issue | Next |
 |---|-------|------|
 | 1 | NpcManager ~130 LOC (router extracted) | Stable — further splits optional |
-| 2 | CC0 licensed BGM | Optional swap when loops sourced (`p5-cc0-bgm`) |
+| 2 | ~28 species still shapelib-only | batch13+ or accept shapelib quality |
+| 3 | Phaser 4 / TypeScript 6 | Major bumps — defer until upstream migration guide |
 
 ---
 
@@ -77,8 +81,8 @@ Last updated: 2026-06-14 (P30–P31 art). **Source of truth for forward work.**
 
 | ID | Task |
 |----|------|
-| p5-cc0-bgm | Licensed BGM + CREDITS.md |
-| p5-critter-polish | More hand art batches |
+| p5-cc0-bgm | CC0 BGM import pipeline + enhanced procedural loops | **done** (P34) |
+| p5-critter-polish | More hand art batches | partial (72/100 bespoke) |
 
 ### P3 — Art (remaining)
 

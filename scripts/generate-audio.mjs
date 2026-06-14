@@ -3,6 +3,7 @@
 import { writeFileSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { spawnSync } from 'child_process';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const dir = join(root, 'public/assets/audio');
@@ -116,24 +117,28 @@ function noteFreq(midi) {
  * Render a song: melody/bass = [{ note: midi|null, beats }], drums = string
  * per half-beat ('k' kick, 'h' hat, '.' rest), looped to song length.
  */
-function renderSong(path, { bpm, melody, bass, drums, melodyWave = 'square', vol = 0.1 }) {
+function renderSong(path, { bpm, melody, bass, drums, melodyWave = 'square', vol = 0.1, loops = 2 }) {
   const beatDur = 60 / bpm;
-  const songBeats = melody.reduce((s, x) => s + x.beats, 0);
+  const songBeatsOne = melody.reduce((s, x) => s + x.beats, 0);
+  const songBeats = songBeatsOne * loops;
   const n = Math.floor(songBeats * beatDur * SR);
   const out = new Float64Array(n);
 
   let pos = 0;
-  for (const step of melody) {
-    const len = Math.floor(step.beats * beatDur * SR);
-    if (step.note != null) {
-      const f = noteFreq(step.note);
-      for (let i = 0; i < len && pos + i < n; i++) {
-        const t = (pos + i) / SR;
-        const env = Math.min(1, i / (SR * 0.006)) * Math.min(1, (len - i) / (SR * 0.05));
-        out[pos + i] += osc(melodyWave, f, t) * 0.5 * env;
+  for (let rep = 0; rep < loops; rep++) {
+    for (const step of melody) {
+      const len = Math.floor(step.beats * beatDur * SR);
+      if (step.note != null) {
+        const f = noteFreq(step.note);
+        for (let i = 0; i < len && pos + i < n; i++) {
+          const t = (pos + i) / SR;
+          const env = Math.min(1, i / (SR * 0.006)) * Math.min(1, (len - i) / (SR * 0.05));
+          out[pos + i] += osc(melodyWave, f, t) * 0.5 * env;
+          out[pos + i] += osc('sine', f * 1.5, t) * 0.12 * env;
+        }
       }
+      pos += len;
     }
-    pos += len;
   }
 
   pos = 0;
@@ -301,3 +306,4 @@ renderSong(join(dir, 'music_victory.wav'), {
 });
 
 console.log('Wrote 9 SFX + 6 BGM themes (town, overworld, battle, gym, cave, victory) to public/assets/audio/');
+spawnSync('node', ['scripts/import-cc0-bgm.mjs'], { cwd: root, stdio: 'inherit' });

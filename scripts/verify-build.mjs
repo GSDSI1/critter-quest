@@ -247,6 +247,12 @@ if (existsSync(join(root, 'scripts/critter-art/batch9.mjs'))) ok('Batch-9 mid-ro
 else fail('critter-art/batch9.mjs missing');
 if (existsSync(join(root, 'scripts/critter-art/batch10.mjs'))) ok('Batch-10 late-game pixel art overrides');
 else fail('critter-art/batch10.mjs missing');
+if (existsSync(join(root, 'scripts/critter-art/batch11.mjs'))) ok('Batch-11 psychic/ice pixel art overrides');
+else fail('critter-art/batch11.mjs missing');
+if (existsSync(join(root, 'scripts/critter-art/batch12.mjs'))) ok('Batch-12 volcanic/endgame pixel art overrides');
+else fail('critter-art/batch12.mjs missing');
+if (existsSync(join(root, 'scripts/import-cc0-bgm.mjs'))) ok('CC0 BGM import script');
+else fail('import-cc0-bgm.mjs missing');
 for (const id of ['mossling', 'sparkbit', 'pebblite', 'cinderkit', 'thornling']) {
   if (existsSync(join(root, `public/assets/critters/${id}.png`))) ok(`Batch-8 PNG ${id}`);
   else fail(`Missing batch-8 critter PNG: ${id}.png (run npm run gen-assets)`);
@@ -258,6 +264,10 @@ for (const id of ['bloomoss', 'rockord', 'voltwing', 'tidewisp', 'coralite']) {
 for (const id of ['crystalynx', 'flamewyrm', 'infernox', 'arctodon', 'mindling']) {
   if (existsSync(join(root, `public/assets/critters/${id}.png`))) ok(`Batch-10 PNG ${id}`);
   else fail(`Missing batch-10 critter PNG: ${id}.png (run npm run gen-assets)`);
+}
+for (const id of ['cerebrain', 'stormhorn', 'glacetail', 'zenolith', 'emberlord']) {
+  if (existsSync(join(root, `public/assets/critters/${id}.png`))) ok(`Batch-11/12 PNG ${id}`);
+  else fail(`Missing batch-11/12 critter PNG: ${id}.png (run npm run gen-assets)`);
 }
 if (existsSync(join(root, 'src/scenes/overworld/CaveSparkles.ts'))) ok('Cave sparkle overlay');
 else fail('CaveSparkles.ts missing');
