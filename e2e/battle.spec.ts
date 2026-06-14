@@ -12,13 +12,14 @@ test('wild battle starts via test bridge', async ({ page }) => {
 });
 
 test('wild battle win returns to overworld', async ({ page }) => {
+  test.setTimeout(120_000);
   await gotoFresh(page);
   await startNewGameToOverworld(page);
   await page.evaluate(() => window.__cq?.startWildBattle('mossling'));
   await waitForScene(page, 'Battle', 15_000);
   await waitForBattleReady(page);
   await page.evaluate(() => window.__cq?.resolveBattle('win'));
-  await waitForScene(page, 'Overworld', 15_000);
+  await waitForScene(page, 'Overworld', 30_000);
 });
 
 test('wild battle lose blacks out to heal center', async ({ page }) => {

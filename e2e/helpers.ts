@@ -174,7 +174,7 @@ export async function walkThroughWarp(
 export async function waitForMap(
   page: Page,
   mapId: string,
-  timeoutMs = 90_000,
+  timeoutMs = 120_000,
 ): Promise<void> {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {

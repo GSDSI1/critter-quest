@@ -1,15 +1,15 @@
 # Critter Quest — Build Queue
 
-Last updated: 2026-06-14 (P32–P34 upgrades). **Source of truth for forward work.**
+Last updated: 2026-06-14 (P35 visual audit). **Source of truth for forward work.**
 
 ## Snapshot
 
 | Metric | Value |
 |--------|-------|
 | Species | **100** |
-| Maps | 29 |
-| Unit tests | 126 (20 files) |
-| E2E specs | 18 files (39 tests) |
+| Maps | 25 |
+| Unit tests | **131** (22 files) |
+| E2E specs | **19 files (48 tests)** |
 | Dex milestones | 20 / 40 / 60 / 80 / 90 / **100** |
 | Bespoke hand art | **72** (starters 9 + batch5 3 + batch6 10 + batch8–12 ×10) |
 | Largest scene file | npcInteractRouter ~175 LOC |
@@ -55,6 +55,7 @@ Last updated: 2026-06-14 (P32–P34 upgrades). **Source of truth for forward wor
 | **P32** | Vite 8 + dev dep upgrades (0 npm audit vulns) |
 | **P33** | batch11/12 hand art (20 species: psychic/ice + volcanic/endgame) |
 | **P34** | Enhanced CC0 procedural BGM (2× loops, harmony layer) + `import-cc0-bgm` pipeline |
+| **P35** | Visual audit (`visual-audit` + `playthrough` e2e, `docs/VISUAL_AUDIT.md`), camera clamp + full sky/interior backdrops, crystal_cave interior, town mart/lab + forest grove **warp coord fixes**, `walkThroughWarp`/`waitForMap` e2e helpers |
 
 ---
 
@@ -74,8 +75,8 @@ Last updated: 2026-06-14 (P32–P34 upgrades). **Source of truth for forward wor
 
 | ID | Task | Status |
 |----|------|--------|
-| p0-e2e-full | Full `npm run test:e2e` before release | **done** (2026-06-14) |
-| p0-push | Push after green CI | **done** (2026-06-14, P26–P29) |
+| p0-e2e-full | Full `npm run test:e2e` before release | **done** (2026-06-14, 48 tests) |
+| p0-push | Push after green CI | **done** (2026-06-14, P35) |
 
 ### P5 — Graphics & audio
 
@@ -103,4 +104,5 @@ Last updated: 2026-06-14 (P32–P34 upgrades). **Source of truth for forward wor
 | Asset loader | `src/utils/assetLoader.ts` |
 | Art pipeline | `scripts/generate-png-assets.mjs`, `scripts/critter-art/shapelib.mjs` |
 | E2E battle | `e2e/battle-fight.spec.ts` |
+| Visual audit | `e2e/visual-audit.spec.ts`, `docs/VISUAL_AUDIT.md` |
 | Verify | `scripts/verify-build.mjs` |
