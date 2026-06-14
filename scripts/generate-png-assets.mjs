@@ -13,6 +13,7 @@ import { drawStarterOverride } from './critter-art/starters.mjs';
 import { drawBatch5Override } from './critter-art/batch5.mjs';
 import { drawBatch6Override } from './critter-art/batch6.mjs';
 import { drawBatch8Override } from './critter-art/batch8.mjs';
+import { drawBatch9Override } from './critter-art/batch9.mjs';
 import { drawShapeArt } from './critter-art/shapelib.mjs';
 import { generatePlayerPngs } from './critter-art/players.mjs';
 
@@ -75,6 +76,7 @@ function drawCreature(rgba, w, h, { id, color, shape, types }, opts = {}) {
   if (id && drawBatch5Override(rgba, w, id, { frame, back })) return;
   if (id && drawBatch6Override(rgba, w, id, { frame, back })) return;
   if (id && drawBatch8Override(rgba, w, id, { frame, back })) return;
+  if (id && drawBatch9Override(rgba, w, id, { frame, back })) return;
   if (drawShapeArt(rgba, w, { id, color, shape, types }, { frame, back })) return;
   const rgb = rgbFromHex(color);
   const dark = shade(rgb, -45);

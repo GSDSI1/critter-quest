@@ -243,9 +243,15 @@ if (existsSync(join(root, 'scripts/critter-art/batch6.mjs'))) ok('Batch-6 pixel 
 else fail('critter-art/batch6.mjs missing');
 if (existsSync(join(root, 'scripts/critter-art/batch8.mjs'))) ok('Batch-8 early-route pixel art overrides');
 else fail('critter-art/batch8.mjs missing');
+if (existsSync(join(root, 'scripts/critter-art/batch9.mjs'))) ok('Batch-9 mid-route pixel art overrides');
+else fail('critter-art/batch9.mjs missing');
 for (const id of ['mossling', 'sparkbit', 'pebblite', 'cinderkit', 'thornling']) {
   if (existsSync(join(root, `public/assets/critters/${id}.png`))) ok(`Batch-8 PNG ${id}`);
   else fail(`Missing batch-8 critter PNG: ${id}.png (run npm run gen-assets)`);
+}
+for (const id of ['bloomoss', 'rockord', 'voltwing', 'tidewisp', 'coralite']) {
+  if (existsSync(join(root, `public/assets/critters/${id}.png`))) ok(`Batch-9 PNG ${id}`);
+  else fail(`Missing batch-9 critter PNG: ${id}.png (run npm run gen-assets)`);
 }
 if (existsSync(join(root, 'src/scenes/overworld/CaveSparkles.ts'))) ok('Cave sparkle overlay');
 else fail('CaveSparkles.ts missing');
