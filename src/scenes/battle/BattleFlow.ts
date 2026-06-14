@@ -17,9 +17,9 @@ import {
   GameState, type CritterInstance, displayName, isFainted, addExp, registerSeen,
 } from '../../systems/stats';
 import { registerCaughtWithMilestone } from '../../systems/dexNotify';
+import { Sfx } from '../../utils/audio';
 import type { BattleScene } from '../BattleScene';
 import { trySave } from '../../utils/saveFeedback';
-import { Sfx } from '../../utils/audio';
 import type { BattlePhase } from './BattleUi';
 import type { BattleUi } from './BattleUi';
 import type { BattleAnims } from './BattleAnims';
@@ -233,6 +233,7 @@ export class BattleFlow {
     if (result.fainted) {
       this.host.showNextMessage();
       this.host.time.delayedCall(400, () => {
+        Sfx.faint();
         this.host.battleAnims.animateFaint(defenderSprite, () => {
           if (playerWasAttacker) this.onEnemyFainted();
           else this.host.onPlayerFainted();
@@ -277,6 +278,7 @@ export class BattleFlow {
         this.host.phase = 'message';
         this.host.showNextMessage();
         this.host.time.delayedCall(400, () => {
+          Sfx.faint();
           this.host.battleAnims.animateFaint(this.host.ui.enemySprite, () => this.onEnemyFainted());
         });
         return;
@@ -302,6 +304,7 @@ export class BattleFlow {
         this.host.phase = 'message';
         this.host.showNextMessage();
         this.host.time.delayedCall(400, () => {
+          Sfx.faint();
           this.host.battleAnims.animateFaint(this.host.ui.enemySprite, () => this.onEnemyFainted());
         });
         return;
@@ -429,6 +432,7 @@ export class BattleFlow {
     const to = this.host.pendingEvolution;
     if (this.host.evolveStep === 0) {
       this.host.evolveStep = 1;
+      Sfx.evolution();
       this.host.battleAnims.evolutionFlash(0);
       this.host.ui.playerSprite.setAlpha(0.2);
       this.host.ui.queueMessage('...');
@@ -440,6 +444,7 @@ export class BattleFlow {
       evolveCritter(this.host.playerMon, to);
       this.host.ui.refreshPlayerSprite(to);
       this.host.ui.playerSprite.setAlpha(1);
+      Sfx.evolution();
       this.host.battleAnims.evolutionFlash(1);
       registerCaughtWithMilestone(GameState.player, to, this.host as BattleScene);
       const b = getCreature(to).baseStats;

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { QUESTS, claimableQuests, isQuestClaimed, questClaimFlag, questRewardLabel } from '../../data/quests';
+import { QUESTS, claimableQuests, isQuestClaimed, questClaimFlag, questRewardLabel, questProgress } from '../../data/quests';
 import { GameState } from '../stats';
 
 function freshPlayer(): typeof GameState.player {
@@ -37,5 +37,12 @@ describe('quests', () => {
     const q = QUESTS.find(x => x.id === 'explorer')!;
     p.visitedMaps = Array.from({ length: 15 }, (_, i) => `map${i}`);
     expect(q.isComplete(p)).toBe(true);
+  });
+
+  it('questProgress returns partial dex progress', () => {
+    const p = freshPlayer();
+    p.dexCaught = ['a', 'b'];
+    const q = QUESTS.find(x => x.id === 'first_catch')!;
+    expect(questProgress(p, q)).toBeCloseTo(0.4);
   });
 });

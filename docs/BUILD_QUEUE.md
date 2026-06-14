@@ -1,6 +1,6 @@
 # Critter Quest — Build Queue
 
-Last updated: 2026-06-12 (P13–P17 advanced build-out). **Source of truth for forward work.**
+Last updated: 2026-06-14 (P26–P29 shipped). **Source of truth for forward work.**
 
 ## Snapshot
 
@@ -8,11 +8,12 @@ Last updated: 2026-06-12 (P13–P17 advanced build-out). **Source of truth for f
 |--------|-------|
 | Species | **100** |
 | Maps | 29 |
-| Unit tests | 113 (17 files) |
-| E2E specs | 17 files (36+ tests) |
+| Unit tests | 126 (20 files) |
+| E2E specs | 18 files (39 tests) |
 | Dex milestones | 20 / 40 / 60 / 80 / 90 / **100** |
-| Largest scene file | NpcManager 324 LOC |
-| Verify | ~195 checks, green |
+| Bespoke hand art | **32** (starters 9 + batch5 3 + batch6 10 + batch8 10) |
+| Largest scene file | npcInteractRouter ~175 LOC |
+| Verify | ~200 checks, green |
 
 ---
 
@@ -38,6 +39,17 @@ Last updated: 2026-06-12 (P13–P17 advanced build-out). **Source of truth for f
 | **P15** | 3-channel chiptune BGM (6 themes), layered SFX |
 | **P16** | Shinies (1/512, featured 1/64), quest log (10 quests), daily featured species |
 | **P17** | PlayerMovement + BattleMenus extracts, champion/quest/weather e2e |
+| **P19** | Asset boot fix (PNG commit path, override priority), README gen-assets docs |
+| **P20** | batch7 retired, batch6 blink/backs, shapelib +3 body plans, starter mid-evo backs |
+| **P21** | Kenney-blended autotiles, WeatherLayer overworld, encounter transition, NPC tints |
+| **P22** | Battle weather VFX, menu nine-slice + slide, theme.ts adoption, PC/Quest/HoF polish |
+| **P23** | Favicon + PWA icon from emberpup, CREDITS audio/shapelib update |
+| **P24** | visual-smoke e2e, weather map unit tests, verify PNG checks |
+| **P25** | `npcDialogs.ts` extract (mom/prof/trainer/elite strings + sprite tints) |
+| **P26** | Unified `battleEntry.ts` (wild skips TrainerIntro), MapRenderer tile anim unification, WeatherLayer particles, HP bar tween fix, atlas fallback |
+| **P27** | theme.ts on Party/Critterdex/Menu, critter idle in menus, layered battle arena + shadows, graded weather overlay |
+| **P28** | batch8 early-route hand art (10 species), starter/volt blink pass, visual-smoke wild-battle e2e |
+| **P29** | `npcInteractRouter.ts` extract (gate/elite/trainer/services), IntroScene idle, faint/evolution SFX, `battleReady` e2e bridge |
 
 ---
 
@@ -45,8 +57,8 @@ Last updated: 2026-06-12 (P13–P17 advanced build-out). **Source of truth for f
 
 | # | Issue | Next |
 |---|-------|------|
-| 1 | Bespoke art coverage | Shape library covers everyone; bespoke grids for starter finals would still help |
-| 2 | NpcManager 324 LOC | Next extract: NPC dialog table → data file |
+| 1 | NpcManager ~130 LOC (router extracted) | Stable — further splits optional |
+| 2 | CC0 licensed BGM | Optional swap when loops sourced (`p5-cc0-bgm`) |
 
 ---
 
@@ -56,8 +68,8 @@ Last updated: 2026-06-12 (P13–P17 advanced build-out). **Source of truth for f
 
 | ID | Task | Status |
 |----|------|--------|
-| p0-e2e-full | Full `npm run test:e2e` before release | **done** (2026-06-12) |
-| p0-push | Push after green CI | **done** (P9/P10) |
+| p0-e2e-full | Full `npm run test:e2e` before release | **done** (2026-06-14) |
+| p0-push | Push after green CI | pending P26–P29 |
 
 ### P5 — Graphics & audio
 
@@ -80,9 +92,9 @@ Last updated: 2026-06-12 (P13–P17 advanced build-out). **Source of truth for f
 | Area | Path |
 |------|------|
 | Species | `src/data/creatures.ts` |
-| Battle flow | `src/scenes/battle/BattleFlow.ts` |
+| Battle flow | `src/scenes/battle/BattleFlow.ts`, `src/ui/battleEntry.ts` |
 | Battle systems | `src/systems/battle.ts` |
 | Asset loader | `src/utils/assetLoader.ts` |
-| Art pipeline | `scripts/generate-png-assets.mjs`, `scripts/critter-art/batch7.mjs` |
+| Art pipeline | `scripts/generate-png-assets.mjs`, `scripts/critter-art/shapelib.mjs` |
 | E2E battle | `e2e/battle-fight.spec.ts` |
 | Verify | `scripts/verify-build.mjs` |

@@ -1,4 +1,4 @@
-import { FONT } from '../ui/theme';
+import { titleStyle, bodyStyle, hintStyle } from '../ui/theme';
 import Phaser from 'phaser';
 import { COLORS, GAME_WIDTH, GAME_HEIGHT, TYPE_NAMES } from '../data/types';
 import { DEX_ORDER, getCreature, totalSpecies } from '../data/creatures';
@@ -6,7 +6,7 @@ import { getEvolutionChain } from '../data/evolutions';
 import { LEARNSETS } from '../data/learnsets';
 import { getMove } from '../data/moves';
 import { GameState } from '../systems/stats';
-import { addCreatureImage } from '../utils/assetLoader';
+import { addCreatureImage, startCritterIdle, type CritterIdleHandle } from '../utils/assetLoader';
 import { buildScreenOverlay, buildMenuPanel } from '../ui/sceneBackdrops';
 import { Input } from '../systems/input';
 import { TouchMenuNav } from '../ui/touchMenuNav';
@@ -17,6 +17,7 @@ export class CritterdexScene extends Phaser.Scene {
   private tab: 'info' | 'area' | 'moves' | 'evo' = 'info';
   private learnScroll = 0;
   private touchNav?: TouchMenuNav;
+  private detailIdle?: CritterIdleHandle;
 
   constructor() {
     super('Critterdex');
@@ -87,11 +88,11 @@ export class CritterdexScene extends Phaser.Scene {
   private renderShell(): void {
     this.children.removeAll(true);
     buildScreenOverlay(this, 0.82);
-    buildMenuPanel(this, 12, 8, GAME_WIDTH - 24, GAME_HEIGHT - 16, 2);
+    const shell = buildMenuPanel(this, 12, 8, GAME_WIDTH - 24, GAME_HEIGHT - 16, 2);
+    shell.setAlpha(0);
+    this.tweens.add({ targets: shell, alpha: 1, duration: 220, ease: 'Back.easeOut' });
     const caught = GameState.player.dexCaught.length;
-    this.add.text(GAME_WIDTH / 2, 16, `Critterdex  ${caught}/${totalSpecies()}`, {
-      fontFamily: FONT, fontSize: '20px', color: '#f5c542',
-    }).setOrigin(0.5).setName('header');
+    this.add.text(GAME_WIDTH / 2, 16, `Critterdex  ${caught}/${totalSpecies()}`, titleStyle('20px')).setOrigin(0.5).setName('header');
     this.renderList();
     this.renderDetail();
   }
@@ -120,10 +121,7 @@ export class CritterdexScene extends Phaser.Scene {
 
       const num = String(def.dexNumber).padStart(3, '0');
       const name = caught ? def.name : seen ? def.name : '???';
-      this.listContainer.add(this.add.text(36, y + 10, `${num}  ${name}`, {
-        fontFamily: FONT, fontSize: '12px',
-        color: caught ? '#f0f0f0' : seen ? '#8899aa' : '#444444',
-      }));
+      this.listContainer.add(this.add.text(36, y + 10, `${num}  ${name}`, bodyStyle('12px', caught ? '#f0f0f0' : seen ? '#8899aa' : '#444444')));
 
       if (caught || seen) {
         def.types.forEach((t, ti) => {
@@ -137,6 +135,8 @@ export class CritterdexScene extends Phaser.Scene {
   }
 
   private renderDetail(): void {
+    this.detailIdle?.stop();
+    this.detailIdle = undefined;
     if (this.detailContainer) this.detailContainer.destroy();
     this.detailContainer = this.add.container(0, 0);
 
@@ -156,82 +156,99 @@ export class CritterdexScene extends Phaser.Scene {
       ['info', 'Info', 330], ['area', 'Area', 390], ['moves', 'Moves', 450], ['evo', 'Evo', 510],
     ];
     tabLabels.forEach(([key, label, x]) => {
-      this.detailContainer.add(this.add.text(x, 52, this.tab === key ? `▶ ${label}` : `  ${label}`, {
-        fontFamily: FONT, fontSize: '10px', color: this.tab === key ? '#f5c542' : '#667788',
-      }).setInteractive({ useHandCursor: true }).on('pointerdown', () => { this.tab = key; this.renderDetail(); }));
+      const active = this.tab === key;
+      if (active) {
+        const pill = this.add.graphics();
+        pill.fillStyle(COLORS.panelBorder, 0.9);
+        pill.fillRoundedRect(x - 4, 48, 52, 18, 6);
+        this.detailContainer.add(pill);
+      }
+      this.detailContainer.add(this.add.text(x, 52, label, bodyStyle('10px', active ? '#f5c542' : '#667788'))
+        .setInteractive({ useHandCursor: true }).on('pointerdown', () => { this.tab = key; this.renderDetail(); }));
     });
 
     if (!seen && !caught) {
-      this.detailContainer.add(this.add.text(470, 200, '???', {
-        fontFamily: FONT, fontSize: '24px', color: '#444444',
-      }).setOrigin(0.5));
+      this.detailContainer.add(this.add.text(470, 180, '?', titleStyle('28px')).setOrigin(0.5));
+      this.detailContainer.add(this.add.text(470, 220, '???', titleStyle('24px')).setOrigin(0.5));
+      this.detailContainer.add(this.add.text(470, 250, 'Not yet discovered', hintStyle('10px')).setOrigin(0.5));
       return;
     }
 
     if (caught) {
-      this.detailContainer.add(addCreatureImage(this, 470, 120, id).setScale(1.5));
+      const spr = addCreatureImage(this, 470, 120, id).setScale(1.5);
+      this.detailIdle = startCritterIdle(this, spr, id, 120);
+      this.detailContainer.add(spr);
       this.detailContainer.add(this.add.image(340, 120, `footprint_${def.shape}`).setScale(1.2));
     }
 
-    this.detailContainer.add(this.add.text(470, 200, caught ? def.name : '???', {
-      fontFamily: FONT, fontSize: '18px', color: '#f5c542',
-    }).setOrigin(0.5));
+    this.detailContainer.add(this.add.text(470, 200, caught ? def.name : '???', titleStyle('18px')).setOrigin(0.5));
 
     def.types.forEach((t, ti) => {
       this.detailContainer.add(this.add.image(450 + ti * 22, 222, `type_${t}`).setScale(0.7));
     });
 
     if (this.tab === 'info') {
-      this.detailContainer.add(this.add.text(470, 248, caught ? def.types.map(t => TYPE_NAMES[t]).join(' / ') : '???', {
-        fontFamily: FONT, fontSize: '11px', color: '#8899aa',
-      }).setOrigin(0.5));
+      this.detailContainer.add(this.add.text(470, 248, caught ? def.types.map(t => TYPE_NAMES[t]).join(' / ') : '???', hintStyle('11px')).setOrigin(0.5));
       this.detailContainer.add(this.add.text(330, 270, caught ? def.description : 'Seen in the wild.', {
-        fontFamily: FONT, fontSize: '11px', color: '#c0c0c0',
+        ...bodyStyle('11px'),
         wordWrap: { width: 280 }, align: 'center',
       }).setOrigin(0.5, 0));
       if (caught) {
         const b = def.baseStats;
-        this.detailContainer.add(this.add.text(330, 350, `HP ${b.hp}  ATK ${b.atk}  DEF ${b.def}\nSPA ${b.spa}  SPD ${b.spd}  SPE ${b.spe}`, {
-          fontFamily: FONT, fontSize: '10px', color: '#667788',
-        }));
+        const stats: [string, number][] = [
+          ['HP', b.hp], ['ATK', b.atk], ['DEF', b.def], ['SPA', b.spa], ['SPD', b.spd], ['SPE', b.spe],
+        ];
+        stats.forEach(([label, val], si) => {
+          const sy = 340 + si * 14;
+          this.detailContainer.add(this.add.text(330, sy, label, hintStyle('9px')));
+          const bar = this.add.graphics();
+          bar.fillStyle(0x333333, 1);
+          bar.fillRoundedRect(370, sy + 2, 120, 8, 2);
+          bar.fillStyle(COLORS.gold, 0.85);
+          bar.fillRoundedRect(370, sy + 2, Math.max(4, (val / 150) * 120), 8, 2);
+          this.detailContainer.add(bar);
+          this.detailContainer.add(this.add.text(500, sy, String(val), hintStyle('9px')));
+        });
         if (def.height && def.weight) {
-          this.detailContainer.add(this.add.text(330, 390, `H:${def.height}m  W:${def.weight}kg`, {
-            fontFamily: FONT, fontSize: '10px', color: '#667788',
-          }));
+          this.detailContainer.add(this.add.text(330, 430, `H:${def.height}m  W:${def.weight}kg`, hintStyle('10px')));
         }
       }
     } else if (this.tab === 'area') {
       const habitat = def.habitat ?? 'Unknown area';
-      this.detailContainer.add(this.add.text(470, 280, 'Habitat', {
-        fontFamily: FONT, fontSize: '14px', color: '#f5c542',
-      }).setOrigin(0.5));
+      this.detailContainer.add(this.add.text(470, 280, 'Habitat', titleStyle('14px')).setOrigin(0.5));
       this.detailContainer.add(this.add.text(330, 310, seen || caught ? habitat : 'Unknown', {
-        fontFamily: FONT, fontSize: '11px', color: '#c0c0c0',
+        ...bodyStyle('11px'),
         wordWrap: { width: 280 }, align: 'center',
       }).setOrigin(0.5, 0));
     } else if (this.tab === 'moves' && caught) {
       const entries = LEARNSETS[id] ?? [];
       const visible = entries.slice(this.learnScroll, this.learnScroll + 12);
-      const lines = visible.map(e => `Lv.${String(e.level).padStart(2)}  ${getMove(e.move).name}`);
-      this.detailContainer.add(this.add.text(330, 270, lines.join('\n') || 'No learnset data.', {
-        fontFamily: FONT, fontSize: '10px', color: '#c0c0c0',
-        lineSpacing: 4,
-      }));
+      visible.forEach((e, mi) => {
+        const move = getMove(e.move);
+        const ty = 270 + mi * 14;
+        this.detailContainer.add(this.add.image(334, ty + 6, `type_${move.type}`).setScale(0.45));
+        this.detailContainer.add(this.add.text(350, ty, `Lv.${String(e.level).padStart(2)}  ${move.name}`, bodyStyle('10px')));
+      });
+      if (entries.length === 0) {
+        this.detailContainer.add(this.add.text(330, 270, 'No learnset data.', bodyStyle('10px')));
+      }
       if (entries.length > 12) {
-        this.detailContainer.add(this.add.text(330, 390, `↑↓ scroll  ${this.learnScroll + 1}-${Math.min(this.learnScroll + 12, entries.length)} / ${entries.length}`, {
-          fontFamily: FONT, fontSize: '9px', color: '#667788',
-        }));
+        this.detailContainer.add(this.add.text(330, 390, `↑↓ scroll  ${this.learnScroll + 1}-${Math.min(this.learnScroll + 12, entries.length)} / ${entries.length}`, hintStyle('9px')));
       }
     } else if (this.tab === 'evo' && (seen || caught)) {
       const chain = getEvolutionChain(id);
-      const chainText = chain.map(sid => getCreature(sid).name).join(' → ');
-      this.detailContainer.add(this.add.text(330, 280, 'Evolution', {
-        fontFamily: FONT, fontSize: '13px', color: '#f5c542',
-      }).setOrigin(0.5, 0));
-      this.detailContainer.add(this.add.text(330, 310, chainText, {
-        fontFamily: FONT, fontSize: '11px', color: '#c0c0c0',
-        wordWrap: { width: 280 }, align: 'center',
-      }).setOrigin(0.5, 0));
+      this.detailContainer.add(this.add.text(330, 280, 'Evolution', titleStyle('13px')).setOrigin(0.5, 0));
+      chain.forEach((sid, ci) => {
+        const cx = 360 + ci * 70;
+        if (GameState.player.dexCaught.includes(sid)) {
+          this.detailContainer.add(addCreatureImage(this, cx, 320, sid, true).setScale(1.2));
+        } else {
+          this.detailContainer.add(this.add.text(cx, 320, '?', bodyStyle('14px', '#444444')).setOrigin(0.5));
+        }
+        if (ci < chain.length - 1) {
+          this.detailContainer.add(this.add.text(cx + 35, 318, '→', hintStyle('10px')).setOrigin(0.5));
+        }
+      });
     }
   }
 

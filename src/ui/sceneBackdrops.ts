@@ -163,16 +163,38 @@ export function buildHealInterior(scene: Phaser.Scene, depth = -5): Phaser.GameO
   return c;
 }
 
-/** Battle arena background image for a map. */
+/** Battle arena background with layered parallax for a map. */
 export function buildBattleArena(scene: Phaser.Scene, mapId: string, depth = -10): Phaser.GameObjects.Image {
   const key = battleBgForMap(mapId);
   const farKey = `${key}_far`;
+  const container = scene.add.container(0, 0).setDepth(depth - 2);
+
   if (scene.textures.exists(farKey)) {
-    const far = scene.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, farKey).setDepth(depth - 1).setAlpha(0.85);
-    far.setScrollFactor(0);
+    const far = scene.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2 - 20, farKey).setAlpha(0.85);
+    container.add(far);
     scene.tweens.add({
-      targets: far, x: far.x + 24, duration: 12000, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
+      targets: far, x: far.x + 18, duration: 14000, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
     });
   }
-  return scene.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, key).setDepth(depth);
+
+  const hills = scene.add.graphics();
+  hills.fillStyle(mapId.includes('cave') ? 0x334155 : mapId.includes('gym') ? 0x78350f : 0x166534, 0.35);
+  hills.fillEllipse(GAME_WIDTH / 2, 280, GAME_WIDTH * 0.9, 120);
+  hills.fillStyle(0x000000, 0.08);
+  hills.fillEllipse(GAME_WIDTH / 2, 300, GAME_WIDTH * 0.7, 80);
+  container.add(hills);
+  scene.tweens.add({
+    targets: hills, x: 6, duration: 9000, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
+  });
+
+  const ground = scene.add.graphics();
+  ground.fillStyle(0x000000, 0.12);
+  ground.fillEllipse(GAME_WIDTH / 2, 360, GAME_WIDTH * 0.85, 40);
+  container.add(ground);
+
+  const bg = scene.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, key).setDepth(depth);
+  scene.tweens.add({
+    targets: bg, y: bg.y + 4, duration: 10000, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
+  });
+  return bg;
 }

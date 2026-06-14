@@ -211,17 +211,91 @@ const PRIME = [
   '................................',
 ];
 
+const CRAB_BACK = [
+  '................................',
+  '...........bbbb.................',
+  '..........bttttb................',
+  '.........bttBBttb...............',
+  '........bttBBBBttb..............',
+  '.......bttBBBBBBttb.............',
+  '........bttBBBBttb..............',
+  '.........bdddddb................',
+  '........bd......db..............',
+  '.......bd........db.............',
+  '......bdo........odb............',
+  '................................',
+  '................................',
+  '................................',
+];
+const CRAB_F2 = [
+  '................................',
+  '...........bbbb.................',
+  '..........bttttb................',
+  '.........bttBBttb...............',
+  '........bttBBBBttb..............',
+  '.......bttBBBBBBttb.............',
+  '........bttBBBBttb..............',
+  '.........bdddddb................',
+  '........bd......db..............',
+  '.......bd........db.............',
+  '......bdo........odb............',
+  '................................',
+  '................................',
+  '................................',
+];
+
+const MOTH_F2 = [
+  '................................',
+  '......pppppppp..................',
+  '.....pBBBBBBp...................',
+  '....pBBBBBBBBp..................',
+  '...pBBddBBddBp..................',
+  '....pBBBBBBp....................',
+  '.....pBBBBp.....................',
+  '......bbbb......................',
+  '.......bb.......................',
+  '................................',
+  '................................',
+  '................................',
+  '................................',
+  '................................',
+];
+const MOTH_BACK = [
+  '................................',
+  '......pppppppp..................',
+  '.....pBBBBBBp...................',
+  '....pBBBBBBBBp..................',
+  '...pBBBBBBBBBp..................',
+  '....pBBBBBBp....................',
+  '.....pBBBBp.....................',
+  '......bbbb......................',
+  '.......bb.......................',
+  '................................',
+  '................................',
+  '................................',
+  '................................',
+  '................................',
+];
+
+function blinkGrid(grid) {
+  return grid.map(row => row.replace(/Ye/g, 'dd').replace(/we/g, 'dd'));
+}
+
+function backGrid(grid) {
+  return grid.map(row => row.replace(/Ye/g, 'BB').replace(/we/g, 'BB'));
+}
+
 const GRIDS = {
-  piercrab: { front: CRAB, f2: CRAB, back: CRAB, color: 0x0ea5e9, ox: 8, oy: 10 },
-  moonmoth: { front: MOTH, f2: MOTH, back: MOTH, color: 0xf472b6, ox: 6, oy: 8 },
-  grovespirit: { front: SPIRIT, f2: SPIRIT, back: SPIRIT, color: 0x4ade80, ox: 8, oy: 10 },
-  glowfern: { front: FERN, f2: FERN, back: FERN, color: 0x4ade80, ox: 8, oy: 10 },
-  voidreaper: { front: REAPER, f2: REAPER, back: REAPER, color: 0x312e81, ox: 8, oy: 10 },
-  solarchion: { front: LION, f2: LION, back: LION, color: 0xfbbf24, ox: 4, oy: 6 },
-  lunawisp: { front: WISP, f2: WISP, back: WISP, color: 0x6366f1, ox: 8, oy: 10 },
-  terradrake: { front: DRAKE, f2: DRAKE, back: DRAKE, color: 0x78716c, ox: 2, oy: 6 },
-  stormcrown: { front: CROWN, f2: CROWN, back: CROWN, color: 0xeab308, ox: 6, oy: 8 },
-  primordix: { front: PRIME, f2: PRIME, back: PRIME, color: 0xc084fc, ox: 8, oy: 10 },
+  piercrab: { front: CRAB, f2: CRAB_F2, back: CRAB_BACK, color: 0x0ea5e9, ox: 8, oy: 10 },
+  moonmoth: { front: MOTH, f2: MOTH_F2, back: MOTH_BACK, color: 0xf472b6, ox: 6, oy: 8 },
+  grovespirit: { front: SPIRIT, f2: blinkGrid(SPIRIT), back: backGrid(SPIRIT), color: 0x4ade80, ox: 8, oy: 10 },
+  glowfern: { front: FERN, f2: blinkGrid(FERN), back: backGrid(FERN), color: 0x4ade80, ox: 8, oy: 10 },
+  voidreaper: { front: REAPER, f2: blinkGrid(REAPER), back: backGrid(REAPER), color: 0x312e81, ox: 8, oy: 10 },
+  solarchion: { front: LION, f2: blinkGrid(LION), back: backGrid(LION), color: 0xfbbf24, ox: 4, oy: 6 },
+  lunawisp: { front: WISP, f2: blinkGrid(WISP), back: backGrid(WISP), color: 0x6366f1, ox: 8, oy: 10 },
+  terradrake: { front: DRAKE, f2: blinkGrid(DRAKE), back: backGrid(DRAKE), color: 0x78716c, ox: 2, oy: 6 },
+  stormcrown: { front: CROWN, f2: blinkGrid(CROWN), back: backGrid(CROWN), color: 0xeab308, ox: 6, oy: 8 },
+  primordix: { front: PRIME, f2: blinkGrid(PRIME), back: backGrid(PRIME), color: 0xc084fc, ox: 8, oy: 10 },
 };
 
 function drawBatch6(rgba, w, id, { frame = 0, back = false } = {}) {

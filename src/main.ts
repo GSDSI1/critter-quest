@@ -17,6 +17,7 @@ import { battleMenuItems } from './scenes/battle/BattleUi';
 import { getBattleWeather } from './systems/weather';
 import type { OverworldScene } from './scenes/OverworldScene';
 import { applyChestReward } from './scenes/overworld/ChestRewards';
+import { hasCreatureGraphic } from './utils/assetLoader';
 import type { FishingScene } from './scenes/FishingScene';
 import type { BugCatchScene } from './scenes/BugCatchScene';
 import type { CritterContestScene } from './scenes/CritterContestScene';
@@ -77,9 +78,11 @@ declare global {
       startTrainerBattle: (npcId: string, mapId?: string) => void;
       resolveBattle: (outcome: 'win' | 'lose' | 'catch') => void;
       battleState: () => { phase: string; enemyHp: number; enemyMaxHp: number; weather: string | null } | null;
+      battleReady: () => boolean;
       battleTapContinue: () => boolean;
       battlePickMove: (index?: number) => boolean;
       battleMenuForTrainer: () => string[];
+      hasCreatureGraphic: (speciesId: string) => boolean;
       openShop: () => void;
       buyShopItem: (itemId?: string) => boolean;
       sellShopItem: (itemId?: string) => boolean;
@@ -204,9 +207,13 @@ if (import.meta.env.DEV) {
       const battle = game.scene.getScene('Battle') as BattleScene | undefined;
       battle?.resolveBattle(outcome);
     },
+    battleReady() {
+      const battle = game.scene.getScene('Battle') as BattleScene | undefined;
+      return Boolean(battle?.scene.isActive() && battle.battleReady);
+    },
     battleState() {
       const battle = game.scene.getScene('Battle') as BattleScene | undefined;
-      if (!battle?.scene.isActive()) return null;
+      if (!battle?.scene.isActive() || !battle.battleReady) return null;
       return {
         phase: battle.phase,
         enemyHp: battle.wild.currentHp,
@@ -216,19 +223,23 @@ if (import.meta.env.DEV) {
     },
     battleTapContinue() {
       const battle = game.scene.getScene('Battle') as BattleScene | undefined;
-      if (!battle) return false;
+      if (!battle?.battleReady) return false;
       battle.onConfirm();
       return true;
     },
     battlePickMove(index = 0) {
       const battle = game.scene.getScene('Battle') as BattleScene | undefined;
-      if (!battle || battle.phase !== 'menu') return false;
+      if (!battle?.battleReady || battle.phase !== 'menu') return false;
       battle.menuChoice('Fight');
       battle.useMove(index);
       return true;
     },
     battleMenuForTrainer() {
       return [...battleMenuItems(true)];
+    },
+    hasCreatureGraphic(speciesId: string) {
+      const menu = game.scene.getScene('Menu');
+      return menu ? hasCreatureGraphic(menu, speciesId) : false;
     },
     openShop() {
       const ow = game.scene.getScene('Overworld');

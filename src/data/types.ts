@@ -21,6 +21,12 @@ export const COLORS = {
   wall: 0x6b5344,
   roof: 0xb91c1c,
   roofLight: 0xdc2626,
+  /** String hex aliases for Phaser text (use with theme.ts). */
+  textHex: '#f0f0f0',
+  textDimHex: '#8899aa',
+  bodyHex: '#c0c0c0',
+  goldHex: '#f5c542',
+  hintHex: '#667788',
 };
 
 export type ElementType = 'flame' | 'tide' | 'leaf' | 'volt' | 'stone' | 'shadow' | 'ice' | 'psychic';

@@ -100,3 +100,18 @@ export function questRewardLabel(q: QuestDef): string {
   if (q.reward.item) parts.push(`${q.reward.item.replace(/_/g, ' ')} x${q.reward.itemCount ?? 1}`);
   return parts.join(' + ');
 }
+
+/** 0–1 progress toward quest completion (for UI bars). */
+export function questProgress(p: PlayerState, q: QuestDef): number {
+  if (q.isComplete(p)) return 1;
+  switch (q.id) {
+    case 'first_catch': return Math.min(1, p.dexCaught.length / 5);
+    case 'catch_20': return Math.min(1, p.dexCaught.length / 20);
+    case 'catch_60': return Math.min(1, p.dexCaught.length / 60);
+    case 'first_badge': return Math.min(1, p.badges.length);
+    case 'four_badges': return Math.min(1, p.badges.length / 4);
+    case 'explorer': return Math.min(1, p.visitedMaps.length / 15);
+    case 'fishing_pro': return Math.min(1, p.fishingBest / 2);
+    default: return q.isComplete(p) ? 1 : 0;
+  }
+}

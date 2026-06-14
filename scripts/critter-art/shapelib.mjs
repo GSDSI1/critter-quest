@@ -352,6 +352,156 @@ const CRYS_BACK = [
   '.......o........',
 ];
 
+// ── Insect: winged bug with antennae ──
+const INSECT_FRONT = [
+  '..oa....oa......',
+  '.obo....obo.....',
+  '..obbbbbbbo.....',
+  '..obwebbbbo.....',
+  '...obbbbddo.....',
+  '..oobbbbboo.....',
+  '.obbbbbbbbbo....',
+  'oblbbbbbbbbbo...',
+  'obbllbbbbbbbo...',
+  '.obbbbbbbbbo....',
+  '..oobbbbbdo.....',
+  '...aobdoa.......',
+  '....oddo........',
+  '.....oo.........',
+];
+const INSECT_F2 = [
+  '..oa....oa......',
+  '.obo....obo.....',
+  '..obbbbbbbo.....',
+  '..obddbbbbo.....',
+  '...obbbbddo.....',
+  '..oobbbbboo.....',
+  '.oblbbbbbbbo....',
+  'obbllbbbbbbbo...',
+  'oblbbbbbbbbbo...',
+  '.obbbbbbbbbo....',
+  '..oobbbbbdo.....',
+  '...aobdoa.......',
+  '....oddo........',
+  '.....oo.........',
+];
+const INSECT_BACK = [
+  '..oa....oa......',
+  '.obo....obo.....',
+  '..obbbbbbbo.....',
+  '..obbdbbbbo.....',
+  '...obbbbdbo.....',
+  '..oobbbbbboo....',
+  '.obblbbbblbbo...',
+  'obbllbbbbllbbo..',
+  'obblbbbbbblbbo..',
+  '.obbbbbbbbbbo...',
+  '..oobbbbbboo....',
+  '...aobdoa.......',
+  '....oddo........',
+  '.....oo.........',
+];
+
+// ── Aquatic: fish-like with fins and tail ──
+const AQUA_FRONT = [
+  '.....ooo........',
+  '....obbbo.......',
+  '...oblbbbo......',
+  '...obwebbbo.....',
+  '....obbbbdo.....',
+  '..oobbbbbbboo...',
+  '.obbbbbbbbbbbo..',
+  'obbbbbbbbbbbbbl.',
+  '.obbbbbbbbbbbo..',
+  '..oobbbbbbboo...',
+  '....obbbbdo.....',
+  '.....aobdo......',
+  '......odo.......',
+  '.....oo.oo......',
+];
+const AQUA_F2 = [
+  '.....ooo........',
+  '....obbbo.......',
+  '...oblbbbo......',
+  '...obddbbbo.....',
+  '....obbbbdo.....',
+  '..oobbbbbbboo...',
+  '.oblbbbbbbbbbo..',
+  'obbbbbbbbbbbbbl.',
+  '.oblbbbbbbbbbo..',
+  '..oobbbbbbboo...',
+  '....obbbbdo.....',
+  '.....aobdo......',
+  '......odo.......',
+  '.....oo.oo......',
+];
+const AQUA_BACK = [
+  '.....ooo........',
+  '....obbbo.......',
+  '...obbbdbo......',
+  '...obbdbbbo.....',
+  '....obbbbdo.....',
+  '..oobbbbbbboo...',
+  '.obblbbbbblbbo..',
+  'obbllbbbbllbblo.',
+  '.obblbbbbblbbo..',
+  '..oobbbbbbboo...',
+  '....obbbbdo.....',
+  '.....aobdo......',
+  '......odo.......',
+  '.....oo.oo......',
+];
+
+// ── Armored: shell/plated body ──
+const ARM_FRONT = [
+  '......aa........',
+  '....oooooo......',
+  '...obbllbbo.....',
+  '..oblbbbbbbo....',
+  '.obbbbbbbbbbo...',
+  '.obbbddddbbbo...',
+  'obbbdbbbbdbbbo..',
+  'obbbdbbbbdbbbo..',
+  'obbbbddddbbbbo..',
+  '.obmbbbbbbmbo...',
+  '.obbmmmmmmbbo...',
+  '..odbbbbbbdo....',
+  '...oddddddo.....',
+  '....oooooo......',
+];
+const ARM_F2 = [
+  '......aa........',
+  '....oooooo......',
+  '...obbllbbo.....',
+  '..oblbbbbbbo....',
+  '.obbbbbbbbbbo...',
+  '.obddbbbbddbo...',
+  'obbbbbbbbbbbbo..',
+  'obbbbbddbbbbbo..',
+  'obbbbbbbbbbbbo..',
+  '.obmbbbbbbmbo...',
+  '.obbmmmmmmbbo...',
+  '..odbbbbbbdo....',
+  '...oddddddo.....',
+  '....oooooo......',
+];
+const ARM_BACK = [
+  '......aa........',
+  '....oooooo......',
+  '...obblbbbo.....',
+  '...obbdbbbo.....',
+  '..obbbbbbbbbo...',
+  '.obbbddddbbbo...',
+  'obbbdbbbbdbbbo..',
+  'obbbdbbbbdbbbo..',
+  'obbbbddddbbbbo..',
+  '.obmbbbbbbmbo...',
+  '.obbmmmmmmbbo...',
+  '..odbbbbbbdo....',
+  '...oddddddo.....',
+  '....oooooo......',
+];
+
 const SHAPES = {
   blob: { front: BLOB_FRONT, f2: BLOB_F2, back: BLOB_BACK },
   quadruped: { front: QUAD_FRONT, f2: QUAD_F2, back: QUAD_BACK },
@@ -359,6 +509,9 @@ const SHAPES = {
   avian: { front: AVIAN_FRONT, f2: AVIAN_F2, back: AVIAN_BACK },
   humanoid: { front: HUM_FRONT, f2: HUM_F2, back: HUM_BACK },
   crystalline: { front: CRYS_FRONT, f2: CRYS_F2, back: CRYS_BACK },
+  insect: { front: INSECT_FRONT, f2: INSECT_F2, back: INSECT_BACK },
+  aquatic: { front: AQUA_FRONT, f2: AQUA_F2, back: AQUA_BACK },
+  armored: { front: ARM_FRONT, f2: ARM_F2, back: ARM_BACK },
 };
 
 /** Deterministic species hash for small per-species variation. */
@@ -392,6 +545,24 @@ export function drawShapeArt(rgba, w, def, { frame = 0, back = false } = {}) {
           setPx(rgba, w, px + dx, py + dy, c);
         }
       }
+    }
+  }
+
+  // Per-species accent: horns, fins, or wing nubs from hash.
+  if (!back) {
+    const accent = TYPE_ACCENTS[types?.[0]] ?? [220, 220, 220, 255];
+    const kind = seed % 3;
+    const ax = ox + (4 + (seed % 6)) * scale;
+    const ay = oy + (2 + (seed % 3)) * scale;
+    if (kind === 0) {
+      for (let i = 0; i < scale * 2; i++) setPx(rgba, w, ax, ay - i, accent);
+      setPx(rgba, w, ax + scale, ay - scale, accent);
+    } else if (kind === 1 && (types?.[0] === 'tide' || shape === 'aquatic')) {
+      setPx(rgba, w, ax - scale, ay + scale * 4, accent);
+      setPx(rgba, w, ax + scale * 3, ay + scale * 4, accent);
+    } else if (kind === 2) {
+      setPx(rgba, w, ax, ay, accent);
+      setPx(rgba, w, ax + scale * 2, ay - scale, accent);
     }
   }
   return true;

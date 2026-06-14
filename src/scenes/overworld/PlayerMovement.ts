@@ -165,7 +165,7 @@ export class PlayerMovement {
   }
 
   startWildBattle(): void {
-    const { dialog, callbacks } = this.deps;
+    const { scene, dialog, callbacks } = this.deps;
     if (!firstAlive(GameState.player.party)) {
       dialog.show('All your critters fainted! Visit the Healing Center.', () => {
         callbacks.setInputLocked(false);
@@ -180,6 +180,7 @@ export class PlayerMovement {
     registerSeen(GameState.player.dexSeen, def.id);
     const wild = createCritter(def.id, level, undefined, { shinyChance: shinyOddsFor(def.id) });
     if (heldItem) wild.heldItem = heldItem;
+    callbacks.setInputLocked(true);
     this.deps.launchWildBattle([wild]);
   }
 }

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { gotoFresh, startNewGameToOverworld, waitForScene } from './helpers';
+import { gotoFresh, startNewGameToOverworld, waitForScene, waitForBattleReady } from './helpers';
 
 async function advanceBattleToMenu(page: import('@playwright/test').Page): Promise<void> {
   await page.waitForFunction(
@@ -26,6 +26,7 @@ test('wild battle fight reduces enemy HP', async ({ page }) => {
   await startNewGameToOverworld(page);
   await page.evaluate(() => window.__cq?.startWildBattle('mossling'));
   await waitForScene(page, 'Battle', 15_000);
+  await waitForBattleReady(page);
 
   for (let i = 0; i < 8; i++) {
     await page.evaluate(() => window.__cq?.battleTapContinue());

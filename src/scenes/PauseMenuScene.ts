@@ -1,4 +1,4 @@
-import { FONT } from '../ui/theme';
+import { titleStyle, bodyStyle, hintStyle } from '../ui/theme';
 import Phaser from 'phaser';
 import { COLORS, GAME_WIDTH } from '../data/types';
 import { getBadge } from '../data/badges';
@@ -14,6 +14,19 @@ import { refreshMusicVolume } from '../utils/music';
 import { TouchMenuNav } from '../ui/touchMenuNav';
 import { formatMinigameBests } from '../systems/minigameScores';
 import { claimableQuests } from '../data/quests';
+
+const MENU_ICONS: Record<string, string> = {
+  Critterdex: '◇',
+  Party: '♦',
+  Quests: '!',
+  'Region Map': '◎',
+  Options: '⚙',
+  Mute: '♪',
+  Unmute: '♪',
+  Fly: '✦',
+  'Save Game': '💾',
+  Close: '×',
+};
 
 export class PauseMenuScene extends Phaser.Scene {
   private selected = 0;
@@ -31,34 +44,24 @@ export class PauseMenuScene extends Phaser.Scene {
     this.options = this.buildOptions();
     this.selected = Math.min(this.selected, this.options.length - 1);
     buildScreenOverlay(this, 0.65);
-    buildMenuPanel(this, 170, 70, 300, 360, 5);
+    const panel = buildMenuPanel(this, 150, 70, 300, 360, 5);
+    panel.setAlpha(0);
+    this.tweens.add({ targets: panel, x: 170, alpha: 1, duration: 220, ease: 'Back.easeOut' });
 
-    this.add.text(GAME_WIDTH / 2, 110, 'MENU', {
-      fontFamily: FONT, fontSize: '24px', color: '#f5c542',
-    }).setOrigin(0.5);
+    this.add.text(GAME_WIDTH / 2, 110, 'MENU', titleStyle('24px')).setOrigin(0.5);
 
-    this.add.text(GAME_WIDTH / 2, 132, GameState.player.name, {
-      fontFamily: FONT, fontSize: '13px', color: '#f0f0f0',
-    }).setOrigin(0.5);
+    this.add.text(GAME_WIDTH / 2, 132, GameState.player.name, bodyStyle('13px', COLORS.textHex)).setOrigin(0.5);
 
-    this.add.text(GAME_WIDTH / 2, 152, `$${GameState.player.money}  |  Badges: ${GameState.player.badges.length}`, {
-      fontFamily: FONT, fontSize: '11px', color: '#8899aa',
-    }).setOrigin(0.5);
+    this.add.text(GAME_WIDTH / 2, 152, `$${GameState.player.money}  |  Badges: ${GameState.player.badges.length}`, hintStyle('11px')).setOrigin(0.5);
 
-    this.add.text(GAME_WIDTH / 2, 164, `Dex: ${GameState.player.dexCaught.length}/${totalSpecies()}  Maps: ${GameState.player.visitedMaps.length}  Signs: ${GameState.player.signsRead}`, {
-      fontFamily: FONT, fontSize: '9px', color: '#667788',
-    }).setOrigin(0.5);
+    this.add.text(GAME_WIDTH / 2, 164, `Dex: ${GameState.player.dexCaught.length}/${totalSpecies()}  Maps: ${GameState.player.visitedMaps.length}  Signs: ${GameState.player.signsRead}`, hintStyle('10px')).setOrigin(0.5);
 
     const bests = formatMinigameBests();
     if (bests) {
-      this.add.text(GAME_WIDTH / 2, 176, bests, {
-        fontFamily: FONT, fontSize: '9px', color: '#8899aa',
-      }).setOrigin(0.5);
+      this.add.text(GAME_WIDTH / 2, 176, bests, hintStyle('10px')).setOrigin(0.5);
     }
 
-    this.add.text(GAME_WIDTH / 2, bests ? 188 : 176, `v${import.meta.env.VITE_APP_VERSION ?? '1.0.0'}`, {
-      fontFamily: FONT, fontSize: '9px', color: '#556677',
-    }).setOrigin(0.5);
+    this.add.text(GAME_WIDTH / 2, bests ? 188 : 176, `v${import.meta.env.VITE_APP_VERSION ?? '1.0.0'}`, hintStyle('10px')).setOrigin(0.5);
 
     if (GameState.player.badges.length > 0) {
       GameState.player.badges.forEach((b, i) => {
@@ -104,10 +107,9 @@ export class PauseMenuScene extends Phaser.Scene {
     this.optionTexts.forEach(t => t.destroy());
     this.optionTexts = [];
     this.options.forEach((opt, i) => {
-      const t = this.add.text(GAME_WIDTH / 2, 200 + i * 36, (i === this.selected ? '▶ ' : '  ') + opt, {
-        fontFamily: FONT, fontSize: '15px',
-        color: i === this.selected ? '#f5c542' : '#c0c0c0',
-      }).setOrigin(0.5);
+      const base = opt.replace(/ !/, '');
+      const icon = MENU_ICONS[base] ?? MENU_ICONS[opt] ?? '•';
+      const t = this.add.text(GAME_WIDTH / 2, 200 + i * 36, (i === this.selected ? '▶ ' : '  ') + `${icon} ${opt}`, bodyStyle('15px', i === this.selected ? COLORS.goldHex : COLORS.bodyHex)).setOrigin(0.5);
       this.optionTexts.push(t);
     });
   }

@@ -1,4 +1,4 @@
-import { FONT } from '../../ui/theme';
+import { FONT, titleStyle, bodyStyle, hintStyle } from '../../ui/theme';
 import Phaser from 'phaser';
 import { COLORS } from '../../data/types';
 import { getMove } from '../../data/moves';
@@ -6,6 +6,7 @@ import { getItem } from '../../data/items';
 import { getBattleUsableItems } from '../../systems/items';
 import { GameState } from '../../systems/stats';
 import { pinContainerChildren } from '../../ui/screenUi';
+import { buildMenuPanel } from '../../ui/sceneBackdrops';
 import type { BattlePhase, BattleUiHost } from './BattleUi';
 
 export const MENU_ITEMS = ['Fight', 'Bag', 'Switch', 'Run'] as const;
@@ -47,16 +48,13 @@ export class BattleMenus {
     const positions = this.menuLabels.length === 3 ? MENU_POS_3 : MENU_POS_4;
     this.menuLabels.forEach((label, i) => {
       const [x, y] = positions[i];
-      const bg = this.scene.add.graphics();
-      bg.fillStyle(COLORS.panelBorder, 0.8);
-      bg.fillRoundedRect(x - 8, y - 8, 126, 44, 6);
-      const t = this.scene.add.text(x + 55, y + 12, label, {
-        fontFamily: FONT, fontSize: '14px', color: '#f0f0f0',
-      }).setOrigin(0.5).setInteractive({ useHandCursor: true, hitArea: new Phaser.Geom.Rectangle(-55, -16, 126, 44), hitAreaCallback: Phaser.Geom.Rectangle.Contains });
+      const panel = buildMenuPanel(this.scene, x - 8, y - 8, 126, 44, 0);
+      const t = this.scene.add.text(x + 55, y + 12, label, bodyStyle('14px', COLORS.textHex))
+        .setOrigin(0.5).setInteractive({ useHandCursor: true, hitArea: new Phaser.Geom.Rectangle(-55, -16, 126, 44), hitAreaCallback: Phaser.Geom.Rectangle.Contains });
       t.on('pointerdown', () => { this.host.menuIndex = i; this.updateMenuHighlight(); this.host.menuChoice(label); });
       const hi = this.scene.add.graphics();
       this.menuHighlights.push(hi);
-      this.menuContainer.add([bg, t, hi]);
+      this.menuContainer.add([panel, t, hi]);
     });
     this.menuContainer.setVisible(false);
     this.updateMenuHighlight();
@@ -104,6 +102,9 @@ export class BattleMenus {
     this.menuContainer.setVisible(false);
     this.refreshMoveMenu();
     this.moveContainer.setVisible(true);
+    this.moveContainer.y = 20;
+    this.moveContainer.alpha = 0;
+    this.scene.tweens.add({ targets: this.moveContainer, y: 0, alpha: 1, duration: 150, ease: 'Cubic.easeOut' });
   }
 
   openBagMenu(): void {
@@ -111,6 +112,9 @@ export class BattleMenus {
     this.menuContainer.setVisible(false);
     this.refreshBagMenu();
     this.bagContainer.setVisible(true);
+    this.bagContainer.y = 20;
+    this.bagContainer.alpha = 0;
+    this.scene.tweens.add({ targets: this.bagContainer, y: 0, alpha: 1, duration: 150, ease: 'Cubic.easeOut' });
   }
 
   refreshMoveMenu(): void {
@@ -121,19 +125,15 @@ export class BattleMenus {
       const row = Math.floor(i / 2);
       const x = 32 + col * 290;
       const y = 352 + row * 34;
-      const bg = this.scene.add.graphics();
-      bg.fillStyle(COLORS.panelBorder, i === this.host.moveIndex ? 1 : 0.85);
-      bg.fillRoundedRect(x, y, 270, 30, 5);
-      this.scene.add.image(x + 8, y + 15, `type_${move.type}`).setOrigin(0, 0.5).setScale(0.7);
-      const label = this.scene.add.text(x + 28, y + 6, `${move.name}  ${m.pp}/${m.maxPp}`, {
-        fontFamily: FONT, fontSize: '11px', color: i === this.host.moveIndex ? '#f5c542' : '#f0f0f0',
-      }).setOrigin(0, 0).setInteractive({
+      const panel = buildMenuPanel(this.scene, x, y, 270, 30, 0);
+      const icon = this.scene.add.image(x + 8, y + 15, `type_${move.type}`).setOrigin(0, 0.5).setScale(0.7);
+      const label = this.scene.add.text(x + 28, y + 6, `${move.name}  ${m.pp}/${m.maxPp}`, bodyStyle('11px', i === this.host.moveIndex ? COLORS.goldHex : COLORS.textHex)).setOrigin(0, 0).setInteractive({
         useHandCursor: true,
         hitArea: new Phaser.Geom.Rectangle(0, 0, 240, 28),
         hitAreaCallback: Phaser.Geom.Rectangle.Contains,
       });
       label.on('pointerdown', () => { this.host.moveIndex = i; this.host.useMove(i); });
-      this.moveContainer.add([bg, label]);
+      this.moveContainer.add([panel, icon, label]);
     });
   }
 
@@ -141,26 +141,20 @@ export class BattleMenus {
     this.bagContainer.removeAll(true);
     const items = getBattleUsableItems(GameState.player.items, !this.host.isTrainer);
     if (items.length === 0) {
-      this.bagContainer.add(this.scene.add.text(40, 390, 'No usable items!', {
-        fontFamily: FONT, fontSize: '12px', color: '#8899aa',
-      }));
+      this.bagContainer.add(this.scene.add.text(40, 390, 'No usable items!', hintStyle('12px')));
       return;
     }
     items.forEach((id, i) => {
       const item = getItem(id);
       const y = 350 + i * 26;
-      const bg = this.scene.add.graphics();
-      bg.fillStyle(COLORS.panelBorder, i === this.host.bagIndex ? 1 : 0.85);
-      bg.fillRoundedRect(32, y, 300, 24, 4);
-      const label = this.scene.add.text(40, y + 4, `${i === this.host.bagIndex ? '▶ ' : ''}${item.name} x${GameState.player.items[id]}`, {
-        fontFamily: FONT, fontSize: '11px', color: i === this.host.bagIndex ? '#f5c542' : '#f0f0f0',
-      }).setInteractive({
+      const panel = buildMenuPanel(this.scene, 32, y, 300, 24, 0);
+      const label = this.scene.add.text(40, y + 4, `${i === this.host.bagIndex ? '▶ ' : ''}${item.name} x${GameState.player.items[id]}`, bodyStyle('11px', i === this.host.bagIndex ? COLORS.goldHex : COLORS.textHex)).setInteractive({
         useHandCursor: true,
         hitArea: new Phaser.Geom.Rectangle(0, 0, 280, 22),
         hitAreaCallback: Phaser.Geom.Rectangle.Contains,
       });
       label.on('pointerdown', () => { this.host.bagIndex = i; this.host.useBagItem(id); });
-      this.bagContainer.add([bg, label]);
+      this.bagContainer.add([panel, label]);
     });
   }
 }

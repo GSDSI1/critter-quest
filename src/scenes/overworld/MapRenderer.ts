@@ -4,7 +4,7 @@ import { getTile, type GameMap, type MapTheme } from '../../data/maps';
 import { isExternalTilesetAvailable } from '../../utils/assetLoader';
 import { isSmallInterior } from '../../utils/camera';
 import { applyMapAutotiles } from '../../utils/tileAutotile';
-import { tileTextureKey, proceduralTilesetKey, bakeProceduralTileset } from '../../utils/sprites';
+import { proceduralTilesetKey, bakeProceduralTileset } from '../../utils/sprites';
 
 /** Alternate tileset frames for animated tall grass / water (see pack-tileset.mjs). */
 const ANIM_ALT: Record<number, number> = { 2: 19, 3: 20 };
@@ -13,9 +13,7 @@ export class MapRenderer {
   private static tileDataCache = new Map<string, number[][]>();
 
   private tileLayer?: Phaser.Tilemaps.TilemapLayer;
-  private animContainer?: Phaser.GameObjects.Container;
   private decorLayer?: Phaser.GameObjects.Container;
-  private animTiles: { img: Phaser.GameObjects.Image; tile: number; x: number; y: number }[] = [];
   private animCells: { x: number; y: number; base: number; alt: number }[] = [];
   private animFrame = 0;
   private animTimer = 0;
@@ -27,22 +25,20 @@ export class MapRenderer {
   render(map: GameMap): void {
     this.map = map;
     this.tileLayer?.destroy();
-    this.animContainer?.destroy();
     this.decorLayer?.destroy();
-    this.animTiles = [];
     this.animCells = [];
     this.useTileAnim = false;
 
     const data = MapRenderer.tileDataFor(map);
+    const isOutdoor = (map.mapTheme ?? 'outdoor') === 'outdoor';
 
     if (isExternalTilesetAvailable(this.scene)) {
       const tm = this.scene.make.tilemap({ data, tileWidth: TILE_SIZE, tileHeight: TILE_SIZE });
       const tileset = tm.addTilesetImage('tileset', 'ext_tileset', TILE_SIZE, TILE_SIZE, 0, 0, 0);
       if (tileset) {
         this.tileLayer = tm.createLayer(0, tileset, 0, 0)?.setDepth(0);
-        if (this.tileLayer) applyMapAutotiles(map, this.tileLayer);
-        this.buildAnimatedOverlays(map, true);
-        // Autotiled external sheet already has soft edges — skip procedural overlays.
+        if (this.tileLayer && isOutdoor) applyMapAutotiles(map, this.tileLayer);
+        this.buildAnimatedOverlays(map);
         this.decorLayer = this.scene.add.container(0, 0).setDepth(6);
         this.renderDecorations();
         return;
@@ -57,11 +53,13 @@ export class MapRenderer {
       this.tileLayer = tm.createLayer(0, tileset, 0, 0)?.setDepth(0);
     }
 
-    if (this.tileLayer && (map.mapTheme ?? 'outdoor') === 'outdoor') {
+    if (this.tileLayer && isOutdoor) {
       applyMapAutotiles(map, this.tileLayer);
     }
-    this.buildAnimatedOverlays(map, false);
-    this.renderEdgeOverlays((map.mapTheme ?? 'outdoor') === 'outdoor');
+    this.buildAnimatedOverlays(map);
+    if (!isOutdoor) {
+      this.renderEdgeOverlays(false);
+    }
     this.decorLayer = this.scene.add.container(0, 0).setDepth(6);
     this.renderDecorations();
   }
@@ -80,35 +78,17 @@ export class MapRenderer {
     return cached;
   }
 
-  private buildAnimatedOverlays(map: GameMap, external: boolean): void {
-    if (external && this.tileLayer) {
-      for (let y = 0; y < map.height; y++) {
-        for (let x = 0; x < map.width; x++) {
-          const tile = getTile(map, x, y);
-          const alt = ANIM_ALT[tile];
-          if (alt !== undefined) this.animCells.push({ x, y, base: tile, alt });
-        }
-      }
-      this.useTileAnim = this.animCells.length > 0;
-      return;
-    }
-
-    const theme: MapTheme = map.mapTheme ?? 'outdoor';
-    this.animContainer = this.scene.add.container(0, 0).setDepth(2);
+  /** Swap tilemap frames for animated grass/water — no per-cell Image overlays. */
+  private buildAnimatedOverlays(map: GameMap): void {
+    if (!this.tileLayer) return;
     for (let y = 0; y < map.height; y++) {
       for (let x = 0; x < map.width; x++) {
         const tile = getTile(map, x, y);
-        if (tile === 2 || tile === 3) {
-          const img = this.scene.add.image(
-            x * TILE_SIZE + TILE_SIZE / 2,
-            y * TILE_SIZE + TILE_SIZE / 2,
-            tileTextureKey(tile, theme, 0),
-          );
-          this.animContainer.add(img);
-          this.animTiles.push({ img, tile, x, y });
-        }
+        const alt = ANIM_ALT[tile];
+        if (alt !== undefined) this.animCells.push({ x, y, base: tile, alt });
       }
     }
+    this.useTileAnim = this.animCells.length > 0;
   }
 
   setDayNightTint(tint: number): void {
@@ -116,21 +96,14 @@ export class MapRenderer {
   }
 
   update(delta: number): void {
+    if (!this.useTileAnim || !this.tileLayer) return;
     this.animTimer += delta;
     if (this.animTimer < 500) return;
     this.animTimer = 0;
     this.animFrame = 1 - this.animFrame;
 
-    if (this.useTileAnim && this.tileLayer) {
-      for (const { x, y, base, alt } of this.animCells) {
-        this.tileLayer.putTileAt(this.animFrame ? alt : base, x, y);
-      }
-      return;
-    }
-
-    const theme = this.map.mapTheme;
-    for (const { img, tile } of this.animTiles) {
-      img.setTexture(tileTextureKey(tile, theme, this.animFrame));
+    for (const { x, y, base, alt } of this.animCells) {
+      this.tileLayer.putTileAt(this.animFrame ? alt : base, x, y);
     }
   }
 

@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT } from '../data/types';
 
+export const CURTAIN_COLOR = 0x1a1a2e;
+
 export function fadeToScene(
   scene: Phaser.Scene,
   key: string,
@@ -34,7 +36,7 @@ export function wipeToScene(
   duration = 350,
 ): void {
   const curtain = scene.add.graphics().setDepth(10000).setScrollFactor(0);
-  curtain.fillStyle(0x0a0a12, 1);
+  curtain.fillStyle(CURTAIN_COLOR, 1);
   const startX = direction === 'left' ? -GAME_WIDTH : GAME_WIDTH;
   curtain.fillRect(startX, 0, GAME_WIDTH, GAME_HEIGHT);
   scene.tweens.add({
@@ -45,13 +47,13 @@ export function wipeToScene(
     onUpdate: (_t, target) => {
       const x = (target as { x: number }).x;
       curtain.clear();
-      curtain.fillStyle(0x0a0a12, 1);
+      curtain.fillStyle(CURTAIN_COLOR, 1);
       curtain.fillRect(x, 0, GAME_WIDTH, GAME_HEIGHT);
       if (direction === 'left') curtain.fillRect(x + GAME_WIDTH, 0, GAME_WIDTH, GAME_HEIGHT);
       else curtain.fillRect(x - GAME_WIDTH, 0, GAME_WIDTH, GAME_HEIGHT);
     },
     onComplete: () => {
-      scene.scene.start(key, { ...data, _fadeIn: true });
+      scene.scene.start(key, { ...data, _wipeIn: true });
       curtain.destroy();
     },
   });
@@ -65,7 +67,7 @@ export function wipeRestartScene(
   duration = 300,
 ): void {
   const curtain = scene.add.graphics().setDepth(10000).setScrollFactor(0);
-  curtain.fillStyle(0x0a0a12, 1);
+  curtain.fillStyle(CURTAIN_COLOR, 1);
   curtain.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
   scene.tweens.add({
     targets: curtain,
@@ -83,7 +85,7 @@ export function wipeRestartScene(
 export function wipeInOnStart(scene: Phaser.Scene, data?: { _wipeIn?: boolean }, duration = 300): void {
   if (!data?._wipeIn) return;
   const curtain = scene.add.graphics().setDepth(10000).setScrollFactor(0);
-  curtain.fillStyle(0x0a0a12, 1);
+  curtain.fillStyle(CURTAIN_COLOR, 1);
   curtain.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
   scene.tweens.add({ targets: curtain, alpha: 0, duration, onComplete: () => curtain.destroy() });
 }

@@ -241,6 +241,12 @@ if (existsSync(join(root, 'scripts/critter-art/batch5.mjs'))) ok('Batch-5 pixel 
 else fail('critter-art/batch5.mjs missing');
 if (existsSync(join(root, 'scripts/critter-art/batch6.mjs'))) ok('Batch-6 pixel art overrides');
 else fail('critter-art/batch6.mjs missing');
+if (existsSync(join(root, 'scripts/critter-art/batch8.mjs'))) ok('Batch-8 early-route pixel art overrides');
+else fail('critter-art/batch8.mjs missing');
+for (const id of ['mossling', 'sparkbit', 'pebblite', 'cinderkit', 'thornling']) {
+  if (existsSync(join(root, `public/assets/critters/${id}.png`))) ok(`Batch-8 PNG ${id}`);
+  else fail(`Missing batch-8 critter PNG: ${id}.png (run npm run gen-assets)`);
+}
 if (existsSync(join(root, 'src/scenes/overworld/CaveSparkles.ts'))) ok('Cave sparkle overlay');
 else fail('CaveSparkles.ts missing');
 if (existsSync(join(root, 'src/scenes/overworld/ForestFireflies.ts'))) ok('Forest firefly overlay');
@@ -279,9 +285,11 @@ for (const s of inputScenes) {
 }
 
 // ── Production build ──
-if (npcMgr.includes('resolveRematch') && npcMgr.includes('storyFlags.champion')) {
-  ok('NpcManager post-champion rematch gate');
-} else fail('NpcManager missing champion rematch gate');
+const npcRouter = existsSync(join(root, 'src/scenes/overworld/npcInteractRouter.ts'))
+  ? read('src/scenes/overworld/npcInteractRouter.ts') : '';
+if (npcRouter.includes('resolveRematch') && npcRouter.includes('storyFlags.champion')) {
+  ok('NPC router post-champion rematch gate');
+} else fail('npcInteractRouter missing champion rematch gate');
 
 if (existsSync(join(root, 'src/data/rematches.ts'))) {
   const rematchSrc = read('src/data/rematches.ts');
@@ -358,6 +366,24 @@ else fail('BattleScene missing touch nav');
 
 if (existsSync(join(root, 'scripts/critter-art/shapelib.mjs'))) ok('Shape-based hand art library');
 else fail('shapelib.mjs missing');
+if (!existsSync(join(root, 'scripts/critter-art/batch7.mjs'))) ok('batch7 retired (shapelib covers early route)');
+else fail('batch7.mjs should be removed — use shapelib');
+if (existsSync(join(root, 'src/data/npcDialogs.ts'))) ok('NPC dialog data module');
+else fail('src/data/npcDialogs.ts missing');
+if (existsSync(join(root, 'src/scenes/overworld/npcInteractRouter.ts'))) ok('NPC interact router');
+else fail('npcInteractRouter.ts missing');
+if (existsSync(join(root, 'src/systems/npcGates.ts'))) ok('NPC gate logic module');
+else fail('npcGates.ts missing');
+if (existsSync(join(root, 'src/scenes/overworld/WeatherLayer.ts'))) ok('Overworld weather VFX layer');
+else fail('WeatherLayer.ts missing');
+if (existsSync(join(root, 'src/ui/encounterTransition.ts'))) ok('Wild encounter transition');
+else fail('encounterTransition.ts missing');
+if (existsSync(join(root, 'public/pwa-192.png'))) ok('PWA icon pwa-192.png');
+else fail('public/pwa-192.png missing — run npm run gen-assets');
+const genAssets = read('scripts/generate-png-assets.mjs');
+if (genAssets.indexOf('drawStarterOverride') < genAssets.indexOf('drawBatch6Override')) {
+  ok('Art override priority: starters before batch6');
+} else fail('generate-png-assets: starters must override before batch6/batch7');
 if (existsSync(join(root, 'scripts/fetch-kenney-tileset.mjs'))) ok('Kenney fetch script');
 else fail('fetch-kenney-tileset.mjs missing');
 if (existsSync(join(root, 'CREDITS.md'))) ok('CREDITS.md');

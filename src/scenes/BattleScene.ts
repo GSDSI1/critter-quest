@@ -13,7 +13,7 @@ import { registerCaughtWithMilestone } from '../systems/dexNotify';
 import { addToParty } from '../systems/save';
 import { trySave } from '../utils/saveFeedback';
 import { preloadCreatureTextures } from '../utils/assetLoader';
-import { fadeInOnStart, startWithFadeIn } from '../ui/transitions';
+import { fadeInOnStart, startWithFadeIn, wipeInOnStart } from '../ui/transitions';
 import { TouchMenuNav } from '../ui/touchMenuNav';
 import { buildBattleArena } from '../ui/sceneBackdrops';
 import { Sfx } from '../utils/audio';
@@ -31,8 +31,9 @@ import { getMap } from '../data/maps';
 import {
   setBattleWeather, weatherLabel, weatherBanner, weatherTint,
 } from '../systems/weather';
+import { buildWeatherLayer, type WeatherLayerHandle } from './overworld/WeatherLayer';
 import { GAME_WIDTH, GAME_HEIGHT } from '../data/types';
-import { FONT } from '../ui/theme';
+import { titleStyle } from '../ui/theme';
 
 export class BattleScene extends Phaser.Scene implements BattleUiHost, BattleFlowHost {
   enemyParty: CritterInstance[] = [];
@@ -46,6 +47,7 @@ export class BattleScene extends Phaser.Scene implements BattleUiHost, BattleFlo
   badgeId = '';
   isRematch = false;
   private mapId = 'route1';
+  private weatherFx?: WeatherLayerHandle | null;
 
   phase: BattlePhase = 'intro';
   pendingLearnMoves: string[] = [];
@@ -60,6 +62,8 @@ export class BattleScene extends Phaser.Scene implements BattleUiHost, BattleFlo
   private flow!: BattleFlow;
   private messageAutoTimer?: Phaser.Time.TimerEvent;
   private touchNav?: TouchMenuNav;
+  /** True after initBattle finishes — test bridge waits on this. */
+  battleReady = false;
 
   constructor() {
     super('Battle');
@@ -75,8 +79,11 @@ export class BattleScene extends Phaser.Scene implements BattleUiHost, BattleFlo
     isRematch?: boolean;
     mapId?: string;
     _fadeIn?: boolean;
+    _wipeIn?: boolean;
   }): void {
-    fadeInOnStart(this, data, 320);
+    if (data._wipeIn) wipeInOnStart(this, data, 320);
+    else fadeInOnStart(this, data, 320);
+    this.battleReady = false;
     void this.initBattle(data);
   }
 
@@ -129,10 +136,12 @@ export class BattleScene extends Phaser.Scene implements BattleUiHost, BattleFlo
 
     buildBattleArena(this, this.mapId);
     if (weather) {
-      this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, weatherTint(weather), 0.1).setDepth(4);
-      this.add.text(GAME_WIDTH / 2, 12, weatherBanner(weather), {
-        fontFamily: FONT, fontSize: '10px', color: '#f5c542', fontStyle: 'bold',
-      }).setOrigin(0.5, 0).setDepth(1100);
+      const tint = weatherTint(weather);
+      this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 4, GAME_WIDTH, GAME_HEIGHT / 2, tint, weather === 'sun' ? 0.06 : 0.14).setDepth(4);
+      this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT * 0.75, GAME_WIDTH, GAME_HEIGHT / 2, tint, 0.04).setDepth(4);
+      this.weatherFx = buildWeatherLayer(this, weather, 6, 0, { light: true });
+      this.events.once('shutdown', () => this.weatherFx?.destroy());
+      this.add.text(GAME_WIDTH / 2, 12, weatherBanner(weather), titleStyle('10px')).setOrigin(0.5, 0).setDepth(1100);
     }
     this.ui.build();
     Input.bind(this);
@@ -171,6 +180,7 @@ export class BattleScene extends Phaser.Scene implements BattleUiHost, BattleFlo
       this.battleAnims.animateSendOut(this.ui.playerSprite, 160, true);
       this.battleAnims.fadeIn(this.ui.enemySprite);
       this.phase = 'message';
+      this.battleReady = true;
       this.showNextMessage();
     });
   }
@@ -300,6 +310,7 @@ export class BattleScene extends Phaser.Scene implements BattleUiHost, BattleFlo
 
   /** DEV test bridge — resolve battle without playing through message queues. */
   resolveBattle(outcome: 'win' | 'lose' | 'catch'): void {
+    if (!this.battleReady || !this.wild) return;
     this.pendingLearnMoves = [];
     this.pendingEvolution = null;
     if (outcome === 'lose') {
@@ -358,6 +369,7 @@ export class BattleScene extends Phaser.Scene implements BattleUiHost, BattleFlo
             trainerName: npc!.name,
             isTrainer: true,
             battleData,
+            introHoldMs: 1200,
           });
           return;
         }

@@ -23,6 +23,14 @@ export async function sceneKeys(page: Page): Promise<string[]> {
   return page.evaluate(() => window.__cq?.sceneKeys() ?? []);
 }
 
+export async function waitForBattleReady(page: Page, timeoutMs = 20_000): Promise<void> {
+  await page.waitForFunction(
+    () => window.__cq?.battleReady?.() ?? false,
+    undefined,
+    { timeout: timeoutMs },
+  );
+}
+
 export async function waitForScene(page: Page, key: string, timeoutMs = 20_000): Promise<void> {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {

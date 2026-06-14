@@ -6,20 +6,23 @@ test('auto-walk pathfinding moves the player', async ({ page }) => {
   await startNewGameToOverworld(page);
   await waitForScene(page, 'Overworld');
   await page.evaluate(() => window.__cq?.completeTutorial());
+  await page.waitForTimeout(500);
 
-  const before = await playerState(page);
-  const destY = (before?.y ?? 15) - 1;
-  await page.evaluate(({ ty }) => {
-    window.__cq?.teleportAndWalk('town', 12, 15, 12, ty);
-  }, { ty: destY });
+  // Spawn tile (12,15) → one step left on open path row (deterministic, no blocked tiles).
+  const destX = 11;
+  const destY = 15;
+  await page.evaluate(({ dx, dy }) => {
+    window.__cq?.teleportAndWalk('town', 12, 15, dx, dy);
+  }, { dx: destX, dy: destY });
 
   await page.waitForFunction(
-    ({ y }) => window.__cq?.player()?.y === y,
-    { y: destY },
-    { timeout: 25_000 },
+    ({ x, y }) => window.__cq?.player()?.x === x && window.__cq?.player()?.y === y,
+    { x: destX, y: destY },
+    { timeout: 35_000 },
   );
 
   const after = await playerState(page);
+  expect(after?.x).toBe(destX);
   expect(after?.y).toBe(destY);
   expect(after?.mapId).toBe('town');
 });

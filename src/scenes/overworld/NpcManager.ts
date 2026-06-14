@@ -1,25 +1,13 @@
 import Phaser from 'phaser';
 import { TILE_SIZE } from '../../data/types';
 import { getTile, type MapNpc, type GameMap } from '../../data/maps';
-import { hasBadge } from '../../data/badges';
-import { GameState, healParty } from '../../systems/stats';
-import { trySave } from '../../utils/saveFeedback';
+import { GameState } from '../../systems/stats';
 import { DialogBox } from '../../ui/DialogBox';
-import { showToast } from '../../ui/mapBanner';
 import { npcTextureKey, type NpcRole } from '../../utils/assetLoader';
-import { showExclamationBubble } from '../TrainerIntroScene';
-import { Sfx } from '../../utils/audio';
-import { resolveRematch } from '../../data/rematches';
-import {
-  startEliteGauntlet, findGauntletNpc,
-} from '../../systems/eliteGauntlet';
-import { addItem } from '../../data/items';
-import { playDayIndex } from '../../ui/minigameShell';
-import { pendingDexMilestone, claimDexMilestone } from '../../systems/dexMilestones';
-import { tryHandleMinigameNpc } from './MinigameNpcHandlers';
-import { momDiscoverabilityLine, profDiscoverabilityLine } from '../../systems/regionDiscovery';
+import { NPC_SPRITE_TINTS } from '../../data/npcDialogs';
 import { TrainerBattleHandler } from './TrainerBattleHandler';
 import { PlayerMovement } from './PlayerMovement';
+import { handleNpcInteraction, showGenericSign } from './npcInteractRouter';
 
 export interface NpcManagerCallbacks {
   setInputLocked: (locked: boolean) => void;
@@ -51,7 +39,7 @@ export class NpcManager {
       dialog,
       callbacks,
       interactNpc: (npc) => this.interactNpc(npc),
-      launchWildBattle: (party) => this.trainerBattles.launchBattle(party, false, '', '', 0, ''),
+      launchWildBattle: (party) => this.trainerBattles.launchWildBattle(party),
     });
   }
 
@@ -73,6 +61,8 @@ export class NpcManager {
         npc.y * TILE_SIZE + TILE_SIZE / 2,
         npcTextureKey(this.scene, role),
       ).setDepth(9).setScale(1);
+      const tint = NPC_SPRITE_TINTS[npc.id];
+      if (tint != null) spr.setTint(tint);
       this.npcSprites.push(spr);
       if (!npc.trainer && role !== 'rival' && role !== 'leader') {
         this.scene.time.addEvent({
@@ -124,201 +114,22 @@ export class NpcManager {
 
     if (getTile(map, tx, ty) === 10) {
       const sign = map.npcs.find(n => n.x === tx && n.y === ty && (n.role === 'sign' || n.id.startsWith('sign')));
-      if (sign) {
-        this.interactNpc(sign);
-      } else {
+      if (sign) this.interactNpc(sign);
+      else {
         this.callbacks.setInputLocked(true);
-        this.dialog.show('...', () => { this.callbacks.setInputLocked(false); });
+        showGenericSign(this.dialog, () => this.callbacks.setInputLocked(false));
       }
     }
   }
 
   interactNpc(npc: MapNpc): void {
     this.callbacks.setInputLocked(true);
-
-    if (npc.gate && !this.gateOpen(npc)) {
-      this.dialog.show(npc.gate!.blockLines, () => { this.callbacks.setInputLocked(false); });
-      return;
-    }
-
-    if (npc.id === 'elite_registrar') {
-      if (GameState.player.storyFlags.champion) {
-        this.dialog.show(['You are the regional Champion!', 'Congratulations again!'], () => {
-          this.callbacks.setInputLocked(false);
-        });
-        return;
-      }
-      if (!GameState.player.badges.includes('psyche')) {
-        this.dialog.show(['Earn the Psyche Badge before challenging the Elite Four.'], () => {
-          this.callbacks.setInputLocked(false);
-        });
-        return;
-      }
-      this.dialog.show(npc.lines, () => {
-        startEliteGauntlet();
-        const first = findGauntletNpc('elite_trainer1');
-        if (first) {
-          showExclamationBubble(this.scene, first.x * TILE_SIZE + 8, first.y * TILE_SIZE, () => {
-            this.trainerBattles.launchGauntletBattle(first);
-          });
-        } else {
-          this.callbacks.setInputLocked(false);
-        }
-      });
-      return;
-    }
-
-    const defeated = GameState.player.defeatedTrainers.includes(npc.id);
-    const rematched = GameState.player.defeatedRematch.includes(npc.id);
-    const rematchDef = resolveRematch(npc.id, npc.rematch);
-    const champion = GameState.player.storyFlags.champion;
-
-    if (champion && rematchDef && defeated && !rematched && npc.trainer) {
-      this.dialog.show(['Want a rematch? I\'ve gotten stronger!'], () => {
-        this.trainerBattles.startTrainerBattle(npc, true);
-      });
-      return;
-    }
-
-    if (npc.trainer && !defeated) {
-      this.dialog.show(npc.lines, () => {
-        if (npc.trainer) {
-          this.trainerBattles.promptTrainerBattle(npc);
-        } else {
-          this.callbacks.setInputLocked(false);
-        }
-      });
-      return;
-    }
-
-    if (defeated && npc.trainer) {
-      const lines = rematched
-        ? ['You beat me again!', 'I\'ll keep training for next time.']
-        : ['You already defeated me!', 'Keep training!'];
-      this.dialog.show(lines, () => { this.callbacks.setInputLocked(false); });
-      return;
-    }
-
-    if (tryHandleMinigameNpc(npc, {
+    handleNpcInteraction(npc, {
       scene: this.scene,
       dialog: this.dialog,
       getMap: () => this.getMap(),
-      unlockInput: () => { this.callbacks.setInputLocked(false); },
-    })) return;
-
-    if (npc.lines.includes('HEAL')) {
-      const welcome = npc.lines.filter(l => l !== 'HEAL');
-      this.dialog.show(welcome, () => {
-        healParty(GameState.player.party);
-        Sfx.heal();
-        trySave(this.scene);
-        showToast(this.scene, 'Critters restored to full health!');
-        this.dialog.show('We hope to see you again!', () => { this.callbacks.setInputLocked(false); });
-      });
-      return;
-    }
-
-    if (npc.lines.includes('SHOP')) {
-      this.scene.scene.launch('Shop', { returnMap: this.getMap().id });
-      this.scene.scene.pause();
-      this.callbacks.setInputLocked(false);
-      return;
-    }
-
-    if (npc.lines.includes('PC')) {
-      this.scene.scene.launch('PC');
-      this.scene.scene.pause();
-      this.callbacks.setInputLocked(false);
-      return;
-    }
-
-    if (npc.id === 'mom') {
-      const day = playDayIndex(GameState.player.playTime);
-      const lines = [...this.getMomLines()];
-      const hint = momDiscoverabilityLine(GameState.player);
-      if (hint) lines.push(hint);
-      if (GameState.player.lastMomGiftDay !== day) {
-        GameState.player.lastMomGiftDay = day;
-        const gift = Math.random() < 0.5 ? 'potion' : 'oran_berry';
-        addItem(GameState.player.items, gift, 1);
-        lines.unshift(gift === 'potion'
-          ? 'I packed a fresh Potion for you today!'
-          : 'I picked an Oran Berry from the garden for you!');
-        trySave(this.scene);
-      }
-      this.dialog.show(lines, () => { this.callbacks.setInputLocked(false); });
-      return;
-    }
-
-    if (npc.id === 'prof') {
-      const milestone = pendingDexMilestone(GameState.player);
-      if (milestone) {
-        claimDexMilestone(GameState.player, milestone);
-        trySave(this.scene);
-        this.dialog.show(milestone.lines, () => { this.callbacks.setInputLocked(false); });
-        return;
-      }
-      const hint = profDiscoverabilityLine(GameState.player);
-      if (hint) {
-        this.dialog.show([hint, 'Keep exploring — the region has secrets!'], () => {
-          this.callbacks.setInputLocked(false);
-        });
-        return;
-      }
-    }
-
-    if (npc.id === 'prof' && GameState.player.storyFlags.contest_winner) {
-      this.dialog.show([
-        `${GameState.player.name}! I heard you won the Critter Contest!`,
-        'The whole region is proud of you.',
-      ], () => { this.callbacks.setInputLocked(false); });
-      return;
-    }
-
-    if (npc.id === 'prof' && GameState.player.storyFlags.champion) {
-      const signs = GameState.player.signsRead;
-      const extra = signs >= 20
-        ? 'You\'ve read every sign in the region — impressive!'
-        : signs >= 10
-          ? `${signs} signs read — you really explore!`
-          : '';
-      this.dialog.show([
-        `${GameState.player.name}! The whole region is talking about you!`,
-        'Champion of Verdant — you make me proud.',
-        extra || 'Trainers across the region want rematches now.',
-      ], () => { this.callbacks.setInputLocked(false); });
-      return;
-    }
-
-    if (npc.role === 'sign' || npc.id.startsWith('sign')) {
-      GameState.player.signsRead++;
-      trySave(this.scene);
-    }
-
-    this.dialog.show(npc.lines, () => { this.callbacks.setInputLocked(false); });
-  }
-
-  private getMomLines(): string[] {
-    const p = GameState.player;
-    if (p.storyFlags.champion) {
-      return ['My champion!', 'I always knew you could do it!', 'Come home anytime for a rest.'];
-    }
-    if (p.badges.length >= 2) {
-      return ['Both badges!', 'Kai keeps asking about you.', 'Be careful on Volcanic Path!'];
-    }
-    if (p.badges.length >= 1) {
-      return ['You earned a badge!', 'Ember City is to the east.', 'I believe in you!'];
-    }
-    if (p.defeatedTrainers.includes('rival')) {
-      return ['You beat Kai!', 'Explore Route 1 and the forest.', 'Visit the Mart for supplies!'];
-    }
-    return ['Be careful out there!', 'Visit the Mart for supplies, and the Healing Center to rest.'];
-  }
-
-  private gateOpen(npc: MapNpc): boolean {
-    const g = npc.gate!;
-    if (g.requiresBadge && !hasBadge(GameState.player.badges, g.requiresBadge)) return false;
-    if (g.requiresFlag && !GameState.player.storyFlags[g.requiresFlag]) return false;
-    return true;
+      unlockInput: () => this.callbacks.setInputLocked(false),
+      trainerBattles: this.trainerBattles,
+    });
   }
 }

@@ -235,6 +235,57 @@ const VINECLAW_FRONT = [
   '................................',
 ];
 
+const FLAMEWYRM_BACK = [
+  '................................',
+  '..............ffff..............',
+  '............ffyyBBff............',
+  '..........fBBBBBBBBf............',
+  '........fBBBBBBBBBBf............',
+  '......fBBBBBBBBBBBBBf...........',
+  '..fBBBBBBBBBBBBBBBBBf...........',
+  '.fBBBBBBBBBBBBBBBBBBBf..........',
+  '..fBBBBBBBBBBBBBBBBBf...........',
+  '....fBBBBBBBBBBBBBf.............',
+  '......ffBBBBBBBBff..............',
+  '........ffyyffff................',
+  '................................',
+  '................................',
+];
+
+const TIDEFIN_BACK = [
+  '................................',
+  '.............tttt...............',
+  '............ttBBtt..............',
+  '..........tBBBBBBBt.............',
+  '........tBBBBBBBBBBt............',
+  '......tBBBBBBBBBBBBt............',
+  '..tBBBBBBBBBBBBBBBBt............',
+  '.tBBBBBBBBBBBBBBBBBBt...........',
+  '..tBBBBBBBBBBBBBBBBt............',
+  '....tBBBBBBBBBBBBt..............',
+  '......tBBBBBBBBt................',
+  '........taaaaat.................',
+  '..........tttt..................',
+  '................................',
+];
+
+const VINECLAW_BACK = [
+  '................................',
+  '...........gg..gg...............',
+  '..........gBBBBBg...............',
+  '........gBBBBBBBBBg.............',
+  '......gBBBBBBBBBBBg.............',
+  '....gBBBBBBBBBBBBBBg............',
+  '..gBBBBBBBBBBBBBBBBg............',
+  '.gBBBBBBBBBBBBBBBBBg............',
+  '..gBBBBBBBBBBBBBBg..............',
+  '....gBBBBBBBBBg.................',
+  '......gdddddg...................',
+  '.......gdddg....................',
+  '........gddg....................',
+  '................................',
+];
+
 const INFERNOX_FRONT = [
   '................................',
   '......ff........ff..............',
@@ -349,6 +400,10 @@ const THORNBEAST_BACK = [
   '....gg.....gg.....gg............',
 ];
 
+function blinkGrid(grid) {
+  return grid.map(row => row.replace(/Ye/g, 'dd').replace(/we/g, 'dd'));
+}
+
 const GRIDS = {
   emberpup: {
     front: EMBERPUP_FRONT,
@@ -360,7 +415,7 @@ const GRIDS = {
   },
   aqualet: {
     front: AQUALET_FRONT,
-    f2: AQUALET_FRONT,
+    f2: blinkGrid(AQUALET_FRONT),
     back: AQUALET_BACK,
     color: 0x3b82f6,
     ox: 16,
@@ -368,7 +423,7 @@ const GRIDS = {
   },
   leafkit: {
     front: LEAFKIT_FRONT,
-    f2: LEAFKIT_FRONT,
+    f2: blinkGrid(LEAFKIT_FRONT),
     back: LEAFKIT_BACK,
     color: 0x22c55e,
     ox: 16,
@@ -376,31 +431,31 @@ const GRIDS = {
   },
   flamewyrm: {
     front: FLAMEWYRM_FRONT,
-    f2: FLAMEWYRM_FRONT,
-    back: EMBERPUP_BACK,
+    f2: blinkGrid(FLAMEWYRM_FRONT),
+    back: FLAMEWYRM_BACK,
     color: 0xff4500,
     ox: 8,
     oy: 10,
   },
   tidefin: {
     front: TIDEFIN_FRONT,
-    f2: TIDEFIN_FRONT,
-    back: AQUALET_BACK,
+    f2: blinkGrid(TIDEFIN_FRONT),
+    back: TIDEFIN_BACK,
     color: 0x1d4ed8,
     ox: 8,
     oy: 8,
   },
   vineclaw: {
     front: VINECLAW_FRONT,
-    f2: VINECLAW_FRONT,
-    back: LEAFKIT_BACK,
+    f2: blinkGrid(VINECLAW_FRONT),
+    back: VINECLAW_BACK,
     color: 0x16a34a,
     ox: 8,
     oy: 10,
   },
   infernox: {
     front: INFERNOX_FRONT,
-    f2: INFERNOX_FRONT,
+    f2: blinkGrid(INFERNOX_FRONT),
     back: INFERNOX_BACK,
     color: 0xdc2626,
     ox: 8,
@@ -408,7 +463,7 @@ const GRIDS = {
   },
   aquadel: {
     front: AQUADEL_FRONT,
-    f2: AQUADEL_FRONT,
+    f2: blinkGrid(AQUADEL_FRONT),
     back: AQUADEL_BACK,
     color: 0x0ea5e9,
     ox: 8,
@@ -416,7 +471,7 @@ const GRIDS = {
   },
   thornbeast: {
     front: THORNBEAST_FRONT,
-    f2: THORNBEAST_FRONT,
+    f2: blinkGrid(THORNBEAST_FRONT),
     back: THORNBEAST_BACK,
     color: 0x15803d,
     ox: 8,

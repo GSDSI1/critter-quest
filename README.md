@@ -6,10 +6,19 @@ An original creature-collecting RPG inspired by classic monster-taming games. Ph
 
 ```bash
 npm install
-npm run dev        # http://localhost:5180 (auto-frees port if stale)
+npm run play       # http://127.0.0.1:5180 — opens dev server (port 5180)
+# or: npm run dev
 npm run verify     # static completeness audit (100+ checks)
 npm run build      # production build → dist/
 npm run check      # verify + build
+```
+
+**First run / missing art:** PNGs ship in-repo. If `atlas.png` or `tileset.png` are absent:
+
+```bash
+npm run gen-assets              # critters, NPCs, players, tiles, audio, atlas
+npm run fetch-kenney            # optional CC0 tile drops
+npm run import-tileset          # merge Kenney into tileset (after fetch)
 ```
 
 ## Controls

@@ -1,14 +1,14 @@
-import { FONT } from '../ui/theme';
+import { titleStyle, bodyStyle, hintStyle } from '../ui/theme';
 import Phaser from 'phaser';
-import { COLORS, GAME_WIDTH, GAME_HEIGHT, TYPE_NAMES } from '../data/types';
+import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../data/types';
 import { getCreature } from '../data/creatures';
 import { getMove } from '../data/moves';
 import { getItem, removeItem } from '../data/items';
 import { getAbility } from '../data/abilities';
 import { getNature } from '../data/natures';
 import { GameState, displayName, isFainted } from '../systems/stats';
-import { drawHpBar } from '../ui/HUD';
-import { addCreatureImage } from '../utils/assetLoader';
+import { paintHpBar } from '../ui/HUD';
+import { addCreatureImage, startCritterIdle, type CritterIdleHandle } from '../utils/assetLoader';
 import { trySave } from '../utils/saveFeedback';
 import { buildScreenOverlay, buildMenuPanel } from '../ui/sceneBackdrops';
 import { Input } from '../systems/input';
@@ -27,6 +27,7 @@ export class PartyScene extends Phaser.Scene {
   private fromPause = false;
   private detailIndex: number | null = null;
   private touchNav?: TouchMenuNav;
+  private idleHandles: CritterIdleHandle[] = [];
 
   constructor() {
     super('Party');
@@ -42,20 +43,20 @@ export class PartyScene extends Phaser.Scene {
   }
 
   private render(): void {
+    this.idleHandles.forEach(h => h.stop());
+    this.idleHandles = [];
     this.children.removeAll(true);
 
     buildScreenOverlay(this, 0.72);
-    buildMenuPanel(this, 20, 16, GAME_WIDTH - 40, GAME_HEIGHT - 32, 5);
+    const panel = buildMenuPanel(this, 20, 16, GAME_WIDTH - 40, GAME_HEIGHT - 32, 5);
+    panel.setAlpha(0);
+    this.tweens.add({ targets: panel, alpha: 1, duration: 220, ease: 'Back.easeOut' });
 
-    this.add.text(GAME_WIDTH / 2, 24, this.battleSwitch ? 'Choose a Critter' : 'Your Party', {
-      fontFamily: FONT, fontSize: '22px', color: '#f5c542',
-    }).setOrigin(0.5);
+    this.add.text(GAME_WIDTH / 2, 24, this.battleSwitch ? 'Choose a Critter' : 'Your Party', titleStyle('22px')).setOrigin(0.5);
 
     const party = GameState.player.party;
     if (party.length === 0) {
-      this.add.text(GAME_WIDTH / 2, 240, 'No critters yet!', {
-        fontFamily: FONT, fontSize: '16px', color: '#8899aa',
-      }).setOrigin(0.5);
+      this.add.text(GAME_WIDTH / 2, 240, 'No critters yet!', bodyStyle('16px', '#8899aa')).setOrigin(0.5);
     }
 
     party.forEach((c, i) => {
@@ -74,64 +75,48 @@ export class PartyScene extends Phaser.Scene {
       panel.lineStyle(2, fainted ? 0x555555 : COLORS.panelBorder, 1);
       panel.strokeRoundedRect(x, y, 280, panelH, 8);
 
-      addCreatureImage(this, x + 40, y + 58, c.speciesId, true).setScale(2).setAlpha(fainted ? 0.4 : 1);
+      const spr = addCreatureImage(this, x + 40, y + 58, c.speciesId, true).setScale(2).setAlpha(fainted ? 0.4 : 1);
+      if (!fainted) this.idleHandles.push(startCritterIdle(this, spr, c.speciesId, y + 58));
 
       def.types.forEach((t, ti) => {
         this.add.image(x + 80 + ti * 18, y + 42, `type_${t}`).setScale(0.6);
       });
 
       this.add.text(x + 80, y + 12, `${c.shiny ? '★ ' : ''}${displayName(c)}`, {
-        fontFamily: FONT, fontSize: '14px', color: fainted ? '#666' : c.shiny ? '#f5c542' : '#f0f0f0', fontStyle: 'bold',
+        ...bodyStyle('14px', fainted ? '#666666' : c.shiny ? '#f5c542' : '#f0f0f0'),
+        fontStyle: 'bold',
       });
-      this.add.text(x + 80, y + 30, `Lv.${c.level}  ${getNature(c.nature).name}`, {
-        fontFamily: FONT, fontSize: '10px', color: '#8899aa',
-      });
-      this.add.text(x + 80, y + 46, `${c.currentHp}/${c.maxHp} HP`, {
-        fontFamily: FONT, fontSize: '9px', color: '#8899aa',
-      });
-      drawHpBar(this, x + 80, y + 58, 180, 8, c.currentHp, c.maxHp);
+      this.add.text(x + 80, y + 30, `Lv.${c.level}  ${getNature(c.nature).name}`, hintStyle('10px'));
+      this.add.text(x + 80, y + 46, `${c.currentHp}/${c.maxHp} HP`, hintStyle('9px'));
+      const hpGfx = this.add.graphics();
+      paintHpBar(hpGfx, x + 80, y + 58, 180, 8, c.currentHp, c.maxHp);
 
       if (showingDetail) {
         const [s1, s2] = formatStatLines(c);
-        this.add.text(x + 80, y + 72, s1, {
-          fontFamily: FONT, fontSize: '8px', color: '#c0c0c0',
-        });
-        this.add.text(x + 80, y + 84, s2, {
-          fontFamily: FONT, fontSize: '8px', color: '#c0c0c0',
-        });
+        this.add.text(x + 80, y + 72, s1, hintStyle('8px'));
+        this.add.text(x + 80, y + 84, s2, hintStyle('8px'));
         const iv = c.ivs;
-        this.add.text(x + 80, y + 98, `IV HP${iv.hp} ATK${iv.atk} DEF${iv.def} SPA${iv.spa} SPD${iv.spd} SPE${iv.spe}`, {
-          fontFamily: FONT, fontSize: '7px', color: '#667788',
-        });
+        this.add.text(x + 80, y + 98, `IV HP${iv.hp} ATK${iv.atk} DEF${iv.def} SPA${iv.spa} SPD${iv.spd} SPE${iv.spe}`, hintStyle('7px'));
         const abil = getAbility(c.ability).name;
-        this.add.text(x + 80, y + 110, `Ability: ${abil.length > 18 ? abil.slice(0, 16) + '…' : abil}`, {
-          fontFamily: FONT, fontSize: '7px', color: '#8899aa',
-        });
+        this.add.text(x + 80, y + 110, `Ability: ${abil.length > 18 ? abil.slice(0, 16) + '…' : abil}`, hintStyle('7px'));
         if (c.heldItem) {
-          this.add.text(x + 80, y + 122, `Held: ${getItem(c.heldItem).name}`, {
-            fontFamily: FONT, fontSize: '8px', color: '#f5c542',
-          });
+          this.add.text(x + 80, y + 122, `Held: ${getItem(c.heldItem).name}`, bodyStyle('8px', '#f5c542'));
         }
       } else {
         const moves = c.moves.map(m => getMove(m.id).name).join(', ');
         this.add.text(x + 80, y + 72, moves, {
-          fontFamily: FONT, fontSize: '8px', color: '#667788', wordWrap: { width: 190 },
+          ...hintStyle('8px'),
+          wordWrap: { width: 190 },
         });
       }
 
       if (this.battleSwitch && !fainted) {
-        const btn = this.add.text(x + 230, y + 90, 'Send Out', {
-          fontFamily: FONT, fontSize: '11px', color: '#e94560',
-        }).setInteractive({ useHandCursor: true });
+        const btn = this.add.text(x + 230, y + 90, 'Send Out', bodyStyle('11px', '#e94560')).setInteractive({ useHandCursor: true });
         btn.on('pointerdown', () => this.selectForBattle(i));
       } else if (!this.battleSwitch) {
-        const info = this.add.text(x + 200, y + 90, showingDetail ? 'Close' : 'Stats', {
-          fontFamily: FONT, fontSize: '10px', color: '#8899aa',
-        }).setInteractive({ useHandCursor: true });
+        const info = this.add.text(x + 200, y + 90, showingDetail ? 'Close' : 'Stats', hintStyle('10px')).setInteractive({ useHandCursor: true });
         info.on('pointerdown', () => { this.detailIndex = showingDetail ? null : i; this.render(); });
-        const nick = this.add.text(x + 248, y + 90, 'Nick', {
-          fontFamily: FONT, fontSize: '10px', color: '#e94560',
-        }).setInteractive({ useHandCursor: true });
+        const nick = this.add.text(x + 248, y + 90, 'Nick', bodyStyle('10px', '#e94560')).setInteractive({ useHandCursor: true });
         nick.on('pointerdown', () => this.promptNickname(i));
       }
     });
@@ -139,14 +124,10 @@ export class PartyScene extends Phaser.Scene {
     if (!this.battleSwitch) this.renderHeldItemMenu();
 
     if (GameState.player.storage.length > 0) {
-      this.add.text(GAME_WIDTH / 2, 458, `+ ${GameState.player.storage.length} in storage`, {
-        fontFamily: FONT, fontSize: '11px', color: '#667788',
-      }).setOrigin(0.5);
+      this.add.text(GAME_WIDTH / 2, 448, `+ ${GameState.player.storage.length} in storage`, hintStyle('11px')).setOrigin(0.5);
     }
 
-    this.add.text(GAME_WIDTH / 2, 468, '[ ESC / Z to close ]', {
-      fontFamily: FONT, fontSize: '12px', color: '#8899aa',
-    }).setOrigin(0.5).setInteractive({ useHandCursor: true }).on('pointerdown', () => this.close());
+    this.add.text(GAME_WIDTH / 2, 478, '[ ESC / Z to close ]', hintStyle('12px')).setOrigin(0.5).setInteractive({ useHandCursor: true }).on('pointerdown', () => this.close());
 
     this.input.keyboard?.off('keydown-ESC');
     this.input.keyboard?.off('keydown-Z');
@@ -171,16 +152,12 @@ export class PartyScene extends Phaser.Scene {
     const available = HELD_ITEMS.filter(id => (GameState.player.items[id] ?? 0) > 0);
     if (available.length === 0 || GameState.player.party.length === 0) return;
 
-    this.add.text(40, 388, 'Give held item to lead critter:', {
-      fontFamily: FONT, fontSize: '10px', color: '#8899aa',
-    });
+    this.add.text(40, 388, 'Give held item to lead critter:', hintStyle('10px'));
     available.forEach((id, i) => {
       const item = getItem(id);
       const col = i % 4;
       const row = Math.floor(i / 4);
-      const t = this.add.text(40 + col * 148, 404 + row * 16, item.name, {
-        fontFamily: FONT, fontSize: '10px', color: '#f5c542',
-      }).setInteractive({ useHandCursor: true });
+      const t = this.add.text(40 + col * 148, 404 + row * 16, item.name, bodyStyle('10px', '#f5c542')).setInteractive({ useHandCursor: true });
       t.on('pointerdown', () => {
         if ((GameState.player.items[id] ?? 0) <= 0) return;
         removeItem(GameState.player.items, id);

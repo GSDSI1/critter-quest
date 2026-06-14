@@ -102,13 +102,23 @@ export function drawHpBar(
   colorOverride?: number,
 ): Phaser.GameObjects.Graphics {
   const g = scene.add.graphics().setDepth(depth);
+  paintHpBar(g, x, y, width, height, current, max, colorOverride);
+  return g;
+}
+
+/** Redraw HP fill on an existing Graphics object (no alloc). */
+export function paintHpBar(
+  g: Phaser.GameObjects.Graphics,
+  x: number, y: number,
+  width: number, height: number,
+  current: number, max: number,
+  colorOverride?: number,
+): void {
   const ratio = max > 0 ? Math.max(0, Math.min(1, current / max)) : 0;
   const color = colorOverride ?? (ratio > 0.5 ? COLORS.hpGreen : ratio > 0.2 ? COLORS.hpYellow : COLORS.hpRed);
-
+  g.clear();
   g.fillStyle(0x333333, 1);
   g.fillRoundedRect(x, y, width, height, 3);
   g.fillStyle(color, 1);
   g.fillRoundedRect(x + 1, y + 1, Math.max(0, (width - 2) * ratio), height - 2, 2);
-
-  return g;
 }

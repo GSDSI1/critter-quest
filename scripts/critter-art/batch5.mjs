@@ -91,10 +91,14 @@ const GLEAMFIN_FRONT = [
   '................................',
 ];
 
+function blinkGrid(grid) {
+  return grid.map(row => row.replace(/Ye/g, 'dd').replace(/we/g, 'dd'));
+}
+
 const GRIDS = {
-  voltchick: { front: VOLTCHICK_FRONT, f2: VOLTCHICK_FRONT, back: VOLTCHICK_FRONT, color: 0xfacc15, ox: 8, oy: 10 },
-  voltail: { front: VOLTAIL_FRONT, f2: VOLTAIL_FRONT, back: VOLTCHICK_FRONT, color: 0xeab308, ox: 6, oy: 8 },
-  gleamfin: { front: GLEAMFIN_FRONT, f2: GLEAMFIN_FRONT, back: GLEAMFIN_FRONT, color: 0x38bdf8, ox: 8, oy: 10 },
+  voltchick: { front: VOLTCHICK_FRONT, f2: blinkGrid(VOLTCHICK_FRONT), back: VOLTCHICK_FRONT, color: 0xfacc15, ox: 8, oy: 10 },
+  voltail: { front: VOLTAIL_FRONT, f2: blinkGrid(VOLTAIL_FRONT), back: VOLTCHICK_FRONT, color: 0xeab308, ox: 6, oy: 8 },
+  gleamfin: { front: GLEAMFIN_FRONT, f2: blinkGrid(GLEAMFIN_FRONT), back: GLEAMFIN_FRONT, color: 0x38bdf8, ox: 8, oy: 10 },
 };
 
 function drawBatch5(rgba, w, id, { frame = 0, back = false } = {}) {

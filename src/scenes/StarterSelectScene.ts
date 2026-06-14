@@ -4,7 +4,7 @@ import { COLORS, GAME_WIDTH, TYPE_NAMES, TYPE_COLORS, type ElementType } from '.
 import { STARTERS, getCreature } from '../data/creatures';
 import { GameState, createCritter, registerSeen, registerCaught } from '../systems/stats';
 import { trySave } from '../utils/saveFeedback';
-import { addCreatureImage, applyCreatureTexture } from '../utils/assetLoader';
+import { addCreatureImage, applyCreatureTexture, startCritterIdle, type CritterIdleHandle } from '../utils/assetLoader';
 import { fadeToScene, fadeInOnStart } from '../ui/transitions';
 import { playerTextureKey } from '../utils/sprites';
 import { buildMenuPanel } from '../ui/sceneBackdrops';
@@ -60,6 +60,7 @@ export class StarterSelectScene extends Phaser.Scene {
   private prevBtn!: ReturnType<typeof createTouchButton>;
   private nextBtn!: ReturnType<typeof createTouchButton>;
   private chooseBtn!: ReturnType<typeof createTouchButton>;
+  private previewIdle?: CritterIdleHandle;
 
   constructor() {
     super('StarterSelect');
@@ -88,14 +89,6 @@ export class StarterSelectScene extends Phaser.Scene {
     this.previewGlow = this.add.graphics().setDepth(3);
     this.creaturePreview = addCreatureImage(this, PANEL_CX, LAYOUT.spriteY, STARTERS[0])
       .setScale(2.2).setVisible(false).setDepth(5);
-    this.tweens.add({
-      targets: this.creaturePreview,
-      y: LAYOUT.spriteY - 4,
-      duration: 900,
-      yoyo: true,
-      repeat: -1,
-      ease: 'Sine.easeInOut',
-    });
 
     this.nameText = this.add.text(PANEL_CX, LAYOUT.nameY, 'Choose your partner!', {
       fontFamily: FONT, fontSize: '18px', color: '#f5c542', fontStyle: 'bold',
@@ -252,6 +245,8 @@ export class StarterSelectScene extends Phaser.Scene {
 
     applyCreatureTexture(this.creaturePreview, this, id);
     this.creaturePreview.setVisible(true);
+    this.previewIdle?.stop();
+    this.previewIdle = startCritterIdle(this, this.creaturePreview, id, LAYOUT.spriteY);
 
     this.previewGlow.clear();
     this.previewGlow.fillStyle(typeColor, 0.12);

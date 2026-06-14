@@ -82,3 +82,13 @@ describe('weather state', () => {
     expect(weatherLabel(null)).toBe('');
   });
 });
+
+describe('map weather (overworld WeatherLayer)', () => {
+  it('weather maps assigned for VFX', async () => {
+    const { getMap } = await import('../../data/maps');
+    expect(getMap('route3').weather).toBe('rain');
+    expect(getMap('glacier_pass').weather).toBe('hail');
+    expect(getMap('volcanic_path').weather).toBe('sun');
+    expect(getMap('town').weather).toBeUndefined();
+  });
+});

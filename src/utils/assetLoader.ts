@@ -69,9 +69,9 @@ export function creatureTexRef(
   variant: CreatureTextureVariant = 'front',
 ): CreatureTexRef {
   const frame = creatureFrameName(speciesId, small, variant);
-  if (usesCreatureAtlas(scene)) {
+  if (usesCreatureAtlas(scene) && hasAtlasFrame(scene, frame, small)) {
     const atlasKey = small ? SM_ATLAS : LG_ATLAS;
-    if (hasAtlasFrame(scene, frame, small)) return { key: atlasKey, frame };
+    return { key: atlasKey, frame };
   }
   let suffix = small ? '_sm' : '';
   if (variant === 'f2') suffix += '_f2';
@@ -239,9 +239,8 @@ export function hasCreatureGraphic(
   small = false,
   variant: CreatureTextureVariant = 'front',
 ): boolean {
-  if (usesCreatureAtlas(scene)) {
-    return hasAtlasFrame(scene, creatureFrameName(speciesId, small, variant), small);
-  }
+  const frame = creatureFrameName(speciesId, small, variant);
+  if (usesCreatureAtlas(scene) && hasAtlasFrame(scene, frame, small)) return true;
   let suffix = small ? '_sm' : '';
   if (variant === 'f2') suffix += '_f2';
   if (variant === 'back') suffix += '_back';

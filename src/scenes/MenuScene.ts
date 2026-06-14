@@ -1,12 +1,12 @@
-import { FONT } from '../ui/theme';
+import { titleStyle, bodyStyle, hintStyle } from '../ui/theme';
 import Phaser from 'phaser';
-import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../data/types';
+import { GAME_WIDTH, GAME_HEIGHT } from '../data/types';
 import { GameState } from '../systems/stats';
 import { loadGame, deleteSave, getSaveStatus } from '../systems/save';
 import { getMap } from '../data/maps';
 import { getCreature } from '../data/creatures';
 import { getTrainer } from '../data/characters';
-import { addCreatureImage, preloadAllRemainingCreatures } from '../utils/assetLoader';
+import { addCreatureImage, preloadAllRemainingCreatures, startCritterIdle, type CritterIdleHandle } from '../utils/assetLoader';
 import { playerTextureKey } from '../utils/sprites';
 import {
   buildTitleBackdrop, addTitleLogo, addBlinkingPrompt,
@@ -16,6 +16,7 @@ import { Input } from '../systems/input';
 import { Sfx } from '../utils/audio';
 import { prefetchScenes } from './registerScenes';
 import { fadeToScene, fadeInOnStart } from '../ui/transitions';
+import { buildMenuPanel } from '../ui/sceneBackdrops';
 
 export class MenuScene extends Phaser.Scene {
   private selected = 0;
@@ -25,6 +26,7 @@ export class MenuScene extends Phaser.Scene {
   private confirmingDelete = false;
   private deleteSelected = 0;
   private deleteOverlay?: Phaser.GameObjects.Container;
+  private titleIdles: CritterIdleHandle[] = [];
 
   constructor() {
     super('Menu');
@@ -56,23 +58,21 @@ export class MenuScene extends Phaser.Scene {
     buildTitleBackdrop(this);
     addTitleLogo(this, 88);
 
-    this.add.text(GAME_WIDTH / 2, 138, 'Catch · Battle · Explore', {
-      fontFamily: FONT, fontSize: '12px', color: '#8899aa',
-    }).setOrigin(0.5);
+    this.add.text(GAME_WIDTH / 2, 138, 'Catch · Battle · Explore', hintStyle('12px')).setOrigin(0.5);
 
     if (saveStatus === 'corrupt') {
       this.add.text(GAME_WIDTH / 2, 200, 'Save file is corrupted.\nDelete it to start fresh.', {
-        fontFamily: FONT, fontSize: '12px', color: '#e94560',
+        ...bodyStyle('12px', '#e94560'),
         align: 'center',
       }).setOrigin(0.5);
     } else if (this.canContinue) {
       this.showSaveSummary();
     } else {
+      this.titleIdles.forEach(h => h.stop());
+      this.titleIdles = [];
       ['emberpup', 'aqualet', 'leafkit'].forEach((id, i) => {
         const spr = addCreatureImage(this, GAME_WIDTH / 2 - 100 + i * 100, 200, id, true).setScale(2);
-        this.tweens.add({
-          targets: spr, y: 195, duration: 900 + i * 100, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
-        });
+        this.titleIdles.push(startCritterIdle(this, spr, id, 200));
       });
     }
 
@@ -81,9 +81,7 @@ export class MenuScene extends Phaser.Scene {
     this.labels.forEach((label, i) => {
       const y = menuStartY + i * 48;
       const btn = this.add.image(GAME_WIDTH / 2, y, 'btn_normal').setOrigin(0.5).setInteractive({ useHandCursor: true });
-      const text = this.add.text(GAME_WIDTH / 2, y, label, {
-        fontFamily: FONT, fontSize: '18px', color: '#f0f0f0',
-      }).setOrigin(0.5);
+      const text = this.add.text(GAME_WIDTH / 2, y, label, bodyStyle('18px', '#f0f0f0')).setOrigin(0.5);
       btn.on('pointerover', () => {
         if (!this.confirmingDelete) {
           this.selected = i;
@@ -98,9 +96,7 @@ export class MenuScene extends Phaser.Scene {
 
     addBlinkingPrompt(this, '↑↓ select  ·  A / Z confirm', GAME_HEIGHT - 36);
 
-    this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 14, 'Keyboard · Controller supported', {
-      fontFamily: FONT, fontSize: '10px', color: '#556677',
-    }).setOrigin(0.5);
+    this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 14, 'Keyboard · Controller supported', hintStyle('10px')).setOrigin(0.5);
 
     this.refreshMenu();
   }
@@ -119,9 +115,7 @@ export class MenuScene extends Phaser.Scene {
 
     this.add.sprite(520, 210, playerTextureKey(this,p.characterId, 'down', 0)).setScale(3);
     const preset = getTrainer(p.characterId);
-    this.add.text(520, 248, preset.label, {
-      fontFamily: FONT, fontSize: '10px', color: '#8899aa',
-    }).setOrigin(0.5);
+    this.add.text(520, 248, preset.label, hintStyle('10px')).setOrigin(0.5);
   }
 
   update(): void {
@@ -187,24 +181,16 @@ export class MenuScene extends Phaser.Scene {
     const overlay = this.add.container(0, 0).setDepth(100);
     overlay.add(this.add.graphics().fillStyle(0x000000, 0.7).fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT));
 
-    const panel = this.add.graphics();
-    panel.fillStyle(COLORS.panel, 0.98);
-    panel.fillRoundedRect(GAME_WIDTH / 2 - 160, 180, 320, 120, 10);
-    panel.lineStyle(2, COLORS.accent, 1);
-    panel.strokeRoundedRect(GAME_WIDTH / 2 - 160, 180, 320, 120, 10);
+    const panel = buildMenuPanel(this, GAME_WIDTH / 2 - 160, 180, 320, 120, 101);
+    panel.setScale(0.85);
     overlay.add(panel);
+    this.tweens.add({ targets: panel, scale: 1, duration: 200, ease: 'Back.easeOut' });
 
-    overlay.add(this.add.text(GAME_WIDTH / 2, 210, 'Delete save file?', {
-      fontFamily: FONT, fontSize: '16px', color: '#f5c542',
-    }).setOrigin(0.5));
+    overlay.add(this.add.text(GAME_WIDTH / 2, 210, 'Delete save file?', titleStyle('16px')).setOrigin(0.5));
 
-    overlay.add(this.add.text(GAME_WIDTH / 2 - 60, 250, 'Yes', {
-      fontFamily: FONT, fontSize: '14px', color: '#8899aa',
-    }).setOrigin(0.5).setName('delYes'));
+    overlay.add(this.add.text(GAME_WIDTH / 2 - 60, 250, 'Yes', bodyStyle('14px', '#8899aa')).setOrigin(0.5).setName('delYes'));
 
-    overlay.add(this.add.text(GAME_WIDTH / 2 + 60, 250, 'No', {
-      fontFamily: FONT, fontSize: '14px', color: '#8899aa',
-    }).setOrigin(0.5).setName('delNo'));
+    overlay.add(this.add.text(GAME_WIDTH / 2 + 60, 250, 'No', bodyStyle('14px', '#8899aa')).setOrigin(0.5).setName('delNo'));
 
     this.deleteOverlay = overlay;
     this.refreshDeleteDialog();

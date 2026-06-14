@@ -7,12 +7,12 @@ import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import {
   writePng, setPx, fillRect, fillCircle, fillEllipse, outlineShape,
-  shade, rgbFromHex, hashSeed,
+  shade, rgbFromHex, hashSeed, readPng, getPx,
 } from './png-utils.mjs';
 import { drawStarterOverride } from './critter-art/starters.mjs';
 import { drawBatch5Override } from './critter-art/batch5.mjs';
 import { drawBatch6Override } from './critter-art/batch6.mjs';
-import { drawBatch7Override } from './critter-art/batch7.mjs';
+import { drawBatch8Override } from './critter-art/batch8.mjs';
 import { drawShapeArt } from './critter-art/shapelib.mjs';
 import { generatePlayerPngs } from './critter-art/players.mjs';
 
@@ -71,10 +71,10 @@ function drawTypeDetail(rgba, w, h, type, cx, cy, s, frame) {
 
 function drawCreature(rgba, w, h, { id, color, shape, types }, opts = {}) {
   const { frame = 0, back = false } = opts;
-  if (id && drawBatch7Override(rgba, w, id, { frame, back })) return;
-  if (id && drawBatch6Override(rgba, w, id, { frame, back })) return;
-  if (id && drawBatch5Override(rgba, w, id, { frame, back })) return;
   if (id && drawStarterOverride(rgba, w, id, { frame, back })) return;
+  if (id && drawBatch5Override(rgba, w, id, { frame, back })) return;
+  if (id && drawBatch6Override(rgba, w, id, { frame, back })) return;
+  if (id && drawBatch8Override(rgba, w, id, { frame, back })) return;
   if (drawShapeArt(rgba, w, { id, color, shape, types }, { frame, back })) return;
   const rgb = rgbFromHex(color);
   const dark = shade(rgb, -45);
@@ -238,3 +238,24 @@ if (existsSync(kenneyDir) && readdirSync(kenneyDir).some(f => f.endsWith('.png')
 }
 
 console.log('Asset pipeline complete.');
+
+function scaleNearest(src, sw, sh, dw, dh) {
+  const out = Buffer.alloc(dw * dh * 4, 0);
+  for (let y = 0; y < dh; y++) {
+    for (let x = 0; x < dw; x++) {
+      const sx = Math.floor(x * sw / dw);
+      const sy = Math.floor(y * sh / dh);
+      const px = getPx(src, sw, sx, sy);
+      if (px) setPx(out, dw, x, y, px);
+    }
+  }
+  return out;
+}
+
+const emberPath = join(critterDir, 'emberpup_sm.png');
+if (existsSync(emberPath)) {
+  const { w, h, rgba } = readPng(emberPath);
+  writePng(join(root, 'public/pwa-192.png'), 192, 192, scaleNearest(rgba, w, h, 192, 192));
+  writePng(join(root, 'public/favicon.png'), 32, 32, rgba);
+  console.log('Wrote public/pwa-192.png + public/favicon.png from emberpup');
+}

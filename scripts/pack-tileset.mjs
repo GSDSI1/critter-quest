@@ -18,9 +18,9 @@ const COUNT = BASE_COUNT + GRASS_PATH_AUTOTILE_COUNT + WATER_SHORE_AUTOTILE_COUN
 const H = W * COUNT;
 
 const C = {
-  grass: [45, 106, 39],
-  grassDark: [34, 84, 30],
-  path: [180, 155, 110],
+  grass: [99, 199, 77],
+  grassDark: [76, 153, 58],
+  path: [228, 166, 114],
   water: [37, 99, 235],
   tree: [20, 83, 45],
   wall: [100, 116, 139],
@@ -201,6 +201,9 @@ function drawGrassPathAutotile(mask) {
   };
   if (mask & 1) blend(2, edge - 1, [...shade(C.grass, 15), 200]);
   if (mask & 4) blend(2, W - edge, [...shade(C.grass, 15), 200]);
+  // Soft path→grass fringe (Kenney blend)
+  if (mask & 1) for (let x = 0; x < W; x++) blend(x, edge, [...shade(C.path, -10), 120]);
+  if (mask & 4) for (let x = 0; x < W; x++) blend(x, W - edge - 1, [...shade(C.path, -10), 120]);
   for (let i = 0; i < 4; i++) {
     const bx = (i * 3 + mask) % 12 + 2;
     const by = (i * 2 + mask) % 10 + 3;
@@ -236,6 +239,9 @@ function drawWaterShoreAutotile(mask) {
   if ((mask & 6) === 6) fillRect(rgba, W, W, W - edge, W - edge, edge, edge, waterEdge);
   if ((mask & 9) === 9) fillRect(rgba, W, W, 0, 0, edge, edge, waterEdge);
   if ((mask & 12) === 12) fillRect(rgba, W, W, 0, W - edge, edge, edge, waterEdge);
+  // Shore foam fringe
+  if (mask & 1) for (let x = 0; x < W; x++) setPx(rgba, W, x, edge, [...shade(C.grass, 20), 180]);
+  if (mask & 4) for (let x = 0; x < W; x++) setPx(rgba, W, x, W - edge - 1, [...shade(C.grass, 20), 180]);
   for (let i = 0; i < 3; i++) {
     setPx(rgba, W, (i * 4 + mask) % 12 + 2, (i * 3 + 2) % 10 + 4, [...shade(C.grassDark, 10), 255]);
   }

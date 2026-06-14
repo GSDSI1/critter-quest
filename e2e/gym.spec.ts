@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { gotoFresh, startNewGameToOverworld, waitForScene, playerState } from './helpers';
+import { gotoFresh, startNewGameToOverworld, waitForScene, waitForBattleReady, playerState } from './helpers';
 
 const GYMS = [
   { npcId: 'gym_leader', mapId: 'gym1', badge: 'verdant' },
@@ -16,6 +16,7 @@ for (const gym of GYMS) {
       window.__cq?.startTrainerBattle(npcId, mapId);
     }, gym);
     await waitForScene(page, 'Battle', 15_000);
+    await waitForBattleReady(page);
     await page.evaluate(() => window.__cq?.resolveBattle('win'));
     await waitForScene(page, 'Overworld', 15_000);
     const p = await playerState(page);

@@ -2,7 +2,7 @@
 
 Audit date: 2026-06-11 · Repo: github.com/GSDSI1/critter-quest · Phaser 3.88 + TS strict + Vite 6
 
-**Current snapshot:** 100 species · 25 maps · 4 gyms + Victory Road · 3 minigames (fishing, bug catch, contest) · 60+ unit tests · 15 e2e specs · ~100 verify checks. See `docs/BUILD_QUEUE.md` for live counts.
+**Current snapshot:** 100 species · 29 maps · shapelib 9 body plans · Kenney tiles · 115+ unit tests · 18 e2e specs · ~200 verify checks. See `docs/BUILD_QUEUE.md` for live counts.
 
 ---
 
@@ -20,8 +20,8 @@ Audit date: 2026-06-11 · Repo: github.com/GSDSI1/critter-quest · Phaser 3.88 +
 
 | # | Problem | Evidence | Impact |
 |---|---------|----------|--------|
-| 1 | Most art still procedural | Species 71–87 lack hand pixel art; Kenney tileset not integrated | Game looks like a prototype |
-| 2 | God files >300 LOC | `NpcManager.ts` ~655, `sprites.ts` ~923, `BattleScene` ~400+ | Hard to iterate in Cursor |
+| 1 | Bespoke art for mid/late routes | Shapelib + starters/batch5–6 cover all | More hand grids optional |
+| 2 | NpcManager LOC | ~324 lines | Extract dialog table to data file |
 | 3 | `Math.random` in battle systems | battle.ts, encounters.ts, etc. — rules say injectable `Rng` | Some battle paths untestable |
 | 4 | Audio mostly procedural | WebAudio beeps; BGM stubs optional | Feels unfinished |
 | 5 | Minigame discoverability | Region map `???` until visited; no quest pointers | Players miss pier/grove/contest |

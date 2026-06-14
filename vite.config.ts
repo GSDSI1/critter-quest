@@ -18,7 +18,10 @@ export default defineConfig({
         theme_color: '#0f0f1a',
         background_color: '#0f0f1a',
         display: 'standalone',
-        icons: [{ src: 'pwa-192.png', sizes: '192x192', type: 'image/png' }],
+        icons: [
+          { src: 'assets/critters/emberpup_sm.png', sizes: '32x32', type: 'image/png' },
+          { src: 'pwa-192.png', sizes: '192x192', type: 'image/png' },
+        ],
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,webmanifest,png,wav}'],

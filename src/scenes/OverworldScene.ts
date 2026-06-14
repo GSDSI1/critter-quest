@@ -20,6 +20,7 @@ import { buildSkyLayer } from './overworld/SkyLayer';
 import { buildCityAtmosphere, buildPierSeagulls } from './overworld/CityAtmosphere';
 import { buildCaveSparkles } from './overworld/CaveSparkles';
 import { buildForestFireflies } from './overworld/ForestFireflies';
+import { buildWeatherLayer, type WeatherLayerHandle } from './overworld/WeatherLayer';
 import { buildHealInterior } from '../ui/sceneBackdrops';
 import { fadeInOnStart, wipeInOnStart } from '../ui/transitions';
 import { shouldShowOverworldTouchPad } from '../ui/touchMenuNav';
@@ -43,6 +44,7 @@ export class OverworldScene extends Phaser.Scene {
   private touchPad?: OverworldTouchPad;
   private nightOverlay?: Phaser.GameObjects.Graphics;
   private forestFireflies?: { update: (playTime: number) => void };
+  private weatherLayer?: WeatherLayerHandle | null;
   private hasMoved = false;
   private introActive = false;
   private walk!: WalkController;
@@ -80,6 +82,10 @@ export class OverworldScene extends Phaser.Scene {
       buildPierSeagulls(this);
     }
     if (this.map.id === 'heal_center') buildHealInterior(this);
+    if (this.map.weather) {
+      this.weatherLayer = buildWeatherLayer(this, this.map.weather, 845, 0);
+    }
+    this.events.once('shutdown', () => this.weatherLayer?.destroy());
 
     this.mapRenderer = new MapRenderer(this);
     this.npcManager = new NpcManager(this, () => this.map, this.dialog, {
