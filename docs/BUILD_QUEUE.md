@@ -1,6 +1,6 @@
 # Critter Quest — Build Queue
 
-Last updated: 2026-06-14 (P26–P29 shipped). **Source of truth for forward work.**
+Last updated: 2026-06-14 (P30–P31 art). **Source of truth for forward work.**
 
 ## Snapshot
 
@@ -11,7 +11,7 @@ Last updated: 2026-06-14 (P26–P29 shipped). **Source of truth for forward work
 | Unit tests | 126 (20 files) |
 | E2E specs | 18 files (39 tests) |
 | Dex milestones | 20 / 40 / 60 / 80 / 90 / **100** |
-| Bespoke hand art | **42** (starters 9 + batch5 3 + batch6 10 + batch8 10 + batch9 10) |
+| Bespoke hand art | **52** (starters 9 + batch5 3 + batch6 10 + batch8 10 + batch9 10 + batch10 10) |
 | Largest scene file | npcInteractRouter ~175 LOC |
 | Verify | ~200 checks, green |
 
@@ -51,6 +51,7 @@ Last updated: 2026-06-14 (P26–P29 shipped). **Source of truth for forward work
 | **P28** | batch8 early-route hand art (10 species), starter/volt blink pass, visual-smoke wild-battle e2e |
 | **P29** | `npcInteractRouter.ts` extract (gate/elite/trainer/services), IntroScene idle, faint/evolution SFX, `battleReady` e2e bridge |
 | **P30** | batch9 mid-route hand art (10 species: route2/route3), full e2e 39/39 green |
+| **P31** | batch10 late-game hand art (10 species: cave/volcanic/glacier/psychic routes) |
 
 ---
 
