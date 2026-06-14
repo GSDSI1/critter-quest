@@ -7,8 +7,8 @@ export const town: GameMap = {
   warps: [
     { x: 12, y: 0, toMap: 'route1', toX: 12, toY: 20 },
     { x: 8, y: 6, toMap: 'heal_center', toX: 4, toY: 7 },
-    { x: 12, y: 6, toMap: 'mart', toX: 4, toY: 7 },
-    { x: 16, y: 6, toMap: 'lab', toX: 4, toY: 7 },
+    { x: 10, y: 6, toMap: 'mart', toX: 4, toY: 7 },
+    { x: 14, y: 6, toMap: 'lab', toX: 4, toY: 7 },
   ],
   npcs: [
     { id: 'mom', x: 10, y: 10, name: 'Mom', role: 'generic', lines: ['Be careful out there!', 'Visit the Mart for supplies, and the Healing Center to rest.'] },

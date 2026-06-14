@@ -7,7 +7,7 @@ export const forest: GameMap = {
   warps: [
     { x: 12, y: 21, toMap: 'route1', toX: 12, toY: 1 },
     { x: 23, y: 10, toMap: 'route2', toX: 1, toY: 10 },
-    { x: 18, y: 8, toMap: 'secret_grove', toX: 10, toY: 14, requiresAllBadges: ['verdant', 'ember'] },
+    { x: 20, y: 8, toMap: 'secret_grove', toX: 10, toY: 14, requiresAllBadges: ['verdant', 'ember'] },
   ],
   npcs: [
     { id: 'ranger', x: 16, y: 8, name: 'Ranger Mia', role: 'trainer_f', lines: ['Rare critters lurk here!', 'Head east to Mossgrove City when you\'re ready.'],

@@ -5,7 +5,7 @@ export const secret_grove: GameMap = {
   id: 'secret_grove', name: 'Secret Grove', width: 20, height: 16,
   spawn: { x: 10, y: 14 }, encounterRate: 0.28, encounterTable: 'secret_grove',
   warps: [
-    { x: 10, y: 15, toMap: 'forest', toX: 18, toY: 8 },
+    { x: 10, y: 15, toMap: 'forest', toX: 20, toY: 8 },
   ],
   npcs: [
     { id: 'grove_sage', x: 10, y: 6, name: 'Grove Sage', role: 'generic', lines: [

@@ -20,4 +20,17 @@ describe('interior door warps', () => {
       expect(isWalkable(tile)).toBe(true);
     }
   });
+
+  it('town mart and lab warps align with WHMHWR row', () => {
+    const town = getMap('town');
+    expect(town.warps.find(w => w.toMap === 'mart')?.x).toBe(10);
+    expect(town.warps.find(w => w.toMap === 'lab')?.x).toBe(14);
+  });
+
+  it('forest secret grove warp sits on east path tile', () => {
+    const forest = getMap('forest');
+    const warp = forest.warps.find(w => w.toMap === 'secret_grove');
+    expect(warp).toEqual(expect.objectContaining({ x: 20, y: 8 }));
+    expect(getTile(forest, warp!.x, warp!.y)).toBe(1);
+  });
 });

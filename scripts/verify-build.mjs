@@ -373,7 +373,7 @@ const transitions = read('src/ui/transitions.ts');
 if (transitions.includes('wipeToScene') && transitions.includes('wipeRestartScene')) ok('Wipe scene transitions');
 else fail('transitions.ts missing wipe helpers');
 
-if (overworld.includes('buildHealInterior') && overworld.includes('buildSkyLayer')) ok('Heal interior + sky parallax');
+if (overworld.includes('buildInteriorForMap') && overworld.includes('buildSkyLayer')) ok('Interior + sky parallax');
 else fail('OverworldScene missing atmosphere layers');
 if (existsSync(join(root, 'src/scenes/overworld/CityAtmosphere.ts'))) ok('City atmosphere tints');
 else fail('CityAtmosphere.ts missing');

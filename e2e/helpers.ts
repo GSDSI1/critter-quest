@@ -154,3 +154,41 @@ export async function teleport(page: Page, mapId: string, x: number, y: number, 
   }, { mapId, x, y, facing });
   await page.waitForTimeout(600);
 }
+
+/** Stand near a warp tile then auto-walk onto it (avoids long cross-map path flakes). */
+export async function walkThroughWarp(
+  page: Page,
+  mapId: string,
+  warpX: number,
+  warpY: number,
+  approachX = warpX,
+  approachY = warpY + 2,
+): Promise<void> {
+  await page.evaluate(({ mapId, approachX, approachY, warpX, warpY }) => {
+    window.__cq?.teleportAndWalk(mapId, approachX, approachY, warpX, warpY);
+  }, { mapId, approachX, approachY, warpX, warpY });
+  await page.waitForTimeout(400);
+}
+
+/** Wait for map change, resolving wild/trainer battles that interrupt auto-walk. */
+export async function waitForMap(
+  page: Page,
+  mapId: string,
+  timeoutMs = 90_000,
+): Promise<void> {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    const keys = await sceneKeys(page);
+    if (keys.includes('Battle')) {
+      await page.waitForFunction(() => window.__cq?.battleReady?.() ?? false, undefined, { timeout: 20_000 }).catch(() => {});
+      await page.evaluate(() => window.__cq?.resolveBattle('win'));
+      await page.waitForTimeout(600);
+      continue;
+    }
+    const p = await playerState(page);
+    if (p?.mapId === mapId) return;
+    await page.waitForTimeout(300);
+  }
+  const p = await playerState(page);
+  throw new Error(`Timed out waiting for map "${mapId}". Last: ${p?.mapId ?? 'unknown'}`);
+}

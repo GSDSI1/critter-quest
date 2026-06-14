@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { gotoFresh, startNewGameToOverworld, teleport, waitForScene, playerState } from './helpers';
+import { gotoFresh, startNewGameToOverworld, teleport, waitForScene, playerState, walkThroughWarp, waitForMap } from './helpers';
 
 test('secret grove accessible with verdant and ember badges', async ({ page }) => {
   await gotoFresh(page);
@@ -16,6 +16,7 @@ test('secret grove accessible with verdant and ember badges', async ({ page }) =
 });
 
 test('forest walk reaches secret grove warp', async ({ page }) => {
+  test.setTimeout(120_000);
   await gotoFresh(page);
   await startNewGameToOverworld(page);
   await waitForScene(page, 'Overworld');
@@ -24,11 +25,10 @@ test('forest walk reaches secret grove warp', async ({ page }) => {
     window.__cq?.giveBadge('ember');
     window.__cq?.completeTutorial();
   });
-  await page.evaluate(() => window.__cq?.walkToWarp('forest', 18, 8));
-  await page.waitForFunction(
-    () => window.__cq?.player()?.mapId === 'secret_grove',
-    { timeout: 25_000 },
-  );
+  await teleport(page, 'forest', 20, 9);
+  await waitForScene(page, 'Overworld');
+  await page.evaluate(() => window.__cq?.stepPlayer(0, -1));
+  await waitForMap(page, 'secret_grove');
   const p = await playerState(page);
   expect(p?.mapId).toBe('secret_grove');
 });

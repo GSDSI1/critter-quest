@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
-import { GAME_WIDTH, GAME_HEIGHT } from './data/types';
-import { getMap } from './data/maps';
+import { GAME_WIDTH, GAME_HEIGHT, TILE_SIZE } from './data/types';
+import { getMap, MAPS } from './data/maps';
 import { resolveTrainerParty } from './data/maps/helpers';
 import { getItem, addItem, removeItem } from './data/items';
 import { DEX_ORDER } from './data/creatures';
@@ -17,17 +17,19 @@ import { battleMenuItems } from './scenes/battle/BattleUi';
 import { getBattleWeather } from './systems/weather';
 import type { OverworldScene } from './scenes/OverworldScene';
 import { applyChestReward } from './scenes/overworld/ChestRewards';
-import { hasCreatureGraphic } from './utils/assetLoader';
+import { hasCreatureGraphic, setAssetMeta } from './utils/assetLoader';
 import type { FishingScene } from './scenes/FishingScene';
 import type { BugCatchScene } from './scenes/BugCatchScene';
 import type { CritterContestScene } from './scenes/CritterContestScene';
+import { isSmallInterior } from './utils/camera';
+import { isOutdoorMap } from './systems/dayNight';
 
 const config = {
   type: Phaser.AUTO,
   width: GAME_WIDTH,
   height: GAME_HEIGHT,
   parent: 'game-container',
-  backgroundColor: '#0f0f1a',
+  backgroundColor: '#86efac',
   pixelArt: true,
   input: {
     gamepad: true,
@@ -104,6 +106,21 @@ declare global {
       claimPendingDexMilestone: () => number;
       walkToWarp: (mapId: string, warpX: number, warpY: number) => void;
       teleportAndWalk: (mapId: string, x: number, y: number, destX: number, destY: number) => void;
+      mapIds: () => string[];
+      overworldMetrics: () => {
+        mapId: string;
+        outdoor: boolean;
+        scrollX: number;
+        scrollY: number;
+        zoom: number;
+        mapW: number;
+        mapH: number;
+        vw: number;
+        vh: number;
+        cameraClamped: boolean;
+      } | null;
+      speciesGraphicsMissing: () => string[];
+      stepPlayer: (dx: number, dy: number) => boolean;
     };
   }
 }
@@ -130,8 +147,7 @@ if (import.meta.env.DEV) {
       GameState.player.x = x;
       GameState.player.y = y;
       GameState.player.facing = facing;
-      const ow = game.scene.getScene('Overworld');
-      if (ow?.scene.isActive()) ow.scene.restart({});
+      game.scene.start('Overworld');
     },
     startNewGame() {
       GameState.reset();
@@ -363,6 +379,55 @@ if (import.meta.env.DEV) {
       GameState.player.y = y;
       GameState.player.facing = 'up';
       game.scene.start('Overworld', { walkTarget: { x: destX, y: destY } });
+    },
+    mapIds() {
+      return Object.keys(MAPS);
+    },
+    overworldMetrics() {
+      const ow = game.scene.getScene('Overworld');
+      if (!ow?.scene.isActive()) return null;
+      const cam = ow.cameras.main;
+      const map = getMap(GameState.player.mapId);
+      const zoom = cam.zoom;
+      const vw = GAME_WIDTH / zoom;
+      const vh = GAME_HEIGHT / zoom;
+      const mapW = map.width * TILE_SIZE;
+      const mapH = map.height * TILE_SIZE;
+      let cameraClamped = true;
+      if (!isSmallInterior(map)) {
+        const minX = Math.min(0, mapW - vw);
+        const maxX = Math.max(0, mapW - vw);
+        const minY = Math.min(0, mapH - vh);
+        const maxY = Math.max(0, mapH - vh);
+        cameraClamped =
+          cam.scrollX >= minX - 0.5 && cam.scrollX <= maxX + 0.5
+          && cam.scrollY >= minY - 0.5 && cam.scrollY <= maxY + 0.5;
+      }
+      return {
+        mapId: map.id,
+        outdoor: isOutdoorMap(map.id),
+        scrollX: cam.scrollX,
+        scrollY: cam.scrollY,
+        zoom,
+        mapW,
+        mapH,
+        vw,
+        vh,
+        cameraClamped,
+      };
+    },
+    speciesGraphicsMissing() {
+      if (game.textures.exists('critters_atlas')) {
+        setAssetMeta({ placeholder: false, version: 3, atlas: true });
+        return DEX_ORDER.filter(id => game.textures.getFrame('critters_atlas', id) == null);
+      }
+      const scene = game.scene.getScene('Overworld') ?? game.scene.getScene('Menu') ?? game.scene.getScene('Boot');
+      if (!scene) return [...DEX_ORDER];
+      return DEX_ORDER.filter(id => !hasCreatureGraphic(scene, id));
+    },
+    stepPlayer(dx, dy) {
+      const ow = game.scene.getScene('Overworld') as OverworldScene | undefined;
+      return ow?.scene.isActive() ? ow.forceStep(dx, dy) : false;
     },
   };
 }

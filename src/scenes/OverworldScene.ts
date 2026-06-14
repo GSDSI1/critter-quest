@@ -10,7 +10,7 @@ import { OverworldHUD } from '../ui/HUD';
 import { showMapBannerForCurrentMap } from '../ui/mapBanner';
 import { OverworldTouchPad } from '../ui/touchButtons';
 import { pinToScreen } from '../ui/screenUi';
-import { applyOverworldCamera } from '../utils/camera';
+import { applyOverworldCamera, clampOverworldCamera, isSmallInterior } from '../utils/camera';
 import { resumeAudio } from '../utils/audio';
 import { setMusicThemeForMap } from '../utils/music';
 import { isOutdoorMap, nightTintAlpha, tileNightTint } from '../systems/dayNight';
@@ -21,7 +21,7 @@ import { buildCityAtmosphere, buildPierSeagulls } from './overworld/CityAtmosphe
 import { buildCaveSparkles } from './overworld/CaveSparkles';
 import { buildForestFireflies } from './overworld/ForestFireflies';
 import { buildWeatherLayer, type WeatherLayerHandle } from './overworld/WeatherLayer';
-import { buildHealInterior } from '../ui/sceneBackdrops';
+import { buildInteriorForMap } from '../ui/sceneBackdrops';
 import { fadeInOnStart, wipeInOnStart } from '../ui/transitions';
 import { shouldShowOverworldTouchPad } from '../ui/touchMenuNav';
 import { WalkController } from './overworld/WalkController';
@@ -81,7 +81,7 @@ export class OverworldScene extends Phaser.Scene {
     if (this.map.id === 'route3' || this.map.id === 'fishing_pier') {
       buildPierSeagulls(this);
     }
-    if (this.map.id === 'heal_center') buildHealInterior(this);
+    if (!isOutdoorMap(this.map.id)) buildInteriorForMap(this, this.map.id, this.map.mapTheme);
     if (this.map.weather) {
       this.weatherLayer = buildWeatherLayer(this, this.map.weather, 845, 0);
     }
@@ -154,6 +154,9 @@ export class OverworldScene extends Phaser.Scene {
 
     this.cameras.main.setBounds(0, 0, this.map.width * TILE_SIZE, this.map.height * TILE_SIZE);
     applyOverworldCamera(this.cameras.main, this.map, this.player);
+    this.cameras.main.on('followupdate', () => {
+      if (!isSmallInterior(this.map)) clampOverworldCamera(this.cameras.main, this.map);
+    });
 
     if (!data.showIntro && !data.blackout) {
       this.time.delayedCall(400, () => showMapBannerForCurrentMap(this));
@@ -200,6 +203,11 @@ export class OverworldScene extends Phaser.Scene {
     g.fillRect(0, 0, 28, GAME_HEIGHT);
     g.fillRect(GAME_WIDTH - 28, 0, 28, GAME_HEIGHT);
     pinToScreen(g, 850);
+  }
+
+  /** Dev/test bridge: force one tile step (same as keyboard, bypasses input lock). */
+  forceStep(dx: number, dy: number): boolean {
+    return this.onPlayerMove(dx, dy);
   }
 
   private onPlayerMove(dx: number, dy: number): boolean {
@@ -255,6 +263,7 @@ export class OverworldScene extends Phaser.Scene {
     const skipMovement = this.inputHandler.update(this.inputCtx(), delta);
     this.mapRenderer.update(delta);
     this.updateDayNightTint();
+    if (!isSmallInterior(this.map)) clampOverworldCamera(this.cameras.main, this.map);
     if (skipMovement) return;
   }
 

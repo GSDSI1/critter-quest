@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import { COLORS, GAME_WIDTH, GAME_HEIGHT } from '../data/types';
 import { battleBgForMap } from '../utils/assetLoader';
+import type { MapTheme } from '../data/maps/types';
+import { pinContainerChildren } from './screenUi';
 
 /** Shared rounded panel chrome for menus. */
 export function buildMenuPanel(
@@ -161,6 +163,93 @@ export function buildHealInterior(scene: Phaser.Scene, depth = -5): Phaser.GameO
   c.add(counter);
 
   return c;
+}
+
+const GYM_TINT: Record<string, { wall: number; mat: number; accent: number }> = {
+  gym1: { wall: 0x14532d, mat: 0x86efac, accent: 0x22c55e },
+  gym2: { wall: 0x7f1d1d, mat: 0xfdba74, accent: 0xef4444 },
+  gym3: { wall: 0x1e3a5f, mat: 0xbae6fd, accent: 0x38bdf8 },
+  gym4: { wall: 0x4c1d95, mat: 0xc4b5fd, accent: 0xa855f7 },
+};
+
+/** Gym arena backdrop — fills viewport behind small tilemaps. */
+export function buildGymInterior(scene: Phaser.Scene, mapId = 'gym1', depth = -5): Phaser.GameObjects.Container {
+  const tint = GYM_TINT[mapId] ?? GYM_TINT.gym1;
+  const c = scene.add.container(0, 0).setDepth(depth);
+
+  const wall = scene.add.graphics();
+  wall.fillGradientStyle(tint.wall, tint.wall, tint.accent, tint.accent, 0.95);
+  wall.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+  c.add(wall);
+
+  const floor = scene.add.graphics();
+  floor.fillStyle(tint.mat, 1);
+  floor.fillRect(0, 300, GAME_WIDTH, GAME_HEIGHT - 300);
+  for (let x = 0; x < GAME_WIDTH; x += 48) {
+    floor.fillStyle(x % 96 === 0 ? tint.accent : tint.mat, 0.35);
+    floor.fillRect(x, 300, 48, GAME_HEIGHT - 300);
+  }
+  floor.lineStyle(3, 0xffffff, 0.25);
+  floor.strokeRect(40, 320, GAME_WIDTH - 80, GAME_HEIGHT - 340);
+  c.add(floor);
+
+  const banners = scene.add.graphics();
+  banners.fillStyle(tint.accent, 0.85);
+  banners.fillTriangle(GAME_WIDTH / 2 - 40, 40, GAME_WIDTH / 2 + 40, 40, GAME_WIDTH / 2, 100);
+  banners.lineStyle(2, 0xffffff, 0.5);
+  banners.strokeTriangle(GAME_WIDTH / 2 - 40, 40, GAME_WIDTH / 2 + 40, 40, GAME_WIDTH / 2, 100);
+  c.add(banners);
+
+  return c;
+}
+
+/** Crystal cave interior — dark stone walls + glowing crystals. */
+export function buildCaveInterior(scene: Phaser.Scene, depth = -5): Phaser.GameObjects.Container {
+  const c = scene.add.container(0, 0).setDepth(depth);
+
+  const wall = scene.add.graphics();
+  wall.fillGradientStyle(0x1c1917, 0x1c1917, 0x292524, 0x44403c, 1);
+  wall.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+  c.add(wall);
+
+  const floor = scene.add.graphics();
+  floor.fillStyle(0x44403c, 1);
+  floor.fillRect(0, 320, GAME_WIDTH, GAME_HEIGHT - 320);
+  for (let x = 0; x < GAME_WIDTH; x += 32) {
+    floor.fillStyle(x % 64 === 0 ? 0x57534e : 0x44403c, 0.8);
+    floor.fillRect(x, 320, 32, GAME_HEIGHT - 320);
+  }
+  c.add(floor);
+
+  const crystals = scene.add.graphics();
+  const specs = [
+    { x: 80, y: 120, c: 0xc084fc },
+    { x: GAME_WIDTH - 100, y: 90, c: 0xa78bfa },
+    { x: GAME_WIDTH / 2 - 30, y: 180, c: 0xe9d5ff },
+    { x: 140, y: 260, c: 0x818cf8 },
+    { x: GAME_WIDTH - 160, y: 240, c: 0xc084fc },
+  ];
+  for (const s of specs) {
+    crystals.fillStyle(s.c, 0.85);
+    crystals.fillTriangle(s.x, s.y + 40, s.x + 24, s.y, s.x + 48, s.y + 40);
+    crystals.fillStyle(0xffffff, 0.25);
+    crystals.fillTriangle(s.x + 8, s.y + 28, s.x + 18, s.y + 8, s.x + 28, s.y + 28);
+  }
+  c.add(crystals);
+
+  return c;
+}
+
+/** Pin a full-screen interior behind overworld tilemaps (lab, mart, heal, gym, cave). */
+export function buildInteriorForMap(scene: Phaser.Scene, mapId: string, mapTheme?: MapTheme): void {
+  let container: Phaser.GameObjects.Container | undefined;
+  if (mapTheme === 'heal' || mapId === 'heal_center') container = buildHealInterior(scene);
+  else if (mapTheme === 'lab' || mapId === 'lab') container = buildLabInterior(scene);
+  else if (mapTheme === 'mart' || mapId === 'mart' || mapId === 'contest_hall' || mapId === 'fishing_pier') {
+    container = buildMartInterior(scene);
+  } else if (mapId.startsWith('gym')) container = buildGymInterior(scene, mapId);
+  else if (mapId === 'crystal_cave') container = buildCaveInterior(scene);
+  if (container) pinContainerChildren(container, -5);
 }
 
 /** Battle arena background with layered parallax for a map. */
